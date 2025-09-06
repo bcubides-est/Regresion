@@ -114,7 +114,7 @@
     "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#test-chi-cuadrado-chi2-de-independencia",
     "title": "3  ANOVA_oneway",
     "section": "5.3 Test Chi-Cuadrado (\\(\\chi^2\\)) de Independencia",
-    "text": "5.3 Test Chi-Cuadrado (\\(\\chi^2\\)) de Independencia\nEste test evalúa formalmente la hipótesis de independencia entre las dos variables.\n\n\\(H_0\\): Las variables son independientes.\n\\(H_1\\): Las variables no son independientes (están asociadas).\nEstadístico: \\(\\chi^2 = \\sum \\frac{(O_{ij} - E_{ij})^2}{E_{ij}}\\)\n\n\n# Test estándar\nchi &lt;- chisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt))\n\nWarning in chisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt)):\nChi-squared approximation may be incorrect\n\nchi\n\n\n    Pearson's Chi-squared test with Yates' continuity correction\n\ndata:  as.factor(pto9$smoker) and as.factor(pto9$lowbwt)\nX-squared = 1.4358, df = 1, p-value = 0.2308\n\n# Test con simulación de Monte Carlo (recomendado cuando hay frecuencias esperadas bajas)\nchisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt), simulate.p.value = TRUE, B = 2000)\n\n\n    Pearson's Chi-squared test with simulated p-value (based on 2000\n    replicates)\n\ndata:  as.factor(pto9$smoker) and as.factor(pto9$lowbwt)\nX-squared = 2.6886, df = NA, p-value = 0.1899\n\n\nConclusión: Un p-valor &gt; 0.05 sugiere que no hay evidencia suficiente para rechazar la hipótesis nula de independencia.",
+    "text": "5.3 Test Chi-Cuadrado (\\(\\chi^2\\)) de Independencia\nEste test evalúa formalmente la hipótesis de independencia entre las dos variables.\n\n\\(H_0\\): Las variables son independientes.\n\\(H_1\\): Las variables no son independientes (están asociadas).\nEstadístico: \\(\\chi^2 = \\sum \\frac{(O_{ij} - E_{ij})^2}{E_{ij}}\\)\n\n\n# Test estándar\nchi &lt;- chisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt))\n\nWarning in chisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt)):\nChi-squared approximation may be incorrect\n\nchi\n\n\n    Pearson's Chi-squared test with Yates' continuity correction\n\ndata:  as.factor(pto9$smoker) and as.factor(pto9$lowbwt)\nX-squared = 1.4358, df = 1, p-value = 0.2308\n\n# Test con simulación de Monte Carlo (recomendado cuando hay frecuencias esperadas bajas)\nchisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt), simulate.p.value = TRUE, B = 2000)\n\n\n    Pearson's Chi-squared test with simulated p-value (based on 2000\n    replicates)\n\ndata:  as.factor(pto9$smoker) and as.factor(pto9$lowbwt)\nX-squared = 2.6886, df = NA, p-value = 0.1919\n\n\nConclusión: Un p-valor &gt; 0.05 sugiere que no hay evidencia suficiente para rechazar la hipótesis nula de independencia.",
     "crumbs": [
       "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway</span>"
     ]
@@ -612,51 +612,51 @@
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html",
-    "title": "8  2. Heteroscedasticidad",
+    "title": "8  Heteroscedasticidad",
     "section": "",
     "text": "9 Introducción\nEste documento presenta un análisis detallado sobre la heteroscedasticidad, uno de los problemas más comunes en el modelado de regresión que viola el supuesto de varianza constante de los errores. Se simulará un conjunto de datos que presenta heterocedasticidad, se mostrarán las técnicas gráficas y formales para su diagnóstico, y se explorarán cuatro soluciones principales para corregir o mitigar sus efectos: errores estándar robustos, Mínimos Cuadrados Ponderados (WLS), Mínimos Cuadrados Generalizados Factibles (FGLS) y la transformación de la variable de respuesta (Box-Cox).",
     "crumbs": [
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>2. Heteroscedasticidad</span>"
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Heteroscedasticidad</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-1-errores-estándar-robustos",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-1-errores-estándar-robustos",
-    "title": "8  2. Heteroscedasticidad",
+    "title": "8  Heteroscedasticidad",
     "section": "13.1 Alternativa 1: Errores Estándar Robustos",
     "text": "13.1 Alternativa 1: Errores Estándar Robustos\nEsta solución no cambia los coeficientes estimados (\\(\\hat{\\beta}_j\\)), pero corrige sus errores estándar para que la inferencia (p-valores, intervalos de confianza) sea válida a pesar de la heterocedasticidad. Se utiliza la matriz de varianza-covarianza de White (HC).\n\n# Se recalculan las pruebas de hipótesis de los coeficientes con errores robustos\ncoeftest(reg, vcov. = vcovHC, type = \"HC3\")\n\n\nt test of coefficients:\n\n             Estimate Std. Error t value  Pr(&gt;|t|)    \n(Intercept) -0.411847   0.591242 -0.6966    0.4864    \nx1           2.062544   0.048701 42.3515 &lt; 2.2e-16 ***\nx2           0.450623   0.109196  4.1267 4.314e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n# Intervalos de confianza robustos\ncoefci(reg, vcov. = vcovHC, type = \"HC3\")\n\n                2.5 %    97.5 %\n(Intercept) -1.573489 0.7497948\nx1           1.966860 2.1582284\nx2           0.236080 0.6651654\n\n# Comparación con los intervalos de confianza originales (no válidos)\nconfint(reg)\n\n                 2.5 %    97.5 %\n(Intercept) -1.6334920 0.8097976\nx1           1.9720696 2.1530184\nx2           0.2276652 0.6735802\n\n# Comparación de modelos (equivalente a anova) con errores robustos\nreg2 &lt;- lm(y ~ x1, data = dat)\nwaldtest(reg2, reg, vcov = vcovHC)\n\nWald test\n\nModel 1: y ~ x1\nModel 2: y ~ x1 + x2\n  Res.Df Df     F    Pr(&gt;F)    \n1    498                       \n2    497  1 17.03 4.314e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1",
     "crumbs": [
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>2. Heteroscedasticidad</span>"
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Heteroscedasticidad</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-2-mínimos-cuadrados-ponderados-wls",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-2-mínimos-cuadrados-ponderados-wls",
-    "title": "8  2. Heteroscedasticidad",
+    "title": "8  Heteroscedasticidad",
     "section": "13.2 Alternativa 2: Mínimos Cuadrados Ponderados (WLS)",
     "text": "13.2 Alternativa 2: Mínimos Cuadrados Ponderados (WLS)\nSi se conoce la forma de la heterocedasticidad, se puede corregir el modelo ajustando por Mínimos Cuadrados Ponderados (WLS). En este caso, como \\(Var(\\epsilon_i | x_{i1}) \\propto x_{i1}\\), los pesos a utilizar son \\(w_i = 1/x_{i1}\\). WLS produce estimadores eficientes (BLUE).\n\n# Se ajusta el modelo WLS especificando los pesos\nreg_wls &lt;- lm(y ~ x1 + x2, data = dat, weights = 1/x1)\nsummary(reg_wls)\n\n\nCall:\nlm(formula = y ~ x1 + x2, data = dat, weights = 1/x1)\n\nWeighted Residuals:\n    Min      1Q  Median      3Q     Max \n-3.6381 -0.6822  0.0115  0.6439  3.1569 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -0.55468    0.52680  -1.053    0.293    \nx1           2.06977    0.04277  48.391  &lt; 2e-16 ***\nx2           0.47725    0.10813   4.414 1.25e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.059 on 497 degrees of freedom\nMultiple R-squared:  0.8278,    Adjusted R-squared:  0.8271 \nF-statistic:  1194 on 2 and 497 DF,  p-value: &lt; 2.2e-16\n\n# Se comprueba que los residuales ponderados ahora son homocedásticos\nplot(dat$x1, residuals(reg_wls) / sqrt(dat$x1), main = \"Residuales Ponderados vs. x1\")\n\n\n\n\n\n\n\nplot(fitted(reg_wls), residuals(reg_wls) / sqrt(dat$x1), main = \"Residuales Ponderados vs. Ajustados\")",
     "crumbs": [
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>2. Heteroscedasticidad</span>"
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Heteroscedasticidad</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-3-mínimos-cuadrados-generalizados-factibles-fgls",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-3-mínimos-cuadrados-generalizados-factibles-fgls",
-    "title": "8  2. Heteroscedasticidad",
+    "title": "8  Heteroscedasticidad",
     "section": "13.3 Alternativa 3: Mínimos Cuadrados Generalizados Factibles (FGLS)",
     "text": "13.3 Alternativa 3: Mínimos Cuadrados Generalizados Factibles (FGLS)\nCuando la forma de la heterocedasticidad no se conoce, se puede estimar a partir de los residuales del modelo MCO inicial.\n\n# Modelo FGLS simple (no recomendado): usa los residuales^2 como estimación de la varianza\nfgls &lt;- lm(y ~ x1 + x2, data = dat, weights = 1/reg$residuals^2) \nsummary(fgls)\n\n\nCall:\nlm(formula = y ~ x1 + x2, data = dat, weights = 1/reg$residuals^2)\n\nWeighted Residuals:\n    Min      1Q  Median      3Q     Max \n-1.0566 -0.9986  0.8527  1.0012  2.1070 \n\nCoefficients:\n             Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -0.413320   0.034227  -12.08   &lt;2e-16 ***\nx1           2.063895   0.003033  680.51   &lt;2e-16 ***\nx2           0.440630   0.008257   53.37   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 0.9982 on 497 degrees of freedom\nMultiple R-squared:  0.999, Adjusted R-squared:  0.9989 \nF-statistic: 2.366e+05 on 2 and 497 DF,  p-value: &lt; 2.2e-16\n\n# Recomendación de Wooldridge: modelar el logaritmo de los residuales al cuadrado\nmodvar &lt;- lm(log(reg$residuals^2) ~ x1 + x2, data = dat)\n# Los pesos se obtienen como la inversa del exponencial de los valores ajustados de este modelo\nfgls2 &lt;- lm(y ~ x1 + x2, data = dat, weights = 1/exp(modvar$fitted.values))\nsummary(fgls2)\n\n\nCall:\nlm(formula = y ~ x1 + x2, data = dat, weights = 1/exp(modvar$fitted.values))\n\nWeighted Residuals:\n    Min      1Q  Median      3Q     Max \n-7.8342 -1.3529  0.0473  1.3365  5.7495 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -0.70667    0.53457  -1.322    0.187    \nx1           2.07638    0.04523  45.903  &lt; 2e-16 ***\nx2           0.51789    0.10963   4.724 3.02e-06 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 2.089 on 497 degrees of freedom\nMultiple R-squared:  0.8123,    Adjusted R-squared:  0.8115 \nF-statistic:  1075 on 2 and 497 DF,  p-value: &lt; 2.2e-16\n\n# Se comprueba la homocedasticidad de los nuevos residuales ponderados\nplot(dat$x1, studres(fgls2), main=\"Residuales Estudentizados del Modelo FGLS (Wooldridge)\")",
     "crumbs": [
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>2. Heteroscedasticidad</span>"
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Heteroscedasticidad</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-4-transformar-la-variable-respuesta-box-cox",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-4-transformar-la-variable-respuesta-box-cox",
-    "title": "8  2. Heteroscedasticidad",
+    "title": "8  Heteroscedasticidad",
     "section": "13.4 Alternativa 4: Transformar la Variable Respuesta (Box-Cox)",
     "text": "13.4 Alternativa 4: Transformar la Variable Respuesta (Box-Cox)\nOtra estrategia es transformar la variable \\(Y\\) para estabilizar la varianza. El método de Box-Cox ayuda a encontrar la transformación de potencia óptima (\\(\\lambda\\)).\n\\[\nY^{(\\lambda)} = \\frac{Y^\\lambda - 1}{\\lambda}\n\\]\n\n# La función boxcox() busca el valor de lambda que maximiza la verosimilitud\nBC &lt;- boxcox(reg)\n\n\n\n\n\n\n\nlam &lt;- BC$x[which.max(BC$y)]\nlam\n\n[1] 0.7878788\n\n# Se transforma Y y se ajusta un nuevo modelo\nyl &lt;- (dat$y^lam - 1) / lam\ndat2 &lt;- cbind(dat, yl)\nreg3 &lt;- lm(yl ~ x1 + x2, data = dat2)\nsummary(reg3)\n\n\nCall:\nlm(formula = yl ~ x1 + x2, data = dat2)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-6.2098 -1.1732  0.0298  1.1323  5.8288 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)  1.73006    0.31342   5.520 5.47e-08 ***\nx1           1.04326    0.02321  44.945  &lt; 2e-16 ***\nx2           0.24004    0.05720   4.196 3.21e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.873 on 497 degrees of freedom\nMultiple R-squared:  0.8045,    Adjusted R-squared:  0.8037 \nF-statistic:  1022 on 2 and 497 DF,  p-value: &lt; 2.2e-16\n\n# Se verifica si el nuevo modelo es homocedástico\nplot(reg3, which = 3)\n\n\n\n\n\n\n\nbptest(reg3)\n\n\n    studentized Breusch-Pagan test\n\ndata:  reg3\nBP = 10.27, df = 2, p-value = 0.005886\n\n# Se compara la normalidad de los residuales del modelo original y el transformado\npar(mfrow=c(1,2))\nhist(studres(reg), main=\"Residuales Originales\")\nhist(studres(reg3), main=\"Residuales del Modelo Transformado\")\n\n\n\n\n\n\n\npar(mfrow=c(1,1))\nshapiro.test(studres(reg3))\n\n\n    Shapiro-Wilk normality test\n\ndata:  studres(reg3)\nW = 0.99171, p-value = 0.006831\n\n\nConclusión: La transformación Box-Cox ha corregido exitosamente el problema de heterocedasticidad, como lo confirma el p-valor alto del test de Breusch-Pagan en el nuevo modelo.",
     "crumbs": [
-      "<span class='chapter-number'>8</span>  <span class='chapter-title'>2. Heteroscedasticidad</span>"
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Heteroscedasticidad</span>"
     ]
   },
   {
@@ -982,141 +982,141 @@
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "",
     "text": "16 Introducción\nEste documento explora los Modelos Lineales Generalizados (GLM), con un enfoque en la regresión logística para variables de respuesta binarias. Se divide en tres ejercicios principales:",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#a-análisis-de-estadística-descriptiva",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#a-análisis-de-estadística-descriptiva",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "17.1 a) Análisis de Estadística Descriptiva",
     "text": "17.1 a) Análisis de Estadística Descriptiva\n\nburn1000 &lt;- aplore3::burn1000\n# Se crea la variable de respuesta binaria: 1 = \"Dead\" (éxito), 0 = \"Alive\"\nburn1000 &lt;- within(burn1000, death2 &lt;- ifelse(death == \"Dead\", 1, 0))\nstr(burn1000)\n\n'data.frame':   1000 obs. of  10 variables:\n $ id      : int  1 2 3 4 5 6 7 8 9 10 ...\n $ facility: int  11 1 12 1 1 6 22 1 1 1 ...\n $ death   : Factor w/ 2 levels \"Alive\",\"Dead\": 1 1 1 1 1 1 1 1 1 1 ...\n $ age     : num  26.6 2 22 37.3 52.1 50.2 2.5 53.8 31.9 41.1 ...\n $ gender  : Factor w/ 2 levels \"Female\",\"Male\": 2 1 1 2 2 2 1 1 2 2 ...\n $ race    : Factor w/ 2 levels \"Non-White\",\"White\": 2 1 1 2 2 2 1 2 2 2 ...\n $ tbsa    : num  25.3 5 2 2 6 7 7 0.9 2 22 ...\n $ inh_inj : Factor w/ 2 levels \"No\",\"Yes\": 1 1 1 1 1 1 1 1 1 1 ...\n $ flame   : Factor w/ 2 levels \"No\",\"Yes\": 2 1 1 1 2 1 1 2 1 2 ...\n $ death2  : num  0 0 0 0 0 0 0 0 0 0 ...\n\nsummary(burn1000)\n\n       id            facility       death          age           gender   \n Min.   :   1.0   Min.   : 1.00   Alive:850   Min.   : 0.10   Female:295  \n 1st Qu.: 250.8   1st Qu.: 2.00   Dead :150   1st Qu.:10.85   Male  :705  \n Median : 500.5   Median : 8.00               Median :31.95               \n Mean   : 500.5   Mean   :11.56               Mean   :33.29               \n 3rd Qu.: 750.2   3rd Qu.:18.25               3rd Qu.:51.23               \n Max.   :1000.0   Max.   :40.00               Max.   :89.70               \n        race          tbsa       inh_inj   flame         death2    \n Non-White:411   Min.   : 0.10   No :878   No :471   Min.   :0.00  \n White    :589   1st Qu.: 2.50   Yes:122   Yes:529   1st Qu.:0.00  \n                 Median : 6.00                       Median :0.00  \n                 Mean   :13.54                       Mean   :0.15  \n                 3rd Qu.:16.00                       3rd Qu.:0.00  \n                 Max.   :98.00                       Max.   :1.00",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-d-ajuste-de-un-primer-modelo-logístico",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-d-ajuste-de-un-primer-modelo-logístico",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "17.2 b-d) Ajuste de un Primer Modelo Logístico",
     "text": "17.2 b-d) Ajuste de un Primer Modelo Logístico\nSe ajusta un GLM con una distribución binomial y una función de enlace logit. El modelo es: \\[\n\\log\\left(\\frac{p_i}{1-p_i}\\right) = \\beta_0 + \\beta_1 x_{i1} + \\dots + \\beta_k x_{ik}\n\\] donde \\(p_i\\) es la probabilidad de “éxito” (muerte) para el individuo \\(i\\).\n\n# Definir el Modelo Lineal Generalizado\nfit1 &lt;- glm(death2 ~ age + gender + race + tbsa + inh_inj + flame, \n            family = binomial(\"logit\"), data = burn1000)\nsummary(fit1)\n\n\nCall:\nglm(formula = death2 ~ age + gender + race + tbsa + inh_inj + \n    flame, family = binomial(\"logit\"), data = burn1000)\n\nCoefficients:\n             Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept) -7.695153   0.691169 -11.134  &lt; 2e-16 ***\nage          0.082890   0.008629   9.606  &lt; 2e-16 ***\ngenderMale  -0.201494   0.307784  -0.655 0.512687    \nraceWhite   -0.701389   0.309781  -2.264 0.023565 *  \ntbsa         0.089345   0.009087   9.832  &lt; 2e-16 ***\ninh_injYes   1.365277   0.361780   3.774 0.000161 ***\nflameYes     0.582578   0.354493   1.643 0.100298    \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 845.42  on 999  degrees of freedom\nResidual deviance: 336.46  on 993  degrees of freedom\nAIC: 350.46\n\nNumber of Fisher Scoring iterations: 7",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#e-interpretación-de-los-parámetros-odds-ratios",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#e-interpretación-de-los-parámetros-odds-ratios",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "17.3 e) Interpretación de los Parámetros (Odds Ratios)",
     "text": "17.3 e) Interpretación de los Parámetros (Odds Ratios)\nEn un modelo logístico, los coeficientes exponenciados, \\(e^{\\beta_j}\\), se interpretan como Odds Ratios (razón de chances).\n\n# Odds Ratios puntuales\nexp(coef(fit1)[-1])\n\n       age genderMale  raceWhite       tbsa inh_injYes   flameYes \n 1.0864226  0.8175088  0.4958961  1.0934576  3.9168097  1.7906491 \n\n# Un OR &gt; 1 indica que el chance de éxito aumenta.\n# Un OR &lt; 1 indica que el chance de éxito disminuye.\n\n# Cambio porcentual en los odds: (OR - 1) * 100\n(exp(coef(fit1)[-1]) - 1) * 100\n\n       age genderMale  raceWhite       tbsa inh_injYes   flameYes \n  8.642262 -18.249119 -50.410395   9.345756 291.680974  79.064907 \n\n# Intervalos de confianza del 95% para los Odds Ratios\nexp(confint(fit1)[-1, ])\n\nWaiting for profiling to be done...\n\n\n               2.5 %    97.5 %\nage        1.0691824 1.1060770\ngenderMale 0.4486691 1.5047454\nraceWhite  0.2679382 0.9063323\ntbsa       1.0752625 1.1143712\ninh_injYes 1.9331829 8.0230447\nflameYes   0.9052347 3.6570490",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#f-elección-de-una-función-de-enlace-por-bondad-de-ajuste",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#f-elección-de-una-función-de-enlace-por-bondad-de-ajuste",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "17.4 f) Elección de una Función de Enlace por Bondad de Ajuste",
     "text": "17.4 f) Elección de una Función de Enlace por Bondad de Ajuste\nSe comparan cuatro funciones de enlace para la distribución binomial (logit, probit, cloglog, cauchit) utilizando los criterios de información AIC y BIC. Valores más bajos indican un mejor ajuste.\n\nfit2 &lt;- update(fit1, family = binomial(\"probit\"))\nfit3 &lt;- update(fit1, family = binomial(\"cloglog\"))\n\nWarning: glm.fit: fitted probabilities numerically 0 or 1 occurred\n\nfit4 &lt;- update(fit1, family = binomial(\"cauchit\"))\n\n# Comparación de modelos\ncbind(AIC(fit1, fit2, fit3, fit4), BIC(fit1, fit2, fit3, fit4))\n\n     df      AIC df      BIC\nfit1  7 350.4623  7 384.8166\nfit2  7 347.0558  7 381.4101\nfit3  7 374.6395  7 408.9938\nfit4  7 389.5935  7 423.9478\n\n\nConclusión: Según AIC y BIC, el modelo fit2 (con enlace probit) ofrece la mejor bondad de ajuste.",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#g-h-selección-automática-del-modelo",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#g-h-selección-automática-del-modelo",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "17.5 g-h) Selección Automática del Modelo",
     "text": "17.5 g-h) Selección Automática del Modelo\nSe utiliza el método de eliminación hacia atrás (backward) basado en el criterio BIC para encontrar el subconjunto de predictores más parsimonioso, partiendo de un modelo con interacciones.\n\nfit5 &lt;- glm(death2 ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj, \n            family = binomial(\"logit\"), data = burn1000)\na &lt;- stepCriterion(fit5, direction = \"backward\", criterion = \"bic\")\n\n\n       Family:  binomial \nLink function:  logit \n    Criterion:  BIC \n\nInitial model:\n~ age + gender + race + tbsa + inh_inj + flame + age * inh_inj + tbsa * inh_inj \n\n\nStep 0 :\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- gender         1 327.92 367.18        0.6284     0.933130\n- flame          1 330.74 370.00        0.6251     0.097426\n- race           1 334.78 374.04        0.6203     0.009797\n&lt;none&gt;             329.91 374.08        0.6281             \n- inh_inj:tbsa   1 337.59 376.85        0.6169     0.002061\n- age:inh_inj    1 351.79 391.06        0.6000     2.31e-06\n\nStep 1 : - gender \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- flame          1 328.74 363.09        0.6255     0.097813\n&lt;none&gt;             327.92 367.18        0.6284             \n- race           1 332.83 367.19        0.6206     0.009622\n- inh_inj:tbsa   1 335.61 369.96        0.6173     0.002051\n- age:inh_inj    1 350.36 384.71        0.5997    1.643e-06\n\nStep 2 : - flame \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- race           1 332.42 361.87        0.6191      0.01843\n&lt;none&gt;             328.74 363.09        0.6255             \n- inh_inj:tbsa   1 337.19 366.64        0.6134      0.00142\n+ gender         1 330.74 370.00        0.6251      0.96626\n- age:inh_inj    1 351.00 380.44        0.5970    1.744e-06\n\nStep 3 : - race \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n&lt;none&gt;             332.42 361.87        0.6191             \n- inh_inj:tbsa   1 340.10 364.63        0.6080     0.002075\n+ flame          1 332.83 367.19        0.6206     0.212331\n+ gender         1 334.33 368.68        0.6188     0.758727\n- age:inh_inj    1 353.46 378.00        0.5921    2.823e-06\n\nFinal model:\n~ age + tbsa + inh_inj + age:inh_inj + tbsa:inh_inj \n\n****************************************************************************\n(*) p-values of the Wald test\n\nfit6 &lt;- update(fit5, formula. = a$final)\nsummary(fit6)\n\n\nCall:\nglm(formula = death2 ~ age + tbsa + inh_inj + age:inh_inj + tbsa:inh_inj, \n    family = binomial(\"logit\"), data = burn1000)\n\nCoefficients:\n                 Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)     -10.31738    1.03278  -9.990  &lt; 2e-16 ***\nage               0.11561    0.01352   8.553  &lt; 2e-16 ***\ntbsa              0.11221    0.01439   7.797 6.36e-15 ***\ninh_injYes        7.10938    1.25863   5.649 1.62e-08 ***\nage:inh_injYes   -0.08004    0.01709  -4.683 2.82e-06 ***\ntbsa:inh_injYes  -0.05538    0.01799  -3.079  0.00207 ** \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 845.42  on 999  degrees of freedom\nResidual deviance: 320.42  on 994  degrees of freedom\nAIC: 332.42\n\nNumber of Fisher Scoring iterations: 8\n\n# Se re-evalúan las funciones de enlace con el nuevo modelo\nfit7 &lt;- update(fit6, family = binomial(\"probit\"))\nfit8 &lt;- update(fit6, family = binomial(\"cloglog\"))\n\nWarning: glm.fit: algorithm did not converge\n\n\nWarning: glm.fit: fitted probabilities numerically 0 or 1 occurred\n\nfit9 &lt;- update(fit6, family = binomial(\"cauchit\"))\n\ncbind(AIC(fit6, fit7, fit8, fit9), BIC(fit6, fit7, fit8, fit9))\n\n     df      AIC df      BIC\nfit6  6 332.4233  6 361.8698\nfit7  6 330.5678  6 360.0143\nfit8  6 342.1889  6 371.6355\nfit9  6 368.4801  6 397.9266\n\n\nConclusión Final: El modelo fit7 (con predictores seleccionados y enlace probit) es el mejor según el criterio BIC.",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#i-validación-de-supuestos",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#i-validación-de-supuestos",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "17.6 i) Validación de Supuestos",
     "text": "17.6 i) Validación de Supuestos\nSe utilizan gráficos de diagnóstico para evaluar el ajuste del modelo final.\n\n# Gráfico de envelope para los residuales (similar a un Q-Q plot con bandas de confianza)\nenvelope(fit7)\n\n\n  |                               \n  |                         |   0%\n  |                               \n  |+                        |   4%\n  |                               \n  |++                       |   8%\n  |                               \n  |+++                      |  12%\n  |                               \n  |++++                     |  16%\n  |                               \n  |+++++                    |  20%\n  |                               \n  |++++++                   |  24%\n  |                               \n  |+++++++                  |  28%\n  |                               \n  |++++++++                 |  32%\n  |                               \n  |+++++++++                |  36%\n  |                               \n  |++++++++++               |  40%\n  |                               \n  |+++++++++++              |  44%\n  |                               \n  |++++++++++++             |  48%\n  |                               \n  |+++++++++++++            |  52%\n  |                               \n  |++++++++++++++           |  56%\n  |                               \n  |+++++++++++++++          |  60%\n  |                               \n  |++++++++++++++++         |  64%\n  |                               \n  |+++++++++++++++++        |  68%\n  |                               \n  |++++++++++++++++++       |  72%\n  |                               \n  |+++++++++++++++++++      |  76%\n  |                               \n  |++++++++++++++++++++     |  80%\n  |                               \n  |+++++++++++++++++++++    |  84%\n  |                               \n  |++++++++++++++++++++++   |  88%\n  |                               \n  |+++++++++++++++++++++++  |  92%\n  |                               \n  |++++++++++++++++++++++++ |  96%\n  |                               \n  |+++++++++++++++++++++++++| 100%",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-ajuste-del-modelo",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-ajuste-del-modelo",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "18.1 b) Ajuste del Modelo",
     "text": "18.1 b) Ajuste del Modelo\n\nglm.fits &lt;- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume,\n                data = Smarket, family = binomial)\nsummary(glm.fits)\n\n\nCall:\nglm(formula = Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + \n    Volume, family = binomial, data = Smarket)\n\nCoefficients:\n             Estimate Std. Error z value Pr(&gt;|z|)\n(Intercept) -0.126000   0.240736  -0.523    0.601\nLag1        -0.073074   0.050167  -1.457    0.145\nLag2        -0.042301   0.050086  -0.845    0.398\nLag3         0.011085   0.049939   0.222    0.824\nLag4         0.009359   0.049974   0.187    0.851\nLag5         0.010313   0.049511   0.208    0.835\nVolume       0.135441   0.158360   0.855    0.392\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 1731.2  on 1249  degrees of freedom\nResidual deviance: 1727.6  on 1243  degrees of freedom\nAIC: 1741.6\n\nNumber of Fisher Scoring iterations: 3",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#c-matriz-de-confusión-con-todos-los-datos",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#c-matriz-de-confusión-con-todos-los-datos",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "18.2 c) Matriz de Confusión (con todos los datos)",
     "text": "18.2 c) Matriz de Confusión (con todos los datos)\nSe evalúa el rendimiento del modelo en los mismos datos con los que fue entrenado (esto generalmente sobreestima el rendimiento real).\n\nglm.probs &lt;- predict(glm.fits, type = \"response\")\nglm.pred &lt;- rep(\"Down\", nrow(Smarket))\nglm.pred[glm.probs &gt; 0.5] &lt;- \"Up\"\n\n# Matriz de Confusión\ntable(Predicción = glm.pred, Real = Smarket$Direction)\n\n          Real\nPredicción Down  Up\n      Down  145 141\n      Up    457 507\n\n# Tasa de acierto global (Accuracy)\nmean(glm.pred == Smarket$Direction)\n\n[1] 0.5216",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#d-entrenamiento-y-prueba",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#d-entrenamiento-y-prueba",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "18.3 d) Entrenamiento y Prueba",
     "text": "18.3 d) Entrenamiento y Prueba\nUn enfoque más realista es dividir los datos: entrenar el modelo con datos antiguos (hasta 2004) y probar su rendimiento en datos nuevos (2005).\n\ntrain &lt;- (Smarket$Year &lt; 2005)\nSmarket.2005 &lt;- Smarket[!train, ]\nDirection.2005 &lt;- Smarket$Direction[!train]\n\nglm.fits.train &lt;- glm(Direction ~ Lag1 + Lag2, # Modelo simplificado\n                      data = Smarket, family = binomial, subset = train)\nglm.probs.test &lt;- predict(glm.fits.train, Smarket.2005, type = \"response\")\n\nglm.pred.test &lt;- rep(\"Down\", nrow(Smarket.2005))\nglm.pred.test[glm.probs.test &gt; 0.5] &lt;- \"Up\"\n\ntable(Predicción = glm.pred.test, Real = Direction.2005)\n\n          Real\nPredicción Down  Up\n      Down   35  35\n      Up     76 106\n\nmean(glm.pred.test == Direction.2005)\n\n[1] 0.5595238",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#a-muestreo-estratificado",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#a-muestreo-estratificado",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "19.1 a) Muestreo Estratificado",
     "text": "19.1 a) Muestreo Estratificado\nDado que las clases (Dead/Alive) están desbalanceadas, se utiliza muestreo estratificado para asegurar que la proporción de clases sea la misma en los conjuntos de entrenamiento y prueba.\n\nset.seed(123)\n# Se toma un 70% de cada estrato para el conjunto de entrenamiento\nstratified &lt;- burn1000 %&gt;%\n  group_by(death) %&gt;%\n  slice_sample(prop = 0.7)\n\n# El 30% restante forma el conjunto de prueba\ntest &lt;- burn1000[setdiff(burn1000$id, stratified$id), ]\n\nsummary(burn1000$death)\n\nAlive  Dead \n  850   150 \n\nsummary(stratified$death)\n\nAlive  Dead \n  595   105",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-entrenamiento-del-modelo-y-selección-de-variables",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-entrenamiento-del-modelo-y-selección-de-variables",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "19.2 b) Entrenamiento del Modelo y Selección de Variables",
     "text": "19.2 b) Entrenamiento del Modelo y Selección de Variables\nEl proceso de ajuste y selección se realiza únicamente con el conjunto de entrenamiento.\n\n# Se usa el modelo con interacciones como punto de partida\nfit5b &lt;- glm(death2 ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj, \n             family = binomial(\"logit\"), data = stratified)\na &lt;- stepCriterion(fit5b, direction = \"backward\", criterion = \"bic\")\n\n\n       Family:  binomial \nLink function:  logit \n    Criterion:  BIC \n\nInitial model:\n~ age + gender + race + tbsa + inh_inj + flame + age * inh_inj + tbsa * inh_inj \n\n\nStep 0 :\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- gender         1 232.66 269.07        0.6302     0.892068\n- flame          1 238.04 274.45        0.6210     0.023533\n&lt;none&gt;             234.64 275.60        0.6297             \n- race           1 239.42 275.83        0.6186     0.010751\n- inh_inj:tbsa   1 240.76 277.17        0.6164     0.005185\n- age:inh_inj    1 253.72 290.12        0.5942    8.119e-06\n\nStep 1 : - gender \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- flame          1 236.04 267.90        0.6215     0.023837\n&lt;none&gt;             232.66 269.07        0.6302             \n- race           1 237.46 269.32        0.6191     0.010725\n- inh_inj:tbsa   1 238.79 270.64        0.6169     0.005162\n- age:inh_inj    1 252.13 283.99        0.5941    6.321e-06\n\nStep 2 : - flame \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- race           1 238.68 265.98        0.6142     0.033530\n&lt;none&gt;             236.04 267.90        0.6215             \n- inh_inj:tbsa   1 243.42 270.73        0.6061     0.002966\n+ gender         1 238.04 274.45        0.6210     0.986257\n- age:inh_inj    1 254.27 281.57        0.5877    9.978e-06\n\nStep 3 : - race \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n&lt;none&gt;             238.68 265.98        0.6142             \n- inh_inj:tbsa   1 245.66 268.42        0.5995      0.00353\n+ flame          1 237.46 269.32        0.6191      0.07887\n+ gender         1 240.59 272.45        0.6138      0.76611\n- age:inh_inj    1 255.86 278.62        0.5822    1.531e-05\n\nFinal model:\n~ age + tbsa + inh_inj + age:inh_inj + tbsa:inh_inj \n\n****************************************************************************\n(*) p-values of the Wald test\n\nfit6b &lt;- update(fit5b, formula. = a$final)\n\n# Se comparan de nuevo las funciones de enlace\nfit7b &lt;- update(fit6b, family = binomial(\"probit\"))\nfit8b &lt;- update(fit6b, family = binomial(\"cloglog\"))\n\nWarning: glm.fit: algorithm did not converge\n\n\nWarning: glm.fit: fitted probabilities numerically 0 or 1 occurred\n\nfit9b &lt;- update(fit6b, family = binomial(\"cauchit\"))",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#c-selección-del-mejor-modelo-global-por-habilidad-predictiva",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#c-selección-del-mejor-modelo-global-por-habilidad-predictiva",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "19.3 c) Selección del Mejor Modelo Global por Habilidad Predictiva",
     "text": "19.3 c) Selección del Mejor Modelo Global por Habilidad Predictiva\nSe utilizan las Curvas ROC (Receiver Operating Characteristic) para comparar el rendimiento predictivo de los modelos en el conjunto de prueba. El área bajo la curva (AUC) es una medida global del poder discriminatorio del modelo.\n\n# Se obtienen las predicciones de probabilidad para el conjunto de prueba\npr6b &lt;- predict(fit6b, newdata = test, type = \"response\")\npr7b &lt;- predict(fit7b, newdata = test, type = \"response\")\npr8b &lt;- predict(fit8b, newdata = test, type = \"response\")\npr9b &lt;- predict(fit9b, newdata = test, type = \"response\")\n\n# Se comparan las curvas ROC\ntestres &lt;- test$death2\nROCc(cbind(testres, pr6b), main=\"Modelo 6 (logit)\")\n\n\n Area Under ROC Curve  =  0.968,   95% CI: (0.949, 0.987) \n     Gini Coefficient  =  0.936,   95% CI: (0.898, 0.974) \n        K-S Statistic  =  0.834 \n\nROCc(cbind(testres, pr7b), main=\"Modelo 7 (probit)\")\n\n\n Area Under ROC Curve  =  0.968,   95% CI: (0.949, 0.987) \n     Gini Coefficient  =  0.936,   95% CI: (0.898, 0.974) \n        K-S Statistic  =  0.83 \n\nROCc(cbind(testres, pr8b), main=\"Modelo 8 (cloglog)\")\n\n\n Area Under ROC Curve  =  0.969,   95% CI: (0.95, 0.987) \n     Gini Coefficient  =  0.937,   95% CI: (0.9, 0.974) \n        K-S Statistic  =  0.816 \n\nROCc(cbind(testres, pr9b), main=\"Modelo 9 (cauchit)\")\n\n\n Area Under ROC Curve  =  0.966,   95% CI: (0.946, 0.986) \n     Gini Coefficient  =  0.933,   95% CI: (0.893, 0.972) \n        K-S Statistic  =  0.838 \n\n\nConclusión: Se elige el modelo con el AUC más alto (en este caso, fit7b).",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   },
   {
     "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#elección-del-punto-de-corte-tau-óptimo",
     "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#elección-del-punto-de-corte-tau-óptimo",
-    "title": "15  Modelos Lineales Generalizados y Habilidad Predictiva",
+    "title": "15  Modelos Lineales Generalizados GAM",
     "section": "19.4 Elección del Punto de Corte (tau) Óptimo",
     "text": "19.4 Elección del Punto de Corte (tau) Óptimo\nUna vez elegido el mejor modelo (fit7b), se debe seleccionar un punto de corte (tau) para convertir las probabilidades predichas en clasificaciones (“Dead” / “Alive”). La elección de tau depende del objetivo (minimizar errores, maximizar precisión, etc.).\n\ntau &lt;- seq(0.1, 0.9, by = 0.05)\nAER &lt;- recall &lt;- precision &lt;- F1 &lt;- NULL\nexito &lt;- \"1\"; frac &lt;- \"0\"\n\nfor (i in 1:length(tau)){\n    glm.pred &lt;- rep(\"0\", length(testres))\n    glm.pred[pr7b &gt; tau[i]] &lt;- \"1\"\n    tab&lt;-table(glm.pred, testres)\n    if (!frac %in% rownames(tab)){\n      tab&lt;-rbind(tab,c(0,0))\n      rownames(tab)[2]&lt;-frac\n    } \n    if (!exito %in% rownames(tab)){\n      tab&lt;-rbind(tab,c(0,0))\n      rownames(tab)[2]&lt;-exito\n    }\n    AER[i]&lt;-(tab[exito,frac]+tab[frac,exito])/sum(tab)\n    precision[i]&lt;-(tab[exito,exito])/sum(tab[exito,])\n    recall[i]&lt;-(tab[exito,exito])/sum(tab[,exito])\n    F1[i]&lt;-2*precision[i]*recall[i]/(precision[i]+recall[i])\n  }\n\ncbind(tau,AER,precision,recall,F1)\n\n       tau        AER precision    recall        F1\n [1,] 0.10 0.14000000 0.5180723 0.9555556 0.6718750\n [2,] 0.15 0.11666667 0.5694444 0.9111111 0.7008547\n [3,] 0.20 0.10333333 0.6060606 0.8888889 0.7207207\n [4,] 0.25 0.07666667 0.7115385 0.8222222 0.7628866\n [5,] 0.30 0.07666667 0.7200000 0.8000000 0.7578947\n [6,] 0.35 0.07000000 0.7608696 0.7777778 0.7692308\n [7,] 0.40 0.06333333 0.8250000 0.7333333 0.7764706\n [8,] 0.45 0.06333333 0.8421053 0.7111111 0.7710843\n [9,] 0.50 0.06666667 0.8571429 0.6666667 0.7500000\n[10,] 0.55 0.07000000 0.8529412 0.6444444 0.7341772\n[11,] 0.60 0.07666667 0.8666667 0.5777778 0.6933333\n[12,] 0.65 0.09000000 0.8461538 0.4888889 0.6197183\n[13,] 0.70 0.08666667 0.9130435 0.4666667 0.6176471\n[14,] 0.75 0.09333333 0.9047619 0.4222222 0.5757576\n[15,] 0.80 0.09333333 1.0000000 0.3777778 0.5483871\n[16,] 0.85 0.10000000 1.0000000 0.3333333 0.5000000\n[17,] 0.90 0.12000000 1.0000000 0.2000000 0.3333333\n\n\nAnálisis: Para elegir el tau óptimo, se busca un equilibrio. La métrica F1, que es la media armónica de la precisión y el recall, es una excelente opción para datos desbalanceados. El tau que maximiza F1 sería una buena elección.",
     "crumbs": [
-      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva</span>"
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Modelos Lineales Generalizados GAM</span>"
     ]
   }
 ]
