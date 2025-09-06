@@ -1,0 +1,1122 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "REGRESIÓN",
+    "section": "",
+    "text": "Bienvenido a la sección de Regresión\nSelecciona el tema que quieras ver a la derecha",
+    "crumbs": [
+      "<span class='chapter-number'>1</span>  <span class='chapter-title'>INTRODUCCIÓN</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html",
+    "title": "2  Intro a analizar Base de Datos, y gráficos - Clase Profe Mario",
+    "section": "",
+    "text": "2.1 Cargando los Paquetes\nSe inicia el análisis instalando (si es necesario) y cargando todas las librerías que se utilizarán a lo largo del documento.\nlibrary(readxl) \nlibrary(psych) \nlibrary(tidyverse)\nlibrary(epiDisplay)\nlibrary(ggplot2)\nlibrary(ggrepel)\nlibrary(qcc)\nlibrary(fBasics)\nlibrary(RcmdrMisc)\nlibrary(aplpack)",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Intro a analizar Base de Datos, y gráficos - Clase Profe Mario</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#lectura-de-base-de-datos",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#lectura-de-base-de-datos",
+    "title": "2  Intro a analizar Base de Datos, y gráficos - Clase Profe Mario",
+    "section": "2.2 Lectura de Base de Datos",
+    "text": "2.2 Lectura de Base de Datos\nSe establece el directorio de trabajo y se leen los datos desde un archivo de Excel. Nota: Para una mejor portabilidad del código, se recomienda el uso de Proyectos de RStudio, que establecen el directorio de trabajo automáticamente en la carpeta del proyecto.\n\nEscuelas &lt;- read_excel(\"Datos_informe.xlsx\")",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Intro a analizar Base de Datos, y gráficos - Clase Profe Mario</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#exploración-del-set-de-datos",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#exploración-del-set-de-datos",
+    "title": "2  Intro a analizar Base de Datos, y gráficos - Clase Profe Mario",
+    "section": "2.3 Exploración del Set de Datos",
+    "text": "2.3 Exploración del Set de Datos\nSe realiza una revisión inicial del conjunto de datos para entender su estructura, dimensiones y el tipo de cada variable.\n\n# View(Escuelas) # Para ver la base de datos, no ejecutar si es muy grande\nhead(Escuelas, 10) # Muestra las primeras 10 filas\n\n# A tibble: 10 × 13\n   Escuela                Cod Pais  Insc_t_completo Alumnos_facultad Costo_local\n   &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;            &lt;dbl&gt;       &lt;dbl&gt;\n 1 Melbourne Business …  2345 Aust…             200                5       24420\n 2 University of South…  2347 Aust…             228                4       19993\n 3 Indian University o…  2349 India             392                5        4300\n 4 Chinese University …  2351 China              90                5       11140\n 5 International Unive…  2353 Japon             126                4       33060\n 6 Asian Institute of …  2355 Fili…             389                5        7562\n 7 Indian Institute of…  2357 India             380                5        3935\n 8 National University…  2359 Sing…             147                6        6146\n 9 Indian Institute of…  2361 India             463                8        2880\n10 Australian National…  2363 Aust…              42                2       20300\n# ℹ 7 more variables: Costo_extranjero &lt;dbl&gt;, Edad &lt;dbl&gt;, Porc_extranj &lt;dbl&gt;,\n#   GMAT &lt;chr&gt;, Ex_Ingles &lt;chr&gt;, Experiencia &lt;dbl&gt;, Sueldo_inicial &lt;dbl&gt;\n\ntail(Escuelas, 10) # Muestra las ultimas 10 filas\n\n# A tibble: 10 × 13\n   Escuela                Cod Pais  Insc_t_completo Alumnos_facultad Costo_local\n   &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;            &lt;dbl&gt;       &lt;dbl&gt;\n 1 Monash Mt Eliza Bus…  2375 Aust…             350               13       16200\n 2 Asian Institute of …  2377 Tail…             300               10       18200\n 3 University of Adela…  2379 Aust…              20               19       16426\n 4 Massey University     2381 Nuev…              30               15       13106\n 5 Royal Melbourne Ins…  2383 Aust…              30                7       13880\n 6 Jamnalal Bajaj Inst…  2385 India             240                9        1000\n 7 Curlin Institute of…  2387 Aust…              98               15        9475\n 8 Lahore University o…  2389 Paki…              70               14       11250\n 9 Universiti Sains Ma…  2391 Mala…              30                5        2260\n10 De La Salle Univers…  2393 Mala…              44               17        3300\n# ℹ 7 more variables: Costo_extranjero &lt;dbl&gt;, Edad &lt;dbl&gt;, Porc_extranj &lt;dbl&gt;,\n#   GMAT &lt;chr&gt;, Ex_Ingles &lt;chr&gt;, Experiencia &lt;dbl&gt;, Sueldo_inicial &lt;dbl&gt;\n\n# Usando el pipe (%&gt;%) para encadenar operaciones\nEscuelas %&gt;% head(10)\n\n# A tibble: 10 × 13\n   Escuela                Cod Pais  Insc_t_completo Alumnos_facultad Costo_local\n   &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;           &lt;dbl&gt;            &lt;dbl&gt;       &lt;dbl&gt;\n 1 Melbourne Business …  2345 Aust…             200                5       24420\n 2 University of South…  2347 Aust…             228                4       19993\n 3 Indian University o…  2349 India             392                5        4300\n 4 Chinese University …  2351 China              90                5       11140\n 5 International Unive…  2353 Japon             126                4       33060\n 6 Asian Institute of …  2355 Fili…             389                5        7562\n 7 Indian Institute of…  2357 India             380                5        3935\n 8 National University…  2359 Sing…             147                6        6146\n 9 Indian Institute of…  2361 India             463                8        2880\n10 Australian National…  2363 Aust…              42                2       20300\n# ℹ 7 more variables: Costo_extranjero &lt;dbl&gt;, Edad &lt;dbl&gt;, Porc_extranj &lt;dbl&gt;,\n#   GMAT &lt;chr&gt;, Ex_Ingles &lt;chr&gt;, Experiencia &lt;dbl&gt;, Sueldo_inicial &lt;dbl&gt;\n\nEscuelas %&gt;% tail(5) %&gt;% summary()\n\n   Escuela               Cod           Pais           Insc_t_completo\n Length:5           Min.   :2385   Length:5           Min.   : 30.0  \n Class :character   1st Qu.:2387   Class :character   1st Qu.: 44.0  \n Mode  :character   Median :2389   Mode  :character   Median : 70.0  \n                    Mean   :2389                      Mean   : 96.4  \n                    3rd Qu.:2391                      3rd Qu.: 98.0  \n                    Max.   :2393                      Max.   :240.0  \n Alumnos_facultad  Costo_local    Costo_extranjero      Edad     \n Min.   : 5       Min.   : 1000   Min.   : 1000    Min.   :23.0  \n 1st Qu.: 9       1st Qu.: 2260   1st Qu.: 2260    1st Qu.:24.0  \n Median :14       Median : 3300   Median : 3600    Median :28.0  \n Mean   :12       Mean   : 5457   Mean   :10451    Mean   :27.2  \n 3rd Qu.:15       3rd Qu.: 9475   3rd Qu.:19097    3rd Qu.:29.0  \n Max.   :17       Max.   :11250   Max.   :26300    Max.   :32.0  \n  Porc_extranj      GMAT            Ex_Ingles          Experiencia \n Min.   : 0.0   Length:5           Length:5           Min.   :0.0  \n 1st Qu.: 2.5   Class :character   Class :character   1st Qu.:1.0  \n Median : 3.5   Mode  :character   Mode  :character   Median :1.0  \n Mean   :12.8                                         Mean   :0.8  \n 3rd Qu.:15.0                                         3rd Qu.:1.0  \n Max.   :43.0                                         Max.   :1.0  \n Sueldo_inicial \n Min.   : 7000  \n 1st Qu.: 7500  \n Median :13100  \n Mean   :19720  \n 3rd Qu.:16000  \n Max.   :55000  \n\n\n\n2.3.1 Tipos de variables y conversión\nSe verifica la estructura y se convierten las columnas al tipo de dato apropiado (en este caso, a factor para las variables categóricas).\n\nEscuelas %&gt;% str() # Da el resumen de la tabla\n\ntibble [25 × 13] (S3: tbl_df/tbl/data.frame)\n $ Escuela         : chr [1:25] \"Melbourne Business School\" \"University of South Wales\" \"Indian University of Management\" \"Chinese University of Hong Kong\" ...\n $ Cod             : num [1:25] 2345 2347 2349 2351 2353 ...\n $ Pais            : chr [1:25] \"Australia\" \"Australia\" \"India\" \"China\" ...\n $ Insc_t_completo : num [1:25] 200 228 392 90 126 389 380 147 463 42 ...\n $ Alumnos_facultad: num [1:25] 5 4 5 5 4 5 5 6 8 2 ...\n $ Costo_local     : num [1:25] 24420 19993 4300 11140 33060 ...\n $ Costo_extranjero: num [1:25] 29600 32582 4300 11140 33060 ...\n $ Edad            : num [1:25] 28 29 22 29 28 25 23 29 23 30 ...\n $ Porc_extranj    : num [1:25] 47 28 0 10 60 50 1 51 0 80 ...\n $ GMAT            : chr [1:25] \"Si\" \"Si\" \"No\" \"Si\" ...\n $ Ex_Ingles       : chr [1:25] \"No\" \"No\" \"No\" \"No\" ...\n $ Experiencia     : num [1:25] 1 1 0 0 0 1 0 1 0 1 ...\n $ Sueldo_inicial  : num [1:25] 71400 65200 7100 31000 87000 22800 7500 43300 7400 46600 ...\n\nEscuelas %&gt;% dim() # Dimensión de la tabla\n\n[1] 25 13\n\nEscuelas %&gt;% colnames() # Muestra el Nombre de las columnas\n\n [1] \"Escuela\"          \"Cod\"              \"Pais\"             \"Insc_t_completo\" \n [5] \"Alumnos_facultad\" \"Costo_local\"      \"Costo_extranjero\" \"Edad\"            \n [9] \"Porc_extranj\"     \"GMAT\"             \"Ex_Ingles\"        \"Experiencia\"     \n[13] \"Sueldo_inicial\"  \n\n# Conversión de columnas a tipo factor\nEscuelas[,c(1,2,3,10,11,12)] &lt;- lapply(Escuelas[,c(1,2,3,10,11,12)], as.factor)\n\n# Se recodifican los niveles de la variable 'Experiencia'\nlevels(Escuelas$Experiencia) &lt;- c(\"No\",\"Si\")\n\n# Se consultan las categorías únicas de la variable 'Pais'\nEscuelas %&gt;% distinct(Pais)\n\n# A tibble: 10 × 1\n   Pais         \n   &lt;fct&gt;        \n 1 Australia    \n 2 India        \n 3 China        \n 4 Japon        \n 5 Filipinas    \n 6 Singapur     \n 7 Tailandia    \n 8 Nueva Zelanda\n 9 Pakistán     \n10 Malasia",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Intro a analizar Base de Datos, y gráficos - Clase Profe Mario</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#análisis-de-variables-cualitativas",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#análisis-de-variables-cualitativas",
+    "title": "2  Intro a analizar Base de Datos, y gráficos - Clase Profe Mario",
+    "section": "2.4 1. Análisis de Variables Cualitativas",
+    "text": "2.4 1. Análisis de Variables Cualitativas\n\n2.4.1 1.1 Tablas de Frecuencia\nSe generan tablas para resumir las frecuencias absolutas y relativas de las variables categóricas.\n\nEscuelas %&gt;% count(Pais) # Muestra las frecuencias absolutas\n\n# A tibble: 10 × 2\n   Pais              n\n   &lt;fct&gt;         &lt;int&gt;\n 1 Australia         9\n 2 China             2\n 3 Filipinas         1\n 4 India             4\n 5 Japon             1\n 6 Malasia           2\n 7 Nueva Zelanda     1\n 8 Pakistán          1\n 9 Singapur          2\n10 Tailandia         2\n\ntable(Escuelas$Pais) # Da la tabla de frecuencias sencilla\n\n\n    Australia         China     Filipinas         India         Japon \n            9             2             1             4             1 \n      Malasia Nueva Zelanda      Pakistán      Singapur     Tailandia \n            2             1             1             2             2 \n\n# Tabla de frecuencias completa con porcentajes y acumulados\ntab1(Escuelas$Pais, graph=FALSE)\n\nEscuelas$Pais : \n              Frequency Percent Cum. percent\nAustralia             9      36           36\nChina                 2       8           44\nFilipinas             1       4           48\nIndia                 4      16           64\nJapon                 1       4           68\nMalasia               2       8           76\nNueva Zelanda         1       4           80\nPakistán              1       4           84\nSingapur              2       8           92\nTailandia             2       8          100\n  Total              25     100          100\n\n\n\n\n2.4.2 1.2 Gráficos\nSe utilizan diferentes tipos de gráficos para visualizar la distribución de las variables cualitativas.\n\n2.4.2.1 Diagrama de barras a color\n\nEscuelas %&gt;% ggplot(aes(Pais)) +\n  geom_bar(color=\"black\", fill=rainbow(length(levels(Escuelas$Pais)))) +\n  ggtitle(\"Diagrama de barras de país\") +\n  labs(x=\"país\", y=\"Frec. Absoluta\") +\n  theme_minimal() +\n  theme(axis.text.x = element_text(angle = 30, size = 8))\n\n\n\n\n\n\n\n\n\n\n2.4.2.2 Diagrama de torta más elaborado\n\nEscuelas2 &lt;- Escuelas %&gt;% count(Pais) # Cuenta las frecuencias de país\nEscuelas2$n &lt;- Escuelas2$n * 100 / sum(Escuelas2$n) # Saca el porcentaje de cada parte\n\nEscuelas3 &lt;- Escuelas2 %&gt;% \n  mutate(csum = rev(cumsum(rev(n))), \n         pos = n/2 + lead(csum, 1),\n         pos = if_else(is.na(pos), n/2, pos))\n\nggplot(Escuelas2, aes(x = \"\" , y = n, fill = fct_inorder(Pais))) +\n  geom_col(width = 1, color = 1) +\n  coord_polar(theta = \"y\") +\n  scale_fill_brewer(palette = \"Pastel1\") +\n  geom_label_repel(data = Escuelas3,\n                   aes(y = pos, label = paste0(round(n, 1), \"%\")),\n                   size = 4.5, nudge_x = 1, show.legend = FALSE) +\n  guides(fill = guide_legend(title = \"País\")) +\n  theme_void()\n\nWarning in RColorBrewer::brewer.pal(n, pal): n too large, allowed maximum for palette Pastel1 is 9\nReturning the palette you asked for with that many colors\n\n\n\n\n\n\n\n\n\n\n\n2.4.2.3 Diagrama de Pareto\n\npareto.chart(table(Escuelas$Pais), main=\"Diagrama de Pareto de País\")\n\n\n\n\n\n\n\n\n               \nPareto chart analysis for table(Escuelas$Pais)\n                Frequency Cum.Freq. Percentage Cum.Percent.\n  Australia             9         9         36           36\n  India                 4        13         16           52\n  China                 2        15          8           60\n  Malasia               2        17          8           68\n  Singapur              2        19          8           76\n  Tailandia             2        21          8           84\n  Filipinas             1        22          4           88\n  Japon                 1        23          4           92\n  Nueva Zelanda         1        24          4           96\n  Pakistán              1        25          4          100",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Intro a analizar Base de Datos, y gráficos - Clase Profe Mario</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#análisis-de-variables-cuantitativas",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#análisis-de-variables-cuantitativas",
+    "title": "2  Intro a analizar Base de Datos, y gráficos - Clase Profe Mario",
+    "section": "2.5 2. Análisis de Variables Cuantitativas",
+    "text": "2.5 2. Análisis de Variables Cuantitativas\n\n2.5.1 2.1 Tablas de Frecuencia\nPara variables continuas, es necesario agrupar los datos en intervalos para crear tablas de frecuencia.\n\nlibrary(fdth)\n\n\nAttaching package: 'fdth'\n\n\nThe following objects are masked from 'package:stats':\n\n    sd, var\n\n# Si toma muchos valores, es mejor hacer una tabla de datos agrupados\n# Se utiliza la regla de Sturges para definir los intervalos.\nTabla_frec &lt;- fdt(Escuelas$Costo_local, breaks = \"Sturges\")\nTabla_frec\n\n      Class limits f   rf rf(%) cf cf(%)\n      [990,6390.1) 7 0.28    28  7    28\n  [6390.1,11790.2) 6 0.24    24 13    52\n [11790.2,17190.3) 6 0.24    24 19    76\n [17190.3,22590.4) 4 0.16    16 23    92\n [22590.4,27990.5) 1 0.04     4 24    96\n [27990.5,33390.6) 1 0.04     4 25   100\n\n\n\n\n2.5.2 2.2 Gráficos\n\n2.5.2.1 Histogramas\nEl histograma es la herramienta gráfica principal para visualizar la distribución de una variable cuantitativa.\n\nEscuelas %&gt;% ggplot(aes(x = Costo_local)) +\n  geom_histogram(fill = \"gray\", color = \"black\", bins = 1 + floor(log2(length(Escuelas$Costo_local)))) + # Regla de Sturges\n  ggtitle(\"Histograma de costo local\") +\n  labs(x = \"Costo (US$)\", y = \"Frecuencia\") +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\n\n2.5.2.2 Boxplot\nEl diagrama de caja o boxplot resume la distribución a través de sus cuartiles e identifica valores atípicos.\n\nboxplot(Escuelas$Insc_t_completo, horizontal = TRUE, main = \"Diagrama de caja de los alumnos por profesor\", xlab = \"Alumnos/profesor\")\n\n\n\n\n\n\n\n\n\n\n\n2.5.3 2.3 Estadísticas de los datos\nSe calculan diversas medidas de resumen para describir las variables cuantitativas.\n\n# Medidas de tendencia central y dispersión\nmean(Escuelas$Insc_t_completo) \n\n[1] 165.16\n\nmedian(Escuelas$Insc_t_completo)\n\n[1] 126\n\nsd(Escuelas$Insc_t_completo)\n\n[1] 140.8411\n\nmax(Escuelas$Insc_t_completo)\n\n[1] 463\n\nmin(Escuelas$Insc_t_completo)\n\n[1] 12\n\n# Medidas de posición (Cuantiles)\n# Cuartiles\nquantile(x = Escuelas$Insc_t_completo, probs = seq(0, 1, by = 1/4))\n\n  0%  25%  50%  75% 100% \n  12   44  126  240  463 \n\n# Deciles\nquantile(Escuelas$Insc_t_completo, probs = seq(0, 1, 1/10))\n\n   0%   10%   20%   30%   40%   50%   60%   70%   80%   90%  100% \n 12.0  30.0  39.6  52.0  82.0 126.0 168.2 222.4 310.0 385.4 463.0 \n\n# Percentiles\nquantile(Escuelas$Insc_t_completo, probs = 0.95)\n\n  95% \n391.4 \n\n# Resumen estadístico completo\nsummary(Escuelas)\n\n                            Escuela        Cod            Pais  \n Asian Institute of Management  : 2   2345   : 1   Australia:9  \n Australian National University : 1   2347   : 1   India    :4  \n Chinese University of Hong Kong: 1   2349   : 1   China    :2  \n Chulalongkorn University       : 1   2351   : 1   Malasia  :2  \n Curlin Institute of Technology : 1   2353   : 1   Singapur :2  \n De La Salle University         : 1   2355   : 1   Tailandia:2  \n (Other)                        :18   (Other):19   (Other)  :4  \n Insc_t_completo Alumnos_facultad  Costo_local    Costo_extranjero\n Min.   : 12.0   Min.   : 2.00    Min.   : 1000   Min.   : 1000   \n 1st Qu.: 44.0   1st Qu.: 5.00    1st Qu.: 6146   1st Qu.: 9000   \n Median :126.0   Median : 7.00    Median :11513   Median :17765   \n Mean   :165.2   Mean   : 8.48    Mean   :12375   Mean   :16582   \n 3rd Qu.:240.0   3rd Qu.:13.00    3rd Qu.:17172   3rd Qu.:22500   \n Max.   :463.0   Max.   :19.00    Max.   :33060   Max.   :33060   \n                                                                  \n      Edad        Porc_extranj   GMAT    Ex_Ingles Experiencia Sueldo_inicial \n Min.   :22.00   Min.   : 0.00   No:11   No:17     No: 6       Min.   : 7000  \n 1st Qu.:25.00   1st Qu.: 6.00   Si:14   Si: 8     Si:19       1st Qu.:16000  \n Median :29.00   Median :27.00                                 Median :41400  \n Mean   :28.36   Mean   :28.08                                 Mean   :37292  \n 3rd Qu.:30.00   3rd Qu.:43.00                                 3rd Qu.:52500  \n Max.   :37.00   Max.   :90.00                                 Max.   :87000  \n                                                                              \n\nbasicStats(Escuelas$Insc_t_completo)\n\n            X..Escuelas.Insc_t_completo\nnobs                          25.000000\nNAs                            0.000000\nMinimum                       12.000000\nMaximum                      463.000000\n1. Quartile                   44.000000\n3. Quartile                  240.000000\nMean                         165.160000\nMedian                       126.000000\nSum                         4129.000000\nSE Mean                       28.168226\nLCL Mean                     107.023640\nUCL Mean                     223.296360\nVariance                   19836.223333\nStdev                        140.841128\nSkewness                       0.668241\nKurtosis                      -1.009321",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Intro a analizar Base de Datos, y gráficos - Clase Profe Mario</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#análisis-de-pares-de-variables",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#análisis-de-pares-de-variables",
+    "title": "2  Intro a analizar Base de Datos, y gráficos - Clase Profe Mario",
+    "section": "2.6 3. Análisis de Pares de Variables",
+    "text": "2.6 3. Análisis de Pares de Variables\n\n2.6.1 3.1 Dos Variables Cualitativas\n\n2.6.1.1 Tablas de Contingencia\nSe utilizan para explorar la relación entre dos variables categóricas, mostrando frecuencias conjuntas y perfiles.\n\nTable &lt;- xtabs(~Ex_Ingles + GMAT, data = Escuelas)\naddmargins(Table) #Frec. Absolutas\n\n         GMAT\nEx_Ingles No Si Sum\n      No   7 10  17\n      Si   4  4   8\n      Sum 11 14  25\n\n# totPercents(Table) #Frec. Relativas\nrowPercents(Table) #Perfiles fila\n\n         GMAT\nEx_Ingles   No   Si Total Count\n       No 41.2 58.8   100    17\n       Si 50.0 50.0   100     8\n\ncolPercents(Table) #Perfiles columna\n\n         GMAT\nEx_Ingles    No    Si\n    No     63.6  71.4\n    Si     36.4  28.6\n    Total 100.0 100.0\n    Count  11.0  14.0\n\n# Gráfico de barras apiladas para perfiles\nggplot(Escuelas, aes(x = Pais, fill = GMAT)) +\n  geom_bar(position = \"fill\") +\n  theme_minimal() +\n  theme(axis.text.x = element_text(angle = 30, size = 8))\n\n\n\n\n\n\n\n\n\n\n\n2.6.2 3.2 Una Cualitativa y otra Cuantitativa\n\n2.6.2.1 Boxplots por categorías\nPermiten comparar la distribución de una variable cuantitativa a través de las categorías de una variable cualitativa.\n\nEscuelas %&gt;% ggplot(aes(x = Pais, y = Costo_local)) +\n  geom_boxplot() +\n  ggtitle(\"Boxplot de costo local segmentado por país\") +\n  labs(x = \"país\", y = \"Costo local\") +\n  theme_minimal() +\n  theme(axis.text.x = element_text(angle = 30, size = 8))\n\n\n\n\n\n\n\n\n\n\n2.6.2.2 Histogramas por categorías\nPermiten visualizar la forma de la distribución de la variable cuantitativa para cada categoría.\n\nEscuelas %&gt;% ggplot(aes(x = Costo_extranjero)) +\n  geom_histogram(fill = \"gray\", color = \"black\", bins = 4) +\n  ggtitle(\"Histograma de costo extranjero\") +\n  labs(x = \"Costo US$\", y = \"Frecuencia\") +\n  facet_wrap(~Experiencia) +\n  theme_minimal() +\n  theme(plot.title = element_text(hjust = 0.5))\n\n\n\n\n\n\n\n\n\n\n\n2.6.3 3.3 Dos variables cuantitativas\n\n2.6.3.1 Coeficiente de correlación\nMide la fuerza y dirección de la relación lineal entre dos variables cuantitativas.\n\ncor(Escuelas$Costo_local, Escuelas$Costo_extranjero)\n\n[1] 0.8347421\n\n\n\n\n2.6.3.2 Diagrama de dispersión\nVisualiza la relación entre dos variables cuantitativas. Se pueden añadir otras variables a través del color o el tamaño.\n\nggplot(Escuelas, aes(x = Costo_local, y = Costo_extranjero, col = GMAT, size = Alumnos_facultad)) +\n  geom_point() +\n  labs(title = \"Relación costo local vs extranjero\", x = \"Costo local\", y = \"Costo extranjero\") + theme_gray()",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Intro a analizar Base de Datos, y gráficos - Clase Profe Mario</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#opcional-gráficos-multivariados",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.html#opcional-gráficos-multivariados",
+    "title": "2  Intro a analizar Base de Datos, y gráficos - Clase Profe Mario",
+    "section": "2.7 4. Opcional: Gráficos Multivariados",
+    "text": "2.7 4. Opcional: Gráficos Multivariados\n\n2.7.1 Diagrama de estrellas o de radar\nVisualiza múltiples variables cuantitativas para cada observación.\n\nsubset &lt;- as.data.frame(cbind(Escuelas$Insc_t_completo, Escuelas$Edad, Escuelas$Costo_local, Escuelas$Alumnos_facultad))\ncolnames(subset) &lt;- c(\"Insc\", \"Edad\", \"cost_l\", \"al_pr\")\nrownames(subset) &lt;- as.factor(Escuelas$Cod)\n\nstars(subset[1:10, ], key.loc = c(10, 5), draw.segments = TRUE)\n\n\n\n\n\n\n\n\n\n\n2.7.2 Caras de Chernoff\nMapea variables multivariadas a características de un rostro humano.\n\na &lt;- faces(subset[1:10, ], face.type = 1)\n\n\n\n\n\n\n\n\neffect of variables:\n modified item       Var     \n \"height of face   \" \"Insc\"  \n \"width of face    \" \"Edad\"  \n \"structure of face\" \"cost_l\"\n \"height of mouth  \" \"al_pr\" \n \"width of mouth   \" \"Insc\"  \n \"smiling          \" \"Edad\"  \n \"height of eyes   \" \"cost_l\"\n \"width of eyes    \" \"al_pr\" \n \"height of hair   \" \"Insc\"  \n \"width of hair   \"  \"Edad\"  \n \"style of hair   \"  \"cost_l\"\n \"height of nose  \"  \"al_pr\" \n \"width of nose   \"  \"Insc\"  \n \"width of ear    \"  \"Edad\"  \n \"height of ear   \"  \"cost_l\"\n\nplot.faces(a)",
+    "crumbs": [
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Intro a analizar Base de Datos, y gráficos - Clase Profe Mario</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "",
+    "text": "4 Introducción\nEste documento presenta un análisis estadístico en dos partes. La primera parte explora la relación entre dos variables categóricas (hábito de fumar de la madre y bajo peso del bebé al nacer) utilizando tablas de contingencia y la prueba \\(\\chi^2\\) de independencia. La segunda parte introduce el Análisis de Varianza (ANOVA) de una vía para comparar las medias de una variable cuantitativa (peso de plantas) a través de diferentes grupos de tratamiento.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#tablas-de-contingencia",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#tablas-de-contingencia",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "5.1 Tablas de Contingencia",
+    "text": "5.1 Tablas de Contingencia\nEstas tablas resumen las frecuencias de las combinaciones de las dos variables.\n\nFrecuencias Absolutas: Conteos directos.\nPerfiles Fila/Columna: Proporciones condicionales que ayudan a visualizar la relación.\n\n\n# Frecuencias Absolutas con totales\naddmargins(table(pto9$smoker, pto9$lowbwt))\n\n     \n       0  1 Sum\n  0   19  1  20\n  1   17  5  22\n  Sum 36  6  42\n\n# Análisis más detallado con xtabs()\nTable &lt;- xtabs(~ pto9$smoker + pto9$lowbwt)\naddmargins(Table)      # Frecuencias Absolutas\n\n           pto9$lowbwt\npto9$smoker  0  1 Sum\n        0   19  1  20\n        1   17  5  22\n        Sum 36  6  42\n\ntotPercents(Table)     # Frecuencias Relativas (porcentaje del total)\n\n         0    1 Total\n0     45.2  2.4  47.6\n1     40.5 11.9  52.4\nTotal 85.7 14.3 100.0\n\nrowPercents(Table)     # Perfiles Fila\n\n           pto9$lowbwt\npto9$smoker    0    1 Total Count\n          0 95.0  5.0   100    20\n          1 77.3 22.7   100    22\n\ncolPercents(Table)     # Perfiles Columna\n\n           pto9$lowbwt\npto9$smoker     0     1\n      0      52.8  16.7\n      1      47.2  83.3\n      Total 100.0 100.0\n      Count  36.0   6.0",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#gráfico-de-frecuencias",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#gráfico-de-frecuencias",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "5.2 Gráfico de Frecuencias",
+    "text": "5.2 Gráfico de Frecuencias\nUn gráfico de barras apiladas permite visualizar las frecuencias y proporciones.\n\npar(mfrow = c(1, 2))\n# Gráfico de Frecuencias Absolutas\nggplot(pto9, aes(x = as.factor(smoker), fill = as.factor(lowbwt))) +\n  geom_bar() +\n  labs(title = \"Frecuencias Absolutas\", x = \"Madre Fumadora\", y = \"Conteo\", fill = \"Bajo Peso\") +\n  theme_minimal()\n\n\n\n\n\n\n\n# Gráfico de Perfiles (Proporciones)\nggplot(pto9, aes(x = as.factor(smoker), fill = as.factor(lowbwt))) +\n  geom_bar(position = \"fill\") +\n  labs(title = \"Perfiles (Proporciones)\", x = \"Madre Fumadora\", y = \"Proporción\", fill = \"Bajo Peso\") +\n  theme_minimal()",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#test-chi-cuadrado-chi2-de-independencia",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#test-chi-cuadrado-chi2-de-independencia",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "5.3 Test Chi-Cuadrado (\\(\\chi^2\\)) de Independencia",
+    "text": "5.3 Test Chi-Cuadrado (\\(\\chi^2\\)) de Independencia\nEste test evalúa formalmente la hipótesis de independencia entre las dos variables.\n\n\\(H_0\\): Las variables son independientes.\n\\(H_1\\): Las variables no son independientes (están asociadas).\nEstadístico: \\(\\chi^2 = \\sum \\frac{(O_{ij} - E_{ij})^2}{E_{ij}}\\)\n\n\n# Test estándar\nchi &lt;- chisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt))\n\nWarning in chisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt)):\nChi-squared approximation may be incorrect\n\nchi\n\n\n    Pearson's Chi-squared test with Yates' continuity correction\n\ndata:  as.factor(pto9$smoker) and as.factor(pto9$lowbwt)\nX-squared = 1.4358, df = 1, p-value = 0.2308\n\n# Test con simulación de Monte Carlo (recomendado cuando hay frecuencias esperadas bajas)\nchisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt), simulate.p.value = TRUE, B = 2000)\n\n\n    Pearson's Chi-squared test with simulated p-value (based on 2000\n    replicates)\n\ndata:  as.factor(pto9$smoker) and as.factor(pto9$lowbwt)\nX-squared = 2.6886, df = NA, p-value = 0.2064\n\n\nConclusión: Un p-valor &gt; 0.05 sugiere que no hay evidencia suficiente para rechazar la hipótesis nula de independencia.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#v-de-cramer",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#v-de-cramer",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "5.4 V de Cramer",
+    "text": "5.4 V de Cramer\nMide la fuerza de la asociación (0 = sin asociación, 1 = asociación perfecta).\n\nV &lt;- sqrt(chi$statistic / (length(pto9$smoker) * min(2 - 1, 2 - 1)))\nV\n\nX-squared \n0.1848935",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#lectura-de-datos-y-exploración",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#lectura-de-datos-y-exploración",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "6.1 1. Lectura de Datos y Exploración",
+    "text": "6.1 1. Lectura de Datos y Exploración\nSe utiliza el conjunto de datos PlantGrowth.\n\ndata &lt;- PlantGrowth\ndata$group &lt;- factor(data$group, levels = c(\"ctrl\", \"trt1\", \"trt2\"))\nhead(data)\n\n  weight group\n1   4.17  ctrl\n2   5.58  ctrl\n3   5.18  ctrl\n4   6.11  ctrl\n5   4.50  ctrl\n6   4.61  ctrl",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#resúmenes-estadísticos-por-grupo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#resúmenes-estadísticos-por-grupo",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "6.2 2. Resúmenes Estadísticos por Grupo",
+    "text": "6.2 2. Resúmenes Estadísticos por Grupo\n\ngroup_by(data, group) %&gt;%\n  summarise(\n    count = n(),\n    mean = mean(weight, na.rm = TRUE),\n    sd = sd(weight, na.rm = TRUE)\n  )\n\n# A tibble: 3 × 4\n  group count  mean    sd\n  &lt;fct&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;\n1 ctrl     10  5.03 0.583\n2 trt1     10  4.66 0.794\n3 trt2     10  5.53 0.443",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#diagnóstico-gráfico",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#diagnóstico-gráfico",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "6.3 3. Diagnóstico Gráfico",
+    "text": "6.3 3. Diagnóstico Gráfico\nSe visualizan los datos para evaluar si los supuestos del ANOVA (normalidad, homocedasticidad) parecen razonables.\n\n# Boxplots\nggboxplot(data, x = \"group\", y = \"weight\", \n          color = \"group\", palette = c(\"#00AFBB\", \"#E7B800\", \"#FC4E07\"),\n          order = c(\"ctrl\", \"trt1\", \"trt2\"),\n          ylab = \"Peso\", xlab = \"Tratamiento\")\n\n\n\n\n\n\n\n# Gráfico de Medias con Intervalos de Confianza\nggline(data, x = \"group\", y = \"weight\", \n       add = c(\"mean_se\", \"jitter\"), \n       order = c(\"ctrl\", \"trt1\", \"trt2\"),\n       ylab = \"Peso\", xlab = \"Tratamiento\")",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#aplicación-del-modelo-anova",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#aplicación-del-modelo-anova",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "6.4 4. Aplicación del Modelo ANOVA",
+    "text": "6.4 4. Aplicación del Modelo ANOVA\nSe ajusta el modelo ANOVA para obtener la tabla de análisis de varianza y la prueba F.\n\n# Estimación de los efectos (tau)\nhat_mu &lt;- mean(data$weight)\ntau_ctrl &lt;- mean(data$weight[data$group == \"ctrl\"]) - hat_mu\ntau_tr1 &lt;- mean(data$weight[data$group == \"trt1\"]) - hat_mu\ntau_tr2 &lt;- mean(data$weight[data$group == \"trt2\"]) - hat_mu\nc(tau_ctrl, tau_tr1, tau_tr2)\n\n[1] -0.041 -0.412  0.453\n\n# Ajuste del modelo ANOVA\nres.aov &lt;- aov(weight ~ group, data = data)\nsummary(res.aov)\n\n            Df Sum Sq Mean Sq F value Pr(&gt;F)  \ngroup        2  3.766  1.8832   4.846 0.0159 *\nResiduals   27 10.492  0.3886                 \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n\nConclusión: El p-valor (0.0159) es menor que 0.05, por lo que se rechaza la hipótesis nula. Se concluye que existe una diferencia estadísticamente significativa en el peso promedio entre al menos dos de los grupos de tratamiento.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#comparaciones-por-pares-post-hoc",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#comparaciones-por-pares-post-hoc",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "6.5 5. Comparaciones por Pares (Post-Hoc)",
+    "text": "6.5 5. Comparaciones por Pares (Post-Hoc)\nUna vez que se rechaza la \\(H_0\\) global, se realizan pruebas post-hoc para identificar qué pares de grupos son significativamente diferentes.\n\n# Método de Tukey HSD (Honest Significant Difference)\nTukeyHSD(res.aov)\n\n  Tukey multiple comparisons of means\n    95% family-wise confidence level\n\nFit: aov(formula = weight ~ group, data = data)\n\n$group\n            diff        lwr       upr     p adj\ntrt1-ctrl -0.371 -1.0622161 0.3202161 0.3908711\ntrt2-ctrl  0.494 -0.1972161 1.1852161 0.1979960\ntrt2-trt1  0.865  0.1737839 1.5562161 0.0120064\n\n# Pruebas t por pares con corrección de Bonferroni\npairwise.t.test(data$weight, data$group, p.adjust.method = \"bonferroni\")\n\n\n    Pairwise comparisons using t tests with pooled SD \n\ndata:  data$weight and data$group \n\n     ctrl  trt1 \ntrt1 0.583 -    \ntrt2 0.263 0.013\n\nP value adjustment method: bonferroni",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#validación-de-supuestos-del-modelo-anova",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#validación-de-supuestos-del-modelo-anova",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "6.6 6. Validación de Supuestos del Modelo ANOVA",
+    "text": "6.6 6. Validación de Supuestos del Modelo ANOVA\nSe verifican los supuestos del modelo sobre los residuales.\n\n6.6.1 a. Homocedasticidad (Igualdad de Varianzas)\n\n\\(H_0\\): Las varianzas de los grupos son iguales.\n\n\n# Gráfico de diagnóstico\nplot(res.aov, 1)\n\n\n\n\n\n\n\n# Test de Levene (más robusto)\nleveneTest(weight ~ group, data = data)\n\nLevene's Test for Homogeneity of Variance (center = median)\n      Df F value Pr(&gt;F)\ngroup  2  1.1192 0.3412\n      27               \n\n# Test de Bartlett (sensible a la no normalidad)\nbartlett.test(weight ~ group, data = data)\n\n\n    Bartlett test of homogeneity of variances\n\ndata:  weight by group\nBartlett's K-squared = 2.8786, df = 2, p-value = 0.2371\n\n\nConclusión: Los p-valores de ambos tests son grandes, por lo que no se rechaza la hipótesis de homocedasticidad.\n\n\n6.6.2 b. Normalidad de los Residuales\n\n\\(H_0\\): Los residuales siguen una distribución normal.\n\n\n# Gráfico Q-Q Plot\nplot(res.aov, 2)\n\n\n\n\n\n\n\n# Test de Shapiro-Wilk\nshapiro.test(res.aov$residuals)\n\n\n    Shapiro-Wilk normality test\n\ndata:  res.aov$residuals\nW = 0.96607, p-value = 0.4379\n\n\nConclusión: El p-valor es grande, por lo que no se rechaza el supuesto de normalidad.",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#alternativa-no-paramétrica-test-de-kruskal-wallis",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.html#alternativa-no-paramétrica-test-de-kruskal-wallis",
+    "title": "3  ANOVA_oneway - Regresión",
+    "section": "6.7 7. Alternativa No Paramétrica: Test de Kruskal-Wallis",
+    "text": "6.7 7. Alternativa No Paramétrica: Test de Kruskal-Wallis\nSi los supuestos del ANOVA no se cumplen (especialmente normalidad y homocedasticidad), se puede utilizar la prueba de Kruskal-Wallis, que es su análoga no paramétrica y trabaja con los rangos de los datos.\n\nkruskal.test(weight ~ group, data = data)\n\n\n    Kruskal-Wallis rank sum test\n\ndata:  weight by group\nKruskal-Wallis chi-squared = 7.9882, df = 2, p-value = 0.01842",
+    "crumbs": [
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>ANOVA_oneway - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "",
+    "text": "5 Introducción\nEste documento presenta una guía detallada para el análisis de Regresión Lineal Simple a través de dos ejercicios prácticos. Se abordan todos los pasos del modelado: estimación de parámetros, pruebas de hipótesis con sus sistemas explícitos, construcción de intervalos de confianza y predicción, y la validación rigurosa de los supuestos del modelo.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#librerías-requeridas",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#librerías-requeridas",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "5.1 Librerías Requeridas",
+    "text": "5.1 Librerías Requeridas\n\nlibrary(MASS)\nlibrary(lmtest)\nlibrary(tseries)\nlibrary(ggplot2)",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#a-modelo-propuesto-de-regresión",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#a-modelo-propuesto-de-regresión",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.1 A) Modelo Propuesto de Regresión",
+    "text": "6.1 A) Modelo Propuesto de Regresión\nSe ajusta un modelo de la forma: \\[\n\\text{frecuencia}_i = \\beta_0 + \\beta_1 \\cdot \\text{peso}_i + \\epsilon_i\n\\]\n\nfit &lt;- lm(frecuencia ~ 1 + peso, data = pacientes)\nsummary(fit)\n\n\nCall:\nlm(formula = frecuencia ~ 1 + peso, data = pacientes)\n\nResiduals:\n     Min       1Q   Median       3Q      Max \n-13.9734  -2.5950   0.8194   3.0306  13.3532 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) 68.24820    1.98810   34.33   &lt;2e-16 ***\npeso         0.76295    0.02616   29.16   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 4.86 on 97 degrees of freedom\nMultiple R-squared:  0.8976,    Adjusted R-squared:  0.8966 \nF-statistic: 850.3 on 1 and 97 DF,  p-value: &lt; 2.2e-16\n\n\nLectura del summary(fit): - Intercept (\\(\\hat{\\beta}_0\\)): 68.248 es la estimación del intercepto. - peso (\\(\\hat{\\beta}_1\\)): 0.763 es la estimación de la pendiente. - Std. Error para peso: Es la raíz de la varianza estimada de \\(\\hat{\\beta}_1\\). - Residual standard error: 4.86 es la estimación de la desviación estándar de los errores (\\(\\hat{\\sigma}\\)). - Adjusted R-squared: 0.8966 es el coeficiente de determinación ajustado. - degrees of freedom: 97 son los grados de libertad para los intervalos de confianza y pruebas de hipótesis de los coeficientes.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#b-estimación-de-parámetros-manual",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#b-estimación-de-parámetros-manual",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.2 B) Estimación de Parámetros (Manual)",
+    "text": "6.2 B) Estimación de Parámetros (Manual)\nSe calculan manualmente los estimadores de los coeficientes, sus varianzas y la varianza del error.\n\\[\n\\hat{\\beta}_1 = r_{xy} \\frac{S_y}{S_x} \\quad | \\quad \\hat{\\beta}_0 = \\bar{y} - \\hat{\\beta}_1 \\bar{x} \\quad | \\quad \\hat{\\sigma}^2 = \\frac{SCE}{n-2}\n\\]\n\ncor &lt;- cor(pacientes$frecuencia, pacientes$peso)\ns_y &lt;- sd(pacientes$frecuencia)\ns_x &lt;- sd(pacientes$peso)\nn &lt;- length(pacientes$frecuencia)\n\nb1_hat &lt;- cor * s_y / s_x\nb0_hat &lt;- mean(pacientes$frecuencia) - b1_hat * mean(pacientes$peso)\ny_hat &lt;- b0_hat + b1_hat * pacientes$peso\nsigma2_hat &lt;- sum((pacientes$frecuencia - y_hat)^2) / (n - 2)\nsigma_hat &lt;- sqrt(sigma2_hat)\n\nvar_hat_b1_hat &lt;- sigma2_hat / ((n - 1) * var(pacientes$peso))\nvar_hat_b0_hat &lt;- sigma2_hat * sum(pacientes$peso^2) / (n * ((n - 1) * var(pacientes$peso)))\ncov_hat_b0_b1 &lt;- -sigma2_hat * mean(pacientes$peso) / ((n - 1) * var(pacientes$peso))\ncor_hat_b0_b1 &lt;- cov_hat_b0_b1 / sqrt(var_hat_b0_hat * var_hat_b1_hat)\n\n# La función vcov() calcula la matriz de varianzas-covarianzas de los estimadores\nvcov(fit)\n\n            (Intercept)         peso\n(Intercept)  3.95253557 -0.050422121\npeso        -0.05042212  0.000684557",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#c-intervalos-de-confianza-para-los-parámetros-beta_0-y-beta_1",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#c-intervalos-de-confianza-para-los-parámetros-beta_0-y-beta_1",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.3 C) Intervalos de Confianza para los Parámetros \\(\\beta_0\\) y \\(\\beta_1\\)",
+    "text": "6.3 C) Intervalos de Confianza para los Parámetros \\(\\beta_0\\) y \\(\\beta_1\\)\nSe construyen intervalos de confianza al 95% para los parámetros de localización del modelo. La fórmula es: \\[\n\\hat{\\beta}_j \\pm t_{(1-\\alpha/2, n-2)} \\cdot EE(\\hat{\\beta}_j)\n\\]\n\nalpha &lt;- 0.05\nLi &lt;- coef(fit) - qt(1 - alpha/2, n - 2) * sqrt(diag(vcov(fit)))\nLs &lt;- coef(fit) + qt(1 - alpha/2, n - 2) * sqrt(diag(vcov(fit)))\ncbind(Li, Ls)\n\n                    Li        Ls\n(Intercept) 64.3023726 72.194023\npeso         0.7110212  0.814878\n\n# Usando la función directa\nconfint(object = fit, level = 0.95)\n\n                 2.5 %    97.5 %\n(Intercept) 64.3023726 72.194023\npeso         0.7110212  0.814878",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#d-prueba-de-hipótesis-hay-relación-entre-las-variables",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#d-prueba-de-hipótesis-hay-relación-entre-las-variables",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.4 D) Prueba de Hipótesis: ¿Hay relación entre las variables?",
+    "text": "6.4 D) Prueba de Hipótesis: ¿Hay relación entre las variables?\nSe realiza una prueba de hipótesis para determinar si la pendiente \\(\\beta_1\\) es significativamente diferente de cero.\nSistema de Hipótesis: \\[\nH_0: \\beta_1 = 0 \\quad \\text{vs.} \\quad H_1: \\beta_1 \\neq 0\n\\]\n\nsign &lt;- 0.05\nt_c &lt;- (as.numeric(fit$coeff - 0) / sqrt(vcov(fit)))\n\nWarning in sqrt(vcov(fit)): NaNs produced\n\nvalcrit &lt;- qt(df = n - 2, 1 - sign/2)\n\n# Decisión por valor crítico\nabs(t_c) &gt; valcrit\n\n            (Intercept) peso\n(Intercept)        TRUE   NA\npeso                 NA TRUE\n\n# Decisión por p-valor\npval &lt;- 2 * (1 - pt(abs(t_c), df = n - 2))\npval\n\n            (Intercept) peso\n(Intercept)           0  NaN\npeso                NaN    0\n\n\nConclusión: Dado que abs(t_c) &gt; valcrit es TRUE y el p-valor es prácticamente cero, se rechaza la hipótesis nula. Existe una relación lineal estadísticamente significativa entre el peso y la frecuencia cardiaca.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#e-prueba-de-hipótesis-es-la-pendiente-mayor-que-1",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#e-prueba-de-hipótesis-es-la-pendiente-mayor-que-1",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.5 E) Prueba de Hipótesis: ¿Es la pendiente mayor que 1?",
+    "text": "6.5 E) Prueba de Hipótesis: ¿Es la pendiente mayor que 1?\nSistema de Hipótesis: \\[\nH_0: \\beta_1 = 1 \\quad \\text{vs.} \\quad H_1: \\beta_1 &gt; 1\n\\]\n\nsign &lt;- 0.05\nt_c &lt;- as.numeric((fit$coeff - 1) / sqrt(vcov(fit)))\n\nWarning in sqrt(vcov(fit)): NaNs produced\n\nvalcrit &lt;- qt(df = n - 2, 1 - sign)\n\n# Decisión por valor crítico\nt_c &gt; valcrit\n\n[1]  TRUE    NA    NA FALSE\n\n# Decisión por p-valor\npval &lt;- 1 - pt(t_c, df = n - 2)\npval\n\n[1]   0 NaN NaN   1\n\n\nConclusión: t_c &gt; valcrit es FALSE y el p-valor es muy alto (0.999). No se rechaza la hipótesis nula. No hay evidencia para afirmar que la pendiente sea mayor que 1.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#f-intervalo-de-confianza-del-90-para-la-media-condicional",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#f-intervalo-de-confianza-del-90-para-la-media-condicional",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.6 F) Intervalo de Confianza del 90% para la Media Condicional",
+    "text": "6.6 F) Intervalo de Confianza del 90% para la Media Condicional\nSe estima el valor esperado de la frecuencia cardiaca para un peso de 70 kg.\n\nalpha &lt;- 0.1\nx_new &lt;- 70\n\nmu &lt;- coef(fit) + coef(fit) * x_new\nvar &lt;- vcov(fit) + x_new^2 * vcov(fit) + 2 * x_new * vcov(fit)\n\nLi &lt;- mu - qt(1 - alpha/2, n - 2) * sqrt(var)\n\nWarning in sqrt(var): NaNs produced\n\nLs &lt;- mu + qt(1 - alpha/2, n - 2) * sqrt(var)\n\nWarning in sqrt(var): NaNs produced\n\ncbind(Li, Ls)\n\n            (Intercept)    peso (Intercept)     peso\n(Intercept)    4611.204     NaN     5080.04      NaN\npeso                NaN 51.0844         NaN 57.25444\n\n\nEl intervalo resultante indica, con un 90% de confianza, entre qué valores se encuentra la frecuencia cardiaca promedio para todas las personas que pesan 70 kg.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#g-intervalo-de-predicción-del-99",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#g-intervalo-de-predicción-del-99",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.7 G) Intervalo de Predicción del 99%",
+    "text": "6.7 G) Intervalo de Predicción del 99%\nUn intervalo de predicción estima el rango en el que se espera que caiga una nueva observación individual.\n\nalpha &lt;- 0.01\nx_new &lt;- 85\n\nsigma2 &lt;- sum(fit$residuals^2) / (n - 2)\nmu_pred &lt;- coef(fit) + coef(fit) * x_new\nvar_pred &lt;- sigma2 * (1 + 1/n + (x_new - mean(peso))^2 / ((n-1)*var(peso)))\nLi_pred &lt;- mu_pred - qt(1 - alpha/2, n - 2) * sqrt(var_pred)\nLs_pred &lt;- mu_pred + qt(1 - alpha/2, n - 2) * sqrt(var_pred)\ncbind(Li_pred, Ls_pred)\n\n               Li_pred    Ls_pred\n(Intercept) 5856.48662 5882.20340\npeso          52.75527   78.47206",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#h-descomposición-de-la-varianza-tabla-anova",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#h-descomposición-de-la-varianza-tabla-anova",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.8 H) Descomposición de la Varianza (Tabla ANOVA)",
+    "text": "6.8 H) Descomposición de la Varianza (Tabla ANOVA)\nLa variabilidad total (SCT) se descompone en la explicada por el modelo (SCM) y la no explicada (SCE).\n\\[\n\\sum(y_i - \\bar{y})^2 = \\sum(\\hat{y}_i - \\bar{y})^2 + \\sum(y_i - \\hat{y}_i)^2\n\\]\n\nSC_Tot &lt;- sum((pacientes$frecuencia - mean(pacientes$frecuencia))^2)\nSC_residuales &lt;- sum(fit$residuals^2)\nSC_mod &lt;- sum((y_hat - mean(pacientes$frecuencia))^2)\n\nall.equal(SC_Tot, SC_mod + SC_residuales)\n\n[1] TRUE",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#i-significancia-de-la-regresión-y-coeficiente-de-determinación",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#i-significancia-de-la-regresión-y-coeficiente-de-determinación",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.9 I) Significancia de la Regresión y Coeficiente de Determinación",
+    "text": "6.9 I) Significancia de la Regresión y Coeficiente de Determinación\nSe realiza una prueba F para la significancia global del modelo.\n\nCM_residuales &lt;- SC_residuales / (n - 2)\nCM_mod &lt;- SC_mod / 1\nF_c &lt;- CM_mod / CM_residuales\n\n# Decisión por p-valor\np_valor_f &lt;- 1 - pf(F_c, df1 = 1, df2 = n - 2)\np_valor_f\n\n[1] 0",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#j-validación-del-modelo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#j-validación-del-modelo",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "6.10 J) Validación del Modelo",
+    "text": "6.10 J) Validación del Modelo\nSe verifican los supuestos del modelo sobre los residuales.\n\nresiduals &lt;- fit$residuals\n\n# a. Media cero y no relación con variables\npar(mfrow=c(1,2))\nplot(frecuencia, residuals, main=\"Residuales vs. Y\")\nplot(peso, residuals, main=\"Residuales vs. X\")\n\n\n\n\n\n\n\nmean(residuals)\n\n[1] -3.385339e-17\n\nt.test(residuals, mu = 0)\n\n\n    One Sample t-test\n\ndata:  residuals\nt = -6.9659e-17, df = 98, p-value = 1\nalternative hypothesis: true mean is not equal to 0\n95 percent confidence interval:\n -0.9644195  0.9644195\nsample estimates:\n    mean of x \n-3.385339e-17 \n\n# b. Varianza constante (Homocedasticidad)\nplot(y_hat, residuals, main=\"Residuales vs. Ajustados\")\nbptest(frecuencia ~ 1 + peso, data=pacientes)\n\n\n    studentized Breusch-Pagan test\n\ndata:  frecuencia ~ 1 + peso\nBP = 0.29529, df = 1, p-value = 0.5868\n\n# El p-valor es grande, así que no se rechaza que haya homocedasticidad.\n\n# d. Normalidad de los residuales\npar(mfrow=c(1,2))\n\n\n\n\n\n\n\nhist(residuals, main=\"Histograma de Residuales\")\nqqnorm(residuals); qqline(residuals, col=\"red\")\n\n\n\n\n\n\n\njarque.bera.test(residuals)\n\n\n    Jarque Bera Test\n\ndata:  residuals\nX-squared = 2.1418, df = 2, p-value = 0.3427\n\nshapiro.test(residuals)\n\n\n    Shapiro-Wilk normality test\n\ndata:  residuals\nW = 0.97912, p-value = 0.1173\n\n# Los p-valores son grandes, por lo cual no se rechaza la normalidad.\n\nConclusión: Todos los supuestos del modelo parecen cumplirse satisfactoriamente.",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#b-estimación-de-parámetros-del-modelo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#b-estimación-de-parámetros-del-modelo",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "7.1 B) Estimación de Parámetros del Modelo",
+    "text": "7.1 B) Estimación de Parámetros del Modelo\nEl modelo es: \\(\\text{diferencia}_i = \\beta_0 + \\beta_1 \\cdot \\text{tratamiento}_i + \\epsilon_i\\), donde tratamiento es 1 si es “2MED” y 0 si es “PLACEBO”.\n\nfit2 &lt;- lm(diferencia ~ 1 + tratamiento, data = hipertension)\nsummary(fit2)\n\n\nCall:\nlm(formula = diferencia ~ 1 + tratamiento, data = hipertension)\n\nResiduals:\n   Min     1Q Median     3Q    Max \n-3.420 -0.310  0.300  1.265  1.980 \n\nCoefficients:\n                Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)      -0.6200     0.8511  -0.728    0.487    \ntratamiento2MED  11.1400     1.2037   9.255 1.51e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.903 on 8 degrees of freedom\nMultiple R-squared:  0.9146,    Adjusted R-squared:  0.9039 \nF-statistic: 85.66 on 1 and 8 DF,  p-value: 1.508e-05",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#c-intervalos-de-confianza-del-99-para-los-parámetros",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#c-intervalos-de-confianza-del-99-para-los-parámetros",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "7.2 C) Intervalos de Confianza del 99% para los Parámetros",
+    "text": "7.2 C) Intervalos de Confianza del 99% para los Parámetros\n\nalpha &lt;- 0.01\nn2 &lt;- nrow(hipertension)\nLi &lt;- coef(fit2) - qt(1 - alpha/2, n2 - 2) * sqrt(diag(vcov(fit2)))\nLs &lt;- coef(fit2) + qt(1 - alpha/2, n2 - 2) * sqrt(diag(vcov(fit2)))\ncbind(Li, Ls)\n\n                       Li        Ls\n(Intercept)     -3.475827  2.235827\ntratamiento2MED  7.101251 15.178749",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#e-prueba-de-hipótesis-h_0-beta_1-0-vs.-h_1-beta_1-0",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#e-prueba-de-hipótesis-h_0-beta_1-0-vs.-h_1-beta_1-0",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "7.3 E) Prueba de Hipótesis: \\(H_0: \\beta_1 = 0\\) vs. \\(H_1: \\beta_1 > 0\\)",
+    "text": "7.3 E) Prueba de Hipótesis: \\(H_0: \\beta_1 = 0\\) vs. \\(H_1: \\beta_1 &gt; 0\\)\nSe prueba si el medicamento tiene un efecto significativamente mayor que el placebo.\n\nt_c &lt;- (as.numeric(fit2$coeff - 0) / sqrt(vcov(fit2)))\n\nWarning in sqrt(vcov(fit2)): NaNs produced\n\npval &lt;- 1 - pt(t_c, df = n2 - 2)\npval\n\n                (Intercept) tratamiento2MED\n(Intercept)       0.7564458             NaN\ntratamiento2MED         NaN    7.541131e-06",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#g-comparación-con-un-modelo-anova",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.html#g-comparación-con-un-modelo-anova",
+    "title": "4  Regresion Lineal Simple - Regresión",
+    "section": "7.4 G) Comparación con un Modelo ANOVA",
+    "text": "7.4 G) Comparación con un Modelo ANOVA\nUna regresión con una sola variable predictora categórica es matemáticamente equivalente a un ANOVA de una vía.\n\nfit_aov &lt;- aov(diferencia ~ tratamiento, data = hipertension)\nsummary(fit_aov)\n\n            Df Sum Sq Mean Sq F value   Pr(&gt;F)    \ntratamiento  1 310.25  310.25   85.66 1.51e-05 ***\nResiduals    8  28.98    3.62                     \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nsummary(fit2)\n\n\nCall:\nlm(formula = diferencia ~ 1 + tratamiento, data = hipertension)\n\nResiduals:\n   Min     1Q Median     3Q    Max \n-3.420 -0.310  0.300  1.265  1.980 \n\nCoefficients:\n                Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)      -0.6200     0.8511  -0.728    0.487    \ntratamiento2MED  11.1400     1.2037   9.255 1.51e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.903 on 8 degrees of freedom\nMultiple R-squared:  0.9146,    Adjusted R-squared:  0.9039 \nF-statistic: 85.66 on 1 and 8 DF,  p-value: 1.508e-05",
+    "crumbs": [
+      "<span class='chapter-number'>4</span>  <span class='chapter-title'>Regresion Lineal Simple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "",
+    "text": "5.1 Introducción\nEste documento presenta una guía detallada para el análisis de Regresión Lineal Múltiple a través de dos ejercicios prácticos. El primer ejercicio se centra en un modelo con predictores continuos, mientras que el segundo explora un modelo con predictores categóricos (ANOVA/ANCOVA). Se abordan todos los pasos del modelado: análisis descriptivo, estimación de parámetros, pruebas de hipótesis y construcción de intervalos de confianza.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#introducción",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#introducción",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "",
+    "text": "5.1.1 Librerías Requeridas\n\nlibrary(readxl)\nlibrary(ppcor)      # Para correlaciones parciales\nlibrary(dplyr)\nlibrary(ggplot2)\nlibrary(fastDummies) # Para crear variables dummy",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#a-análisis-descriptivo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#a-análisis-descriptivo",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "6.1 a) Análisis Descriptivo",
+    "text": "6.1 a) Análisis Descriptivo\nSe inicia con una exploración de las relaciones entre las variables mediante diagramas de dispersión y matrices de correlación.\n\nAtletas &lt;- read_excel(\"Atletas.xlsx\")\n# View(Atletas)\n\n# Matriz de diagramas de dispersión\nplot(Atletas)\n\n\n\n\n\n\n\n# Matriz de correlación de Pearson\ncor(Atletas)\n\n           lbm         ht         wt        rcc\nlbm 1.00000000 0.71132706 0.93917965 0.08524203\nht  0.71132706 1.00000000 0.71506428 0.01460278\nwt  0.93917965 0.71506428 1.00000000 0.02054923\nrcc 0.08524203 0.01460278 0.02054923 1.00000000\n\n# Matriz de correlaciones parciales\npcor(Atletas)\n\n$estimate\n          lbm         ht         wt        rcc\nlbm 1.0000000  0.1687532  0.8798006  0.1947647\nht  0.1687532  1.0000000  0.1865226 -0.0329934\nwt  0.8798006  0.1865226  1.0000000 -0.1646123\nrcc 0.1947647 -0.0329934 -0.1646123  1.0000000\n\n$p.value\n             lbm        ht           wt        rcc\nlbm 0.000000e+00 0.1002613 4.047452e-32 0.05722977\nht  1.002613e-01 0.0000000 6.881920e-02 0.74963535\nwt  4.047452e-32 0.0688192 0.000000e+00 0.10900297\nrcc 5.722977e-02 0.7496354 1.090030e-01 0.00000000\n\n$statistic\n          lbm         ht        wt        rcc\nlbm  0.000000  1.6599295 17.944907  1.9251815\nht   1.659929  0.0000000  1.840707 -0.3200571\nwt  17.944907  1.8407070  0.000000 -1.6180485\nrcc  1.925182 -0.3200571 -1.618048  0.0000000\n\n$n\n[1] 98\n\n$gp\n[1] 2\n\n$method\n[1] \"pearson\"",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#c-estimación-de-los-parámetros-del-modelo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#c-estimación-de-los-parámetros-del-modelo",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "6.2 c) Estimación de los Parámetros del Modelo",
+    "text": "6.2 c) Estimación de los Parámetros del Modelo\nSe ajusta un modelo de Regresión Lineal Múltiple de la forma: \\[\n\\text{lbm}_i = \\beta_0 + \\beta_1 \\text{ht}_i + \\beta_2 \\text{wt}_i + \\beta_3 \\text{rcc}_i + \\epsilon_i\n\\] Los parámetros se estiman por Mínimos Cuadrados Ordinarios (MCO).\n\nfit &lt;- lm(lbm ~ 1 + ht + wt + rcc, data = Atletas)\nsummary(fit)\n\n\nCall:\nlm(formula = lbm ~ 1 + ht + wt + rcc, data = Atletas)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-5.0163 -1.8628  0.1932  1.8690  6.0228 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -1.30797    6.71133  -0.195   0.8459    \nht           0.06848    0.04126   1.660   0.1003    \nwt           0.56637    0.03156  17.945   &lt;2e-16 ***\nrcc          1.42480    0.74008   1.925   0.0572 .  \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 2.359 on 94 degrees of freedom\nMultiple R-squared:  0.8896,    Adjusted R-squared:  0.8861 \nF-statistic: 252.6 on 3 and 94 DF,  p-value: &lt; 2.2e-16\n\n# Intervalos de confianza para los coeficientes\nconfint(fit)\n\n                   2.5 %     97.5 %\n(Intercept) -14.63346824 12.0175228\nht           -0.01343245  0.1503940\nwt            0.50370761  0.6290412\nrcc          -0.04465812  2.8942516",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#d-comprobación-matricial-de-los-parámetros",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#d-comprobación-matricial-de-los-parámetros",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "6.3 d) Comprobación Matricial de los Parámetros",
+    "text": "6.3 d) Comprobación Matricial de los Parámetros\nLos estimadores MCO pueden calcularse manualmente usando la notación matricial: \\[\n\\hat{\\boldsymbol{\\beta}} = (X^T X)^{-1} X^T Y\n\\]\n\nn &lt;- dim(Atletas)[1]\nY &lt;- as.matrix(Atletas[, 1])\nX &lt;- as.matrix(Atletas[, 2:4])\nX &lt;- cbind(rep(1, n), X) # Añadir columna de unos para el intercepto\ncolnames(X)[1]&lt;-\"interc\"\n\nbetahat &lt;- solve(t(X) %*% X) %*% t(X) %*% Y\n\n# Comprobar si los cálculos manuales y los de lm() coinciden\nall.equal(as.numeric(betahat), as.numeric(fit$coefficients))\n\n[1] TRUE",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#e-matriz-de-varianzas-y-covarianzas-estimada",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#e-matriz-de-varianzas-y-covarianzas-estimada",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "6.4 e) Matriz de Varianzas y Covarianzas Estimada",
+    "text": "6.4 e) Matriz de Varianzas y Covarianzas Estimada\nLa matriz de varianza-covarianza de los estimadores se calcula como: \\[\n\\text{Var}(\\hat{\\boldsymbol{\\beta}}) = \\hat{\\sigma}^2 (X^T X)^{-1}\n\\] donde \\(\\hat{\\sigma}^2 = \\frac{SCE}{n-p}\\) es la varianza residual estimada.\n\n# Resultado de R\nvcov(fit)\n\n            (Intercept)            ht            wt           rcc\n(Intercept) 45.04189942 -2.346794e-01  0.0971874453 -2.391439e+00\nht          -0.23467939  1.701993e-03 -0.0009309838  3.986147e-06\nwt           0.09718745 -9.309838e-04  0.0009961501 -3.377628e-04\nrcc         -2.39143869  3.986147e-06 -0.0003377628  5.477249e-01\n\n# Cálculo manual\nvarhat &lt;- (1 / (n - 4)) * sum((Y - X %*% betahat)^2)\nvcovbetahat &lt;- varhat * solve(t(X) %*% X)\n\n# Comprobar si son iguales\nall.equal(as.numeric(vcovbetahat), as.numeric(vcov(fit)))\n\n[1] TRUE",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#i-prueba-de-significancia-global-del-modelo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#i-prueba-de-significancia-global-del-modelo",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "6.5 i) Prueba de Significancia Global del Modelo",
+    "text": "6.5 i) Prueba de Significancia Global del Modelo\nSe evalúa si el modelo en su conjunto es significativo. - \\(H_0\\): \\(\\beta_1 = \\beta_2 = \\beta_3 = 0\\) (El modelo no es significativo). - \\(H_1\\): Al menos un \\(\\beta_j \\neq 0\\).\n\n# Opción 1: Usar el F-statistic de la salida de summary()\nsummary(fit)\n\n\nCall:\nlm(formula = lbm ~ 1 + ht + wt + rcc, data = Atletas)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-5.0163 -1.8628  0.1932  1.8690  6.0228 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -1.30797    6.71133  -0.195   0.8459    \nht           0.06848    0.04126   1.660   0.1003    \nwt           0.56637    0.03156  17.945   &lt;2e-16 ***\nrcc          1.42480    0.74008   1.925   0.0572 .  \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 2.359 on 94 degrees of freedom\nMultiple R-squared:  0.8896,    Adjusted R-squared:  0.8861 \nF-statistic: 252.6 on 3 and 94 DF,  p-value: &lt; 2.2e-16\n\n# Opción 2: Comparar el modelo completo con un modelo reducido (solo intercepto) usando anova()\nfit0 &lt;- lm(lbm ~ 1, data = Atletas)\nanova(fit0, fit, test = \"F\")\n\nAnalysis of Variance Table\n\nModel 1: lbm ~ 1\nModel 2: lbm ~ 1 + ht + wt + rcc\n  Res.Df    RSS Df Sum of Sq      F    Pr(&gt;F)    \n1     97 4741.4                                  \n2     94  523.2  3    4218.2 252.59 &lt; 2.2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n\nConclusión: En ambas opciones, el p-valor es extremadamente pequeño, por lo que se rechaza \\(H_0\\). El modelo es globalmente significativo.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#m-prueba-de-significancia-de-un-subconjunto-de-variables",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#m-prueba-de-significancia-de-un-subconjunto-de-variables",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "6.6 m) Prueba de Significancia de un Subconjunto de Variables",
+    "text": "6.6 m) Prueba de Significancia de un Subconjunto de Variables\nSe prueba si las variables ht y rcc son conjuntamente necesarias en el modelo. - \\(H_0\\): \\(\\beta_{ht} = \\beta_{rcc} = 0\\). - \\(H_1\\): Al menos uno de los dos coeficientes es distinto de cero.\n\n# Se compara el modelo completo con un modelo reducido que excluye ht y rcc\nfit1 &lt;- lm(lbm ~ 1 + wt, data = Atletas)\nanova(fit1, fit, test = \"F\")\n\nAnalysis of Variance Table\n\nModel 1: lbm ~ 1 + wt\nModel 2: lbm ~ 1 + ht + wt + rcc\n  Res.Df    RSS Df Sum of Sq      F  Pr(&gt;F)  \n1     96 559.21                              \n2     94 523.24  2    35.964 3.2304 0.04397 *\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n\nConclusión: El p-valor pequeño indica que se rechaza \\(H_0\\). Las variables ht y rcc son conjuntamente significativas y deben permanecer en el modelo.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#n-prueba-de-hipótesis-lineal-beta_ht-beta_wt",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#n-prueba-de-hipótesis-lineal-beta_ht-beta_wt",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "6.7 n) Prueba de Hipótesis Lineal: \\(\\beta_{ht} = \\beta_{wt}\\) ?",
+    "text": "6.7 n) Prueba de Hipótesis Lineal: \\(\\beta_{ht} = \\beta_{wt}\\) ?\nSe prueba si los efectos de la altura y el peso son iguales. - \\(H_0\\): \\(\\beta_{ht} - \\beta_{wt} = 0\\). - \\(H_1\\): \\(\\beta_{ht} - \\beta_{wt} \\neq 0\\).\n\na &lt;- c(0, 1, -1, 0) # Vector para la combinación lineal\nt_C &lt;- t(a)%*%as.matrix(fit$coeff)/sqrt((t(a)%*%as.matrix(vcov(fit))%*%a))\npval_n &lt;- 2 * (1 - pt(abs(t_C), n - 4))\nc(t_calculado = t_C, p_valor = pval_n)\n\n  t_calculado       p_valor \n-7.373079e+00  6.449596e-11 \n\n\nConclusión: Se rechaza \\(H_0\\). Los efectos de la altura y el peso son significativamente diferentes.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#o-intervalo-de-confianza-del-95-para-la-media",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#o-intervalo-de-confianza-del-95-para-la-media",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "6.8 o) Intervalo de Confianza del 95% para la Media",
+    "text": "6.8 o) Intervalo de Confianza del 95% para la Media\nSe calcula un intervalo de confianza para el valor esperado de lbm para un atleta con ht=170, wt=70 y rcc=4.5.\n\nnuevos_datos &lt;- data.frame(ht = 170, wt = 70, rcc = 4.5)\npredict(fit, nuevos_datos, se.fit = TRUE, interval = \"confidence\", level = 0.95)\n\n$fit\n       fit      lwr      upr\n1 56.39155 55.67493 57.10817\n\n$se.fit\n[1] 0.3609235\n\n$df\n[1] 94\n\n$residual.scale\n[1] 2.359327",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#a-estadísticas-descriptivas",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#a-estadísticas-descriptivas",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "7.1 a) Estadísticas Descriptivas",
+    "text": "7.1 a) Estadísticas Descriptivas\n\nipb_data &lt;- read_excel(\"ipb.xlsx\")\nhead(ipb_data)\n\n# A tibble: 6 × 3\n  grupo  sexo    ipb\n  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;\n1 Grupo1 F      1.2 \n2 Grupo1 F      1.43\n3 Grupo1 F      1.1 \n4 Grupo1 F      1.45\n5 Grupo1 F      0.95\n6 Grupo1 F      2.75\n\n# Resúmenes por grupo\nipb_data %&gt;%\n  group_by(grupo, sexo) %&gt;%\n  summarise(\n    n = n(),\n    media_ipb = mean(ipb),\n    sd_ipb = sd(ipb)\n  )\n\n`summarise()` has grouped output by 'grupo'. You can override using the\n`.groups` argument.\n\n\n# A tibble: 6 × 5\n# Groups:   grupo [3]\n  grupo  sexo      n media_ipb sd_ipb\n  &lt;chr&gt;  &lt;chr&gt; &lt;int&gt;     &lt;dbl&gt;  &lt;dbl&gt;\n1 Grupo1 F        10      1.35  0.541\n2 Grupo1 M        10      2.72  0.527\n3 Grupo2 F        10      1.51  0.570\n4 Grupo2 M        10      3.45  0.476\n5 Grupo3 F        10      1.89  0.624\n6 Grupo3 M        10      3.82  0.420\n\n# Boxplot\nboxplot(ipb ~ grupo * sexo, data = ipb_data,\n        xlab = \"Grupo y Sexo\", ylab = \"IPB\",\n        frame = FALSE, col = c(\"#00AFBB\", \"#E7B800\", \"#FC4E07\"))",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#c-estimación-de-parámetros-del-modelo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#c-estimación-de-parámetros-del-modelo",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "7.2 c) Estimación de Parámetros del Modelo",
+    "text": "7.2 c) Estimación de Parámetros del Modelo\nSe ajusta un modelo con predictores categóricos. R crea automáticamente las variables dummy. \\[\n\\text{ipb}_i = \\beta_0 + \\beta_1 \\text{grupo2}_i + \\beta_2 \\text{grupo3}_i + \\beta_3 \\text{sexoM}_i + \\epsilon_i\n\\] - \\(\\beta_0\\) es la media del grupo de referencia (Grupo 1, Femenino). - Los otros \\(\\beta\\) son los cambios promedio con respecto al grupo de referencia.\n\nfit_ipb &lt;- lm(ipb ~ 1 + grupo + sexo, data = ipb_data)\nsummary(fit_ipb)\n\n\nCall:\nlm(formula = ipb ~ 1 + grupo + sexo, data = ipb_data)\n\nResiduals:\n     Min       1Q   Median       3Q      Max \n-1.22478 -0.29049  0.02787  0.27287  1.58787 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)   1.1621     0.1390   8.361 1.98e-11 ***\ngrupoGrupo2   0.4464     0.1702   2.622   0.0112 *  \ngrupoGrupo3   0.8225     0.1702   4.832 1.09e-05 ***\nsexoM         1.7457     0.1390  12.560  &lt; 2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 0.5383 on 56 degrees of freedom\nMultiple R-squared:  0.7639,    Adjusted R-squared:  0.7512 \nF-statistic: 60.38 on 3 and 56 DF,  p-value: &lt; 2.2e-16",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#d-el-ipb-depende-del-grupo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#d-el-ipb-depende-del-grupo",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "7.3 d) ¿El IPB depende del Grupo?",
+    "text": "7.3 d) ¿El IPB depende del Grupo?\nSe prueba si los coeficientes asociados a los grupos son conjuntamente cero. - \\(H_0\\): \\(\\beta_{grupo2} = \\beta_{grupo3} = 0\\).\n\n# Se compara el modelo completo con un modelo reducido sin la variable 'grupo'\nfit_reducido_grupo &lt;- lm(ipb ~ 1 + sexo, data = ipb_data)\nanova(fit_reducido_grupo, fit_ipb, test = \"F\")\n\nAnalysis of Variance Table\n\nModel 1: ipb ~ 1 + sexo\nModel 2: ipb ~ 1 + grupo + sexo\n  Res.Df    RSS Df Sum of Sq      F    Pr(&gt;F)    \n1     58 23.011                                  \n2     56 16.229  2     6.782 11.701 5.674e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n\nConclusión: El p-valor es muy pequeño, se rechaza \\(H_0\\). El grupo tiene un efecto significativo en el IPB.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#e-el-ipb-depende-del-sexo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#e-el-ipb-depende-del-sexo",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "7.4 e) ¿El IPB depende del Sexo?",
+    "text": "7.4 e) ¿El IPB depende del Sexo?\nSe prueba si el coeficiente asociado al sexo es cero. - \\(H_0\\): \\(\\beta_{sexoM} = 0\\).\n\n# Se puede juzgar directamente por el p-valor de 'sexoM' en summary(fit_ipb)\nsummary(fit_ipb)\n\n\nCall:\nlm(formula = ipb ~ 1 + grupo + sexo, data = ipb_data)\n\nResiduals:\n     Min       1Q   Median       3Q      Max \n-1.22478 -0.29049  0.02787  0.27287  1.58787 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)   1.1621     0.1390   8.361 1.98e-11 ***\ngrupoGrupo2   0.4464     0.1702   2.622   0.0112 *  \ngrupoGrupo3   0.8225     0.1702   4.832 1.09e-05 ***\nsexoM         1.7457     0.1390  12.560  &lt; 2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 0.5383 on 56 degrees of freedom\nMultiple R-squared:  0.7639,    Adjusted R-squared:  0.7512 \nF-statistic: 60.38 on 3 and 56 DF,  p-value: &lt; 2.2e-16\n\n\nConclusión: El p-valor (0.13) es mayor que 0.05. No hay evidencia de que el sexo tenga un efecto significativo en el IPB, después de controlar por el grupo.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#f-hay-interacción-entre-sexo-y-grupo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.html#f-hay-interacción-entre-sexo-y-grupo",
+    "title": "5  Regresion lineal multiple - Regresión",
+    "section": "7.5 f) ¿Hay Interacción entre Sexo y Grupo?",
+    "text": "7.5 f) ¿Hay Interacción entre Sexo y Grupo?\nSe prueba si el efecto del grupo sobre el IPB es el mismo para hombres y mujeres. - \\(H_0\\): No hay interacción.\n\n# Se ajusta un modelo con el término de interacción\nfit_interaccion &lt;- lm(ipb ~ 1 + grupo + sexo + grupo:sexo, data = ipb_data)\nsummary(fit_interaccion)\n\n\nCall:\nlm(formula = ipb ~ 1 + grupo + sexo + grupo:sexo, data = ipb_data)\n\nResiduals:\n     Min       1Q   Median       3Q      Max \n-1.13275 -0.31603 -0.04393  0.24413  1.40200 \n\nCoefficients:\n                  Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)         1.3480     0.1677   8.037 8.61e-11 ***\ngrupoGrupo2         0.1667     0.2372   0.703   0.4852    \ngrupoGrupo3         0.5446     0.2372   2.296   0.0256 *  \nsexoM               1.3740     0.2372   5.792 3.66e-07 ***\ngrupoGrupo2:sexoM   0.5594     0.3355   1.668   0.1012    \ngrupoGrupo3:sexoM   0.5558     0.3355   1.657   0.1034    \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 0.5304 on 54 degrees of freedom\nMultiple R-squared:  0.7789,    Adjusted R-squared:  0.7585 \nF-statistic: 38.05 on 5 and 54 DF,  p-value: &lt; 2.2e-16\n\n# Se comparan los modelos con y sin interacción\nanova(fit_ipb, fit_interaccion, test = \"F\")\n\nAnalysis of Variance Table\n\nModel 1: ipb ~ 1 + grupo + sexo\nModel 2: ipb ~ 1 + grupo + sexo + grupo:sexo\n  Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)\n1     56 16.229                           \n2     54 15.192  2    1.0364 1.8419 0.1683\n\n\nConclusión: El p-valor (0.55) es grande. No hay evidencia de un efecto de interacción significativo.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Regresion lineal multiple - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html",
+    "title": "6  2. Heteroscedasticidad - Regresión",
+    "section": "",
+    "text": "7 Introducción\nEste documento presenta un análisis detallado sobre la heteroscedasticidad, uno de los problemas más comunes en el modelado de regresión que viola el supuesto de varianza constante de los errores. Se simulará un conjunto de datos que presenta heterocedasticidad, se mostrarán las técnicas gráficas y formales para su diagnóstico, y se explorarán cuatro soluciones principales para corregir o mitigar sus efectos: errores estándar robustos, Mínimos Cuadrados Ponderados (WLS), Mínimos Cuadrados Generalizados Factibles (FGLS) y la transformación de la variable de respuesta (Box-Cox).",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>2. Heteroscedasticidad - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-1-errores-estándar-robustos",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-1-errores-estándar-robustos",
+    "title": "6  2. Heteroscedasticidad - Regresión",
+    "section": "11.1 Alternativa 1: Errores Estándar Robustos",
+    "text": "11.1 Alternativa 1: Errores Estándar Robustos\nEsta solución no cambia los coeficientes estimados (\\(\\hat{\\beta}_j\\)), pero corrige sus errores estándar para que la inferencia (p-valores, intervalos de confianza) sea válida a pesar de la heterocedasticidad. Se utiliza la matriz de varianza-covarianza de White (HC).\n\n# Se recalculan las pruebas de hipótesis de los coeficientes con errores robustos\ncoeftest(reg, vcov. = vcovHC, type = \"HC3\")\n\n\nt test of coefficients:\n\n             Estimate Std. Error t value  Pr(&gt;|t|)    \n(Intercept) -0.411847   0.591242 -0.6966    0.4864    \nx1           2.062544   0.048701 42.3515 &lt; 2.2e-16 ***\nx2           0.450623   0.109196  4.1267 4.314e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n# Intervalos de confianza robustos\ncoefci(reg, vcov. = vcovHC, type = \"HC3\")\n\n                2.5 %    97.5 %\n(Intercept) -1.573489 0.7497948\nx1           1.966860 2.1582284\nx2           0.236080 0.6651654\n\n# Comparación con los intervalos de confianza originales (no válidos)\nconfint(reg)\n\n                 2.5 %    97.5 %\n(Intercept) -1.6334920 0.8097976\nx1           1.9720696 2.1530184\nx2           0.2276652 0.6735802\n\n# Comparación de modelos (equivalente a anova) con errores robustos\nreg2 &lt;- lm(y ~ x1, data = dat)\nwaldtest(reg2, reg, vcov = vcovHC)\n\nWald test\n\nModel 1: y ~ x1\nModel 2: y ~ x1 + x2\n  Res.Df Df     F    Pr(&gt;F)    \n1    498                       \n2    497  1 17.03 4.314e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>2. Heteroscedasticidad - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-2-mínimos-cuadrados-ponderados-wls",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-2-mínimos-cuadrados-ponderados-wls",
+    "title": "6  2. Heteroscedasticidad - Regresión",
+    "section": "11.2 Alternativa 2: Mínimos Cuadrados Ponderados (WLS)",
+    "text": "11.2 Alternativa 2: Mínimos Cuadrados Ponderados (WLS)\nSi se conoce la forma de la heterocedasticidad, se puede corregir el modelo ajustando por Mínimos Cuadrados Ponderados (WLS). En este caso, como \\(Var(\\epsilon_i | x_{i1}) \\propto x_{i1}\\), los pesos a utilizar son \\(w_i = 1/x_{i1}\\). WLS produce estimadores eficientes (BLUE).\n\n# Se ajusta el modelo WLS especificando los pesos\nreg_wls &lt;- lm(y ~ x1 + x2, data = dat, weights = 1/x1)\nsummary(reg_wls)\n\n\nCall:\nlm(formula = y ~ x1 + x2, data = dat, weights = 1/x1)\n\nWeighted Residuals:\n    Min      1Q  Median      3Q     Max \n-3.6381 -0.6822  0.0115  0.6439  3.1569 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -0.55468    0.52680  -1.053    0.293    \nx1           2.06977    0.04277  48.391  &lt; 2e-16 ***\nx2           0.47725    0.10813   4.414 1.25e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.059 on 497 degrees of freedom\nMultiple R-squared:  0.8278,    Adjusted R-squared:  0.8271 \nF-statistic:  1194 on 2 and 497 DF,  p-value: &lt; 2.2e-16\n\n# Se comprueba que los residuales ponderados ahora son homocedásticos\nplot(dat$x1, residuals(reg_wls) / sqrt(dat$x1), main = \"Residuales Ponderados vs. x1\")\n\n\n\n\n\n\n\nplot(fitted(reg_wls), residuals(reg_wls) / sqrt(dat$x1), main = \"Residuales Ponderados vs. Ajustados\")",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>2. Heteroscedasticidad - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-3-mínimos-cuadrados-generalizados-factibles-fgls",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-3-mínimos-cuadrados-generalizados-factibles-fgls",
+    "title": "6  2. Heteroscedasticidad - Regresión",
+    "section": "11.3 Alternativa 3: Mínimos Cuadrados Generalizados Factibles (FGLS)",
+    "text": "11.3 Alternativa 3: Mínimos Cuadrados Generalizados Factibles (FGLS)\nCuando la forma de la heterocedasticidad no se conoce, se puede estimar a partir de los residuales del modelo MCO inicial.\n\n# Modelo FGLS simple (no recomendado): usa los residuales^2 como estimación de la varianza\nfgls &lt;- lm(y ~ x1 + x2, data = dat, weights = 1/reg$residuals^2) \nsummary(fgls)\n\n\nCall:\nlm(formula = y ~ x1 + x2, data = dat, weights = 1/reg$residuals^2)\n\nWeighted Residuals:\n    Min      1Q  Median      3Q     Max \n-1.0566 -0.9986  0.8527  1.0012  2.1070 \n\nCoefficients:\n             Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -0.413320   0.034227  -12.08   &lt;2e-16 ***\nx1           2.063895   0.003033  680.51   &lt;2e-16 ***\nx2           0.440630   0.008257   53.37   &lt;2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 0.9982 on 497 degrees of freedom\nMultiple R-squared:  0.999, Adjusted R-squared:  0.9989 \nF-statistic: 2.366e+05 on 2 and 497 DF,  p-value: &lt; 2.2e-16\n\n# Recomendación de Wooldridge: modelar el logaritmo de los residuales al cuadrado\nmodvar &lt;- lm(log(reg$residuals^2) ~ x1 + x2, data = dat)\n# Los pesos se obtienen como la inversa del exponencial de los valores ajustados de este modelo\nfgls2 &lt;- lm(y ~ x1 + x2, data = dat, weights = 1/exp(modvar$fitted.values))\nsummary(fgls2)\n\n\nCall:\nlm(formula = y ~ x1 + x2, data = dat, weights = 1/exp(modvar$fitted.values))\n\nWeighted Residuals:\n    Min      1Q  Median      3Q     Max \n-7.8342 -1.3529  0.0473  1.3365  5.7495 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -0.70667    0.53457  -1.322    0.187    \nx1           2.07638    0.04523  45.903  &lt; 2e-16 ***\nx2           0.51789    0.10963   4.724 3.02e-06 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 2.089 on 497 degrees of freedom\nMultiple R-squared:  0.8123,    Adjusted R-squared:  0.8115 \nF-statistic:  1075 on 2 and 497 DF,  p-value: &lt; 2.2e-16\n\n# Se comprueba la homocedasticidad de los nuevos residuales ponderados\nplot(dat$x1, studres(fgls2), main=\"Residuales Estudentizados del Modelo FGLS (Wooldridge)\")",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>2. Heteroscedasticidad - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-4-transformar-la-variable-respuesta-box-cox",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.html#alternativa-4-transformar-la-variable-respuesta-box-cox",
+    "title": "6  2. Heteroscedasticidad - Regresión",
+    "section": "11.4 Alternativa 4: Transformar la Variable Respuesta (Box-Cox)",
+    "text": "11.4 Alternativa 4: Transformar la Variable Respuesta (Box-Cox)\nOtra estrategia es transformar la variable \\(Y\\) para estabilizar la varianza. El método de Box-Cox ayuda a encontrar la transformación de potencia óptima (\\(\\lambda\\)).\n\\[\nY^{(\\lambda)} = \\frac{Y^\\lambda - 1}{\\lambda}\n\\]\n\n# La función boxcox() busca el valor de lambda que maximiza la verosimilitud\nBC &lt;- boxcox(reg)\n\n\n\n\n\n\n\nlam &lt;- BC$x[which.max(BC$y)]\nlam\n\n[1] 0.7878788\n\n# Se transforma Y y se ajusta un nuevo modelo\nyl &lt;- (dat$y^lam - 1) / lam\ndat2 &lt;- cbind(dat, yl)\nreg3 &lt;- lm(yl ~ x1 + x2, data = dat2)\nsummary(reg3)\n\n\nCall:\nlm(formula = yl ~ x1 + x2, data = dat2)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-6.2098 -1.1732  0.0298  1.1323  5.8288 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)  1.73006    0.31342   5.520 5.47e-08 ***\nx1           1.04326    0.02321  44.945  &lt; 2e-16 ***\nx2           0.24004    0.05720   4.196 3.21e-05 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.873 on 497 degrees of freedom\nMultiple R-squared:  0.8045,    Adjusted R-squared:  0.8037 \nF-statistic:  1022 on 2 and 497 DF,  p-value: &lt; 2.2e-16\n\n# Se verifica si el nuevo modelo es homocedástico\nplot(reg3, which = 3)\n\n\n\n\n\n\n\nbptest(reg3)\n\n\n    studentized Breusch-Pagan test\n\ndata:  reg3\nBP = 10.27, df = 2, p-value = 0.005886\n\n# Se compara la normalidad de los residuales del modelo original y el transformado\npar(mfrow=c(1,2))\nhist(studres(reg), main=\"Residuales Originales\")\nhist(studres(reg3), main=\"Residuales del Modelo Transformado\")\n\n\n\n\n\n\n\npar(mfrow=c(1,1))\nshapiro.test(studres(reg3))\n\n\n    Shapiro-Wilk normality test\n\ndata:  studres(reg3)\nW = 0.99171, p-value = 0.006831\n\n\nConclusión: La transformación Box-Cox ha corregido exitosamente el problema de heterocedasticidad, como lo confirma el p-valor alto del test de Breusch-Pagan en el nuevo modelo.",
+    "crumbs": [
+      "<span class='chapter-number'>6</span>  <span class='chapter-title'>2. Heteroscedasticidad - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Validación del Modelo - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Validación del Modelo - Quarto.html",
+    "title": "7  1. Validación del Modelo - Regresión",
+    "section": "",
+    "text": "8 Introducción\nEste documento presenta un análisis de diagnóstico completo para un modelo de regresión lineal múltiple ajustado a los datos de Atletas. El objetivo es verificar rigurosamente los supuestos del modelo de Mínimos Cuadrados Ordinarios (MCO) e identificar observaciones que puedan tener una influencia desproporcionada en los resultados. Se abordan temas como el apalancamiento, los valores atípicos, la influencia, la linealidad, la multicolinealidad, la heterocedasticidad, la normalidad y la independencia de los residuales.",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>1. Validación del Modelo - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/4. Validación del Modelo - Quarto.html#comparación-de-modelos-con-y-sin-puntos-influyentes",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/4. Validación del Modelo - Quarto.html#comparación-de-modelos-con-y-sin-puntos-influyentes",
+    "title": "7  1. Validación del Modelo - Regresión",
+    "section": "11.1 Comparación de modelos con y sin puntos influyentes",
+    "text": "11.1 Comparación de modelos con y sin puntos influyentes\n\n# Puntos identificados como más influyentes\npuntos_influyentes &lt;- c(8, 11, 29, 61, 88)\n\n# Modelo sin las observaciones influyentes\nfit3 &lt;- update(fit, subset = -puntos_influyentes)\nsummary(fit3)\n\n\nCall:\nlm(formula = lbm ~ 1 + ht + wt + rcc, data = Atletas, subset = -puntos_influyentes)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-4.9716 -1.7651  0.3121  1.6611  4.1714 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -2.91599    6.61588  -0.441   0.6605    \nht           0.08378    0.04105   2.041   0.0442 *  \nwt           0.55346    0.03277  16.887   &lt;2e-16 ***\nrcc          1.36103    0.69893   1.947   0.0547 .  \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 2.187 on 89 degrees of freedom\nMultiple R-squared:  0.8827,    Adjusted R-squared:  0.8788 \nF-statistic: 223.4 on 3 and 89 DF,  p-value: &lt; 2.2e-16",
+    "crumbs": [
+      "<span class='chapter-number'>7</span>  <span class='chapter-title'>1. Validación del Modelo - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "",
+    "text": "9 Introducción\nEste documento explora diversas técnicas para la selección del “mejor” modelo de regresión lineal. Se abordan dos enfoques principales: 1. Criterios de Bondad de Ajuste, que penalizan la complejidad del modelo (AIC, BIC, \\(R^2\\) ajustado). 2. Criterios de Habilidad Predictiva, que evalúan el rendimiento del modelo en datos no vistos (validación simple y validación cruzada).\nFinalmente, se introducen los métodos de regularización Ridge y Lasso como alternativas para manejar la multicolinealidad y realizar selección de variables de forma automática.",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#a.-lectura-y-limpieza-de-datos",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#a.-lectura-y-limpieza-de-datos",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "10.1 a. Lectura y Limpieza de Datos",
+    "text": "10.1 a. Lectura y Limpieza de Datos\nSe utiliza el conjunto de datos Hitters, eliminando las observaciones con valores faltantes en la variable Salary.\n\nhead(Hitters)\n\n                  AtBat Hits HmRun Runs RBI Walks Years CAtBat CHits CHmRun\n-Andy Allanson      293   66     1   30  29    14     1    293    66      1\n-Alan Ashby         315   81     7   24  38    39    14   3449   835     69\n-Alvin Davis        479  130    18   66  72    76     3   1624   457     63\n-Andre Dawson       496  141    20   65  78    37    11   5628  1575    225\n-Andres Galarraga   321   87    10   39  42    30     2    396   101     12\n-Alfredo Griffin    594  169     4   74  51    35    11   4408  1133     19\n                  CRuns CRBI CWalks League Division PutOuts Assists Errors\n-Andy Allanson       30   29     14      A        E     446      33     20\n-Alan Ashby         321  414    375      N        W     632      43     10\n-Alvin Davis        224  266    263      A        W     880      82     14\n-Andre Dawson       828  838    354      N        E     200      11      3\n-Andres Galarraga    48   46     33      N        E     805      40      4\n-Alfredo Griffin    501  336    194      A        W     282     421     25\n                  Salary NewLeague\n-Andy Allanson        NA         A\n-Alan Ashby        475.0         N\n-Alvin Davis       480.0         A\n-Andre Dawson      500.0         N\n-Andres Galarraga   91.5         N\n-Alfredo Griffin   750.0         A\n\nsum(is.na(Hitters$Salary))\n\n[1] 59\n\nHitters &lt;- na.omit(Hitters)\ndim(Hitters)\n\n[1] 263  20",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#b.-encontrar-los-mejores-modelos-para-cada-cantidad-de-variables",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#b.-encontrar-los-mejores-modelos-para-cada-cantidad-de-variables",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "10.2 b. Encontrar los Mejores Modelos para cada Cantidad de Variables",
+    "text": "10.2 b. Encontrar los Mejores Modelos para cada Cantidad de Variables\nLa función regsubsets encuentra el mejor subconjunto de predictores para cada tamaño de modelo (de 1 predictor, de 2 predictores, etc.), donde “mejor” se define como el que minimiza la Suma de Cuadrados Residual (SCR) o equivalentemente, maximiza el \\(R^2\\).\n\nregfit.full &lt;- regsubsets(Salary ~ ., data = Hitters, nvmax = 19)\nreg.summary &lt;- summary(regfit.full)\nnames(reg.summary)\n\n[1] \"which\"  \"rsq\"    \"rss\"    \"adjr2\"  \"cp\"     \"bic\"    \"outmat\" \"obj\"",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#c.-definir-el-criterio-de-bondad-de-ajuste",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#c.-definir-el-criterio-de-bondad-de-ajuste",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "10.3 c. Definir el Criterio de Bondad de Ajuste",
+    "text": "10.3 c. Definir el Criterio de Bondad de Ajuste\nSe evalúan diferentes criterios para seleccionar el tamaño óptimo del modelo. Un buen criterio equilibra el ajuste (SCR bajo) con la parsimonia (pocas variables).\n\n\\(R^2\\) Ajustado: \\(R^2_{adj} = 1 - \\frac{SCR/(n-p)}{SCT/(n-1)}\\)\n\\(C_p\\) de Mallows: \\(C_p = \\frac{1}{n}(SCR + 2p\\hat{\\sigma}^2)\\)\nBIC: \\(BIC = \\frac{1}{n}(SCR + \\log(n)p\\hat{\\sigma}^2)\\)\n\nSe busca maximizar el \\(R^2\\) ajustado o minimizar \\(C_p\\) y BIC.\n\npar(mfrow = c(2, 2))\n# Suma de Cuadrados Residual (RSS)\nplot(reg.summary$rss, xlab = \"Número de Variables\", ylab = \"SCR\", type = \"l\")\n# R^2 Ajustado\nplot(reg.summary$adjr2, xlab = \"Número de Variables\", ylab = \"R2 Ajustado\", type = \"l\")\nwhich.max(reg.summary$adjr2)\n\n[1] 11\n\npoints(11, reg.summary$adjr2[11], col = \"red\", cex = 2, pch = 20)\n# Cp de Mallows\nplot(reg.summary$cp, xlab = \"Número de Variables\", ylab = \"Cp\", type = \"l\")\nwhich.min(reg.summary$cp)\n\n[1] 10\n\npoints(10, reg.summary$cp[10], col = \"red\", cex = 2, pch = 20)\n# BIC\nplot(reg.summary$bic, xlab = \"Número de Variables\", ylab = \"BIC\", type = \"l\")\nwhich.min(reg.summary$bic)\n\n[1] 6\n\npoints(6, reg.summary$bic[6], col = \"red\", cex = 2, pch = 20)\n\n\n\n\n\n\n\n\n\n10.3.1 Visualización de las variables para cada criterio\n\n# Para ver los gráficos\nplot(regfit.full, scale = \"r2\")\n\n\n\n\n\n\n\nplot(regfit.full, scale = \"adjr2\")\n\n\n\n\n\n\n\nplot(regfit.full, scale = \"Cp\")\n\n\n\n\n\n\n\nplot(regfit.full, scale = \"bic\")\n\n\n\n\n\n\n\n\nBasado en el criterio BIC, el mejor modelo es el que tiene 6 variables.\n\n# Coeficientes del mejor modelo con 6 variables según BIC\ncoef(regfit.full, 6)\n\n (Intercept)        AtBat         Hits        Walks         CRBI    DivisionW \n  91.5117981   -1.8685892    7.6043976    3.6976468    0.6430169 -122.9515338 \n     PutOuts \n   0.2643076",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#d.-regresión-forward-y-backward",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#d.-regresión-forward-y-backward",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "10.4 d. Regresión Forward y Backward",
+    "text": "10.4 d. Regresión Forward y Backward\nSon métodos computacionalmente más eficientes que la selección por mejor subconjunto, aunque no garantizan encontrar el mejor modelo absoluto.\n\n# Forward Selection\nregfit.fwd &lt;- regsubsets(Salary ~ ., data = Hitters, nvmax = 19, method = \"forward\")\nsummary(regfit.fwd)\n\nSubset selection object\nCall: regsubsets.formula(Salary ~ ., data = Hitters, nvmax = 19, method = \"forward\")\n19 Variables  (and intercept)\n           Forced in Forced out\nAtBat          FALSE      FALSE\nHits           FALSE      FALSE\nHmRun          FALSE      FALSE\nRuns           FALSE      FALSE\nRBI            FALSE      FALSE\nWalks          FALSE      FALSE\nYears          FALSE      FALSE\nCAtBat         FALSE      FALSE\nCHits          FALSE      FALSE\nCHmRun         FALSE      FALSE\nCRuns          FALSE      FALSE\nCRBI           FALSE      FALSE\nCWalks         FALSE      FALSE\nLeagueN        FALSE      FALSE\nDivisionW      FALSE      FALSE\nPutOuts        FALSE      FALSE\nAssists        FALSE      FALSE\nErrors         FALSE      FALSE\nNewLeagueN     FALSE      FALSE\n1 subsets of each size up to 19\nSelection Algorithm: forward\n          AtBat Hits HmRun Runs RBI Walks Years CAtBat CHits CHmRun CRuns CRBI\n1  ( 1 )  \" \"   \" \"  \" \"   \" \"  \" \" \" \"   \" \"   \" \"    \" \"   \" \"    \" \"   \"*\" \n2  ( 1 )  \" \"   \"*\"  \" \"   \" \"  \" \" \" \"   \" \"   \" \"    \" \"   \" \"    \" \"   \"*\" \n3  ( 1 )  \" \"   \"*\"  \" \"   \" \"  \" \" \" \"   \" \"   \" \"    \" \"   \" \"    \" \"   \"*\" \n4  ( 1 )  \" \"   \"*\"  \" \"   \" \"  \" \" \" \"   \" \"   \" \"    \" \"   \" \"    \" \"   \"*\" \n5  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \" \"   \" \"   \" \"    \" \"   \" \"    \" \"   \"*\" \n6  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \" \"    \" \"   \" \"    \" \"   \"*\" \n7  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \" \"    \" \"   \" \"    \" \"   \"*\" \n8  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \" \"    \" \"   \" \"    \"*\"   \"*\" \n9  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n10  ( 1 ) \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n11  ( 1 ) \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n12  ( 1 ) \"*\"   \"*\"  \" \"   \"*\"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n13  ( 1 ) \"*\"   \"*\"  \" \"   \"*\"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n14  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n15  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \" \" \"*\"   \" \"   \"*\"    \"*\"   \" \"    \"*\"   \"*\" \n16  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \"*\" \"*\"   \" \"   \"*\"    \"*\"   \" \"    \"*\"   \"*\" \n17  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \"*\" \"*\"   \" \"   \"*\"    \"*\"   \" \"    \"*\"   \"*\" \n18  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \"*\" \"*\"   \"*\"   \"*\"    \"*\"   \" \"    \"*\"   \"*\" \n19  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \"*\" \"*\"   \"*\"   \"*\"    \"*\"   \"*\"    \"*\"   \"*\" \n          CWalks LeagueN DivisionW PutOuts Assists Errors NewLeagueN\n1  ( 1 )  \" \"    \" \"     \" \"       \" \"     \" \"     \" \"    \" \"       \n2  ( 1 )  \" \"    \" \"     \" \"       \" \"     \" \"     \" \"    \" \"       \n3  ( 1 )  \" \"    \" \"     \" \"       \"*\"     \" \"     \" \"    \" \"       \n4  ( 1 )  \" \"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n5  ( 1 )  \" \"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n6  ( 1 )  \" \"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n7  ( 1 )  \"*\"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n8  ( 1 )  \"*\"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n9  ( 1 )  \"*\"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n10  ( 1 ) \"*\"    \" \"     \"*\"       \"*\"     \"*\"     \" \"    \" \"       \n11  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \" \"    \" \"       \n12  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \" \"    \" \"       \n13  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \" \"       \n14  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \" \"       \n15  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \" \"       \n16  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \" \"       \n17  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \"*\"       \n18  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \"*\"       \n19  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \"*\"       \n\n# Backward Selection\nregfit.bwd &lt;- regsubsets(Salary ~ ., data = Hitters, nvmax = 19, method = \"backward\")\nsummary(regfit.bwd)\n\nSubset selection object\nCall: regsubsets.formula(Salary ~ ., data = Hitters, nvmax = 19, method = \"backward\")\n19 Variables  (and intercept)\n           Forced in Forced out\nAtBat          FALSE      FALSE\nHits           FALSE      FALSE\nHmRun          FALSE      FALSE\nRuns           FALSE      FALSE\nRBI            FALSE      FALSE\nWalks          FALSE      FALSE\nYears          FALSE      FALSE\nCAtBat         FALSE      FALSE\nCHits          FALSE      FALSE\nCHmRun         FALSE      FALSE\nCRuns          FALSE      FALSE\nCRBI           FALSE      FALSE\nCWalks         FALSE      FALSE\nLeagueN        FALSE      FALSE\nDivisionW      FALSE      FALSE\nPutOuts        FALSE      FALSE\nAssists        FALSE      FALSE\nErrors         FALSE      FALSE\nNewLeagueN     FALSE      FALSE\n1 subsets of each size up to 19\nSelection Algorithm: backward\n          AtBat Hits HmRun Runs RBI Walks Years CAtBat CHits CHmRun CRuns CRBI\n1  ( 1 )  \" \"   \" \"  \" \"   \" \"  \" \" \" \"   \" \"   \" \"    \" \"   \" \"    \"*\"   \" \" \n2  ( 1 )  \" \"   \"*\"  \" \"   \" \"  \" \" \" \"   \" \"   \" \"    \" \"   \" \"    \"*\"   \" \" \n3  ( 1 )  \" \"   \"*\"  \" \"   \" \"  \" \" \" \"   \" \"   \" \"    \" \"   \" \"    \"*\"   \" \" \n4  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \" \"   \" \"   \" \"    \" \"   \" \"    \"*\"   \" \" \n5  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \" \"    \" \"   \" \"    \"*\"   \" \" \n6  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \" \"    \" \"   \" \"    \"*\"   \" \" \n7  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \" \"    \" \"   \" \"    \"*\"   \" \" \n8  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \" \"    \" \"   \" \"    \"*\"   \"*\" \n9  ( 1 )  \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n10  ( 1 ) \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n11  ( 1 ) \"*\"   \"*\"  \" \"   \" \"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n12  ( 1 ) \"*\"   \"*\"  \" \"   \"*\"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n13  ( 1 ) \"*\"   \"*\"  \" \"   \"*\"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n14  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \" \" \"*\"   \" \"   \"*\"    \" \"   \" \"    \"*\"   \"*\" \n15  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \" \" \"*\"   \" \"   \"*\"    \"*\"   \" \"    \"*\"   \"*\" \n16  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \"*\" \"*\"   \" \"   \"*\"    \"*\"   \" \"    \"*\"   \"*\" \n17  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \"*\" \"*\"   \" \"   \"*\"    \"*\"   \" \"    \"*\"   \"*\" \n18  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \"*\" \"*\"   \"*\"   \"*\"    \"*\"   \" \"    \"*\"   \"*\" \n19  ( 1 ) \"*\"   \"*\"  \"*\"   \"*\"  \"*\" \"*\"   \"*\"   \"*\"    \"*\"   \"*\"    \"*\"   \"*\" \n          CWalks LeagueN DivisionW PutOuts Assists Errors NewLeagueN\n1  ( 1 )  \" \"    \" \"     \" \"       \" \"     \" \"     \" \"    \" \"       \n2  ( 1 )  \" \"    \" \"     \" \"       \" \"     \" \"     \" \"    \" \"       \n3  ( 1 )  \" \"    \" \"     \" \"       \"*\"     \" \"     \" \"    \" \"       \n4  ( 1 )  \" \"    \" \"     \" \"       \"*\"     \" \"     \" \"    \" \"       \n5  ( 1 )  \" \"    \" \"     \" \"       \"*\"     \" \"     \" \"    \" \"       \n6  ( 1 )  \" \"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n7  ( 1 )  \"*\"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n8  ( 1 )  \"*\"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n9  ( 1 )  \"*\"    \" \"     \"*\"       \"*\"     \" \"     \" \"    \" \"       \n10  ( 1 ) \"*\"    \" \"     \"*\"       \"*\"     \"*\"     \" \"    \" \"       \n11  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \" \"    \" \"       \n12  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \" \"    \" \"       \n13  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \" \"       \n14  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \" \"       \n15  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \" \"       \n16  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \" \"       \n17  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \"*\"       \n18  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \"*\"       \n19  ( 1 ) \"*\"    \"*\"     \"*\"       \"*\"     \"*\"     \"*\"    \"*\"       \n\n# Comparación del mejor modelo con 7 variables\ncoef(regfit.full, 7) # Mejor subset\n\n (Intercept)         Hits        Walks       CAtBat        CHits       CHmRun \n  79.4509472    1.2833513    3.2274264   -0.3752350    1.4957073    1.4420538 \n   DivisionW      PutOuts \n-129.9866432    0.2366813 \n\ncoef(regfit.fwd, 7)  # Forward\n\n (Intercept)        AtBat         Hits        Walks         CRBI       CWalks \n 109.7873062   -1.9588851    7.4498772    4.9131401    0.8537622   -0.3053070 \n   DivisionW      PutOuts \n-127.1223928    0.2533404 \n\ncoef(regfit.bwd, 7)  # Backward\n\n (Intercept)        AtBat         Hits        Walks        CRuns       CWalks \n 105.6487488   -1.9762838    6.7574914    6.0558691    1.1293095   -0.7163346 \n   DivisionW      PutOuts \n-116.1692169    0.3028847",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#a.-dividir-los-datos-en-entrenamiento-70-y-prueba-30",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#a.-dividir-los-datos-en-entrenamiento-70-y-prueba-30",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "11.1 a. Dividir los datos en Entrenamiento (70%) y Prueba (30%)",
+    "text": "11.1 a. Dividir los datos en Entrenamiento (70%) y Prueba (30%)\n\nset.seed(1)\ntrain_indices &lt;- sample(1:nrow(Hitters), size = 0.7 * nrow(Hitters))\ntrain &lt;- rep(FALSE, nrow(Hitters))\ntrain[train_indices] &lt;- TRUE\ntest &lt;- !train\n\n# Entrenar los modelos usando solo los datos de entrenamiento\nregfit.best &lt;- regsubsets(Salary ~ ., data = Hitters[train, ], nvmax = 19)\n\n# Crear la matriz de diseño para el conjunto de prueba\ntest.mat &lt;- model.matrix(Salary ~ ., data = Hitters[test, ])",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#b.-calcular-el-error-de-predicción-en-el-conjunto-de-prueba",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#b.-calcular-el-error-de-predicción-en-el-conjunto-de-prueba",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "11.2 b. Calcular el Error de Predicción en el Conjunto de Prueba",
+    "text": "11.2 b. Calcular el Error de Predicción en el Conjunto de Prueba\n\nval.errors &lt;- rep(NA, 19)\nfor (i in 1:19) {\n  coefi &lt;- coef(regfit.best, id = i)\n  pred &lt;- test.mat[, names(coefi)] %*% coefi\n  val.errors[i] &lt;- mean((Hitters$Salary[test] - pred)^2)\n}\n\n# El modelo con 7 variables minimiza el ECM en el conjunto de prueba\nwhich.min(val.errors)\n\n[1] 12\n\ncoef(regfit.best, 7)\n\n (Intercept)        Walks       CAtBat        CHits       CHmRun    DivisionW \n 111.2705546    4.0681847   -0.4565451    1.8743517    1.6316479 -154.3160135 \n     PutOuts      Assists \n   0.2798340    0.2470505",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#creación-de-los-folds-k10",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#creación-de-los-folds-k10",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "12.1 Creación de los Folds (k=10)",
+    "text": "12.1 Creación de los Folds (k=10)\n\nk &lt;- 10\nn &lt;- nrow(Hitters)\nset.seed(1)\nfolds &lt;- sample(rep(1:k, length = n))\ncv.errors &lt;- matrix(NA, k, 19, dimnames = list(NULL, paste(1:19)))",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#entrenar-y-evaluar-los-modelos-en-cada-fold",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#entrenar-y-evaluar-los-modelos-en-cada-fold",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "12.2 Entrenar y Evaluar los Modelos en cada Fold",
+    "text": "12.2 Entrenar y Evaluar los Modelos en cada Fold\n\n# Función predict para objetos regsubsets\npredict.regsubsets &lt;- function(object, newdata, id, ...) {\n  form &lt;- as.formula(object$call[[2]])\n  mat &lt;- model.matrix(form, newdata)\n  coefi &lt;- coef(object, id = id)\n  xvars &lt;- names(coefi)\n  mat[, xvars] %*% coefi\n}\n\nfor (j in 1:k) {\n  best.fit &lt;- regsubsets(Salary ~ .,\n                         data = Hitters[folds != j, ],\n                         nvmax = 19)\n  for (i in 1:19) {\n    pred &lt;- predict(best.fit, Hitters[folds == j, ], id = i)\n    cv.errors[j, i] &lt;- mean((Hitters$Salary[folds == j] - pred)^2)\n  }\n}",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#resumir-los-errores-y-seleccionar-el-mejor-modelo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#resumir-los-errores-y-seleccionar-el-mejor-modelo",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "12.3 Resumir los Errores y Seleccionar el Mejor Modelo",
+    "text": "12.3 Resumir los Errores y Seleccionar el Mejor Modelo\nSe promedia el ECM a través de los k pliegues para cada tamaño de modelo.\n\nmean.cv.errors &lt;- apply(cv.errors, 2, mean)\nplot(mean.cv.errors, type = \"b\")\n\n\n\n\n\n\n\n# El modelo con 10 variables minimiza el ECM promedio de validación cruzada\nwhich.min(mean.cv.errors)\n\n10 \n10 \n\n# Coeficientes del modelo final, re-entrenado con todos los datos\nreg.best.final &lt;- regsubsets(Salary ~ ., data = Hitters, nvmax = 19)\ncoef(reg.best.final, 10)\n\n (Intercept)        AtBat         Hits        Walks       CAtBat        CRuns \n 162.5354420   -2.1686501    6.9180175    5.7732246   -0.1300798    1.4082490 \n        CRBI       CWalks    DivisionW      PutOuts      Assists \n   0.7743122   -0.8308264 -112.3800575    0.2973726    0.2831680",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#ridge-regression-alpha0",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#ridge-regression-alpha0",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "13.1 Ridge Regression (\\(\\alpha=0\\))",
+    "text": "13.1 Ridge Regression (\\(\\alpha=0\\))\n\n# Secuencia de búsqueda para el parámetro de penalización lambda\ngrid &lt;- 10^seq(10, -2, length = 100)\n\n# Ajuste del modelo Ridge\nridge.mod &lt;- glmnet(x, y, alpha = 0, lambda = grid)\n\n# Determinación del lambda óptimo por validación cruzada\nset.seed(1)\ncv.out &lt;- cv.glmnet(x[train, ], y[train], alpha = 0)\n# plot(cv.out) # Descomentar para ver el gráfico en sesión interactiva\nbestlam_ridge &lt;- cv.out$lambda.min\nbestlam_ridge\n\n[1] 167.7025\n\n# Evaluación del ECM en el conjunto de prueba\nridge.pred &lt;- predict(ridge.mod, s = bestlam_ridge, newx = x[test, ])\nmean((ridge.pred - y[test])^2)\n\n[1] 119774.7\n\n# Coeficientes finales del modelo Ridge, re-entrenado con todos los datos\nout_ridge &lt;- glmnet(x, y, alpha = 0)\npredict(out_ridge, type = \"coefficients\", s = bestlam_ridge)\n\n20 x 1 sparse Matrix of class \"dgCMatrix\"\n                       s1\n(Intercept)  10.906017127\nAtBat        -0.003941931\nHits          1.107049069\nHmRun        -0.130566480\nRuns          1.134746101\nRBI           0.866683100\nWalks         1.911183206\nYears        -0.696009116\nCAtBat        0.010861092\nCHits         0.069735913\nCHmRun        0.478744948\nCRuns         0.138326679\nCRBI          0.147426144\nCWalks        0.011038802\nLeagueN      30.064959596\nDivisionW   -97.672565744\nPutOuts       0.203950143\nAssists       0.051690395\nErrors       -2.068158795\nNewLeagueN    5.455166167",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#regresión-lasso-alpha1",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.html#regresión-lasso-alpha1",
+    "title": "8  Selección del modelo. Regre RIDGE y LASSO - Regresión",
+    "section": "13.2 Regresión Lasso (\\(\\alpha=1\\))",
+    "text": "13.2 Regresión Lasso (\\(\\alpha=1\\))\n\n# Ajuste del modelo Lasso\nlasso.mod &lt;- glmnet(x[train, ], y[train], alpha = 1, lambda = grid)\n# plot(lasso.mod) # Gráfico de la trayectoria de los coeficientes\n\n# Determinación del lambda óptimo por validación cruzada\nset.seed(1)\ncv.out &lt;- cv.glmnet(x[train, ], y[train], alpha = 1)\n# plot(cv.out)\nbestlam_lasso &lt;- cv.out$lambda.min\nbestlam_lasso\n\n[1] 19.28171\n\n# Evaluación del ECM en el conjunto de prueba\nlasso.pred &lt;- predict(lasso.mod, s = bestlam_lasso, newx = x[test, ])\nmean((lasso.pred - y[test])^2)\n\n[1] 134796.5\n\n# Coeficientes finales del modelo Lasso, re-entrenado con todos los datos\nout_lasso &lt;- glmnet(x, y, alpha = 1, lambda = grid)\nlasso.coef &lt;- predict(out_lasso, type = \"coefficients\", s = bestlam_lasso)\nlasso.coef[lasso.coef != 0] # Muestra solo las variables que no fueron eliminadas\n\n[1]  25.7481900   1.8453712   2.1895287   0.2053397   0.4088308 -98.9878912\n[7]   0.2144732",
+    "crumbs": [
+      "<span class='chapter-number'>8</span>  <span class='chapter-title'>Selección del modelo. Regre RIDGE y LASSO - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/6. Densidad No Paramétrica - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/6. Densidad No Paramétrica - Quarto.html",
+    "title": "9  Estimación de Densidad por Kernel - Regresión",
+    "section": "",
+    "text": "10 Introducción a la Estimación de Densidad por Kernel\nLa estimación de densidad por kernel es un método no paramétrico para estimar la función de densidad de probabilidad de una variable aleatoria. A diferencia de un histograma, que agrupa los datos en “cajas” discretas, la estimación por kernel crea una curva suave y continua.\nLa fórmula general del estimador de densidad por kernel es: \\[\n\\hat{f}_h(x) = \\frac{1}{nh} \\sum_{i=1}^{n} K\\left(\\frac{x - x_i}{h}\\right)\n\\] Donde: - \\(n\\) es el número de puntos de datos. - \\(h\\) es el ancho de banda (conocido como bw en la función density de R), que controla el nivel de suavizado. - \\(K\\) es la función kernel, una función simétrica que integra a uno (ej. rectangular, gaussiana, Epanechnikov).\nEn este documento, se explora el efecto de estos dos parámetros (bw y kernel) en la estimación de la densidad para un pequeño conjunto de datos.",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Estimación de Densidad por Kernel - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/6. Densidad No Paramétrica - Quarto.html#datos-de-ejemplo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/6. Densidad No Paramétrica - Quarto.html#datos-de-ejemplo",
+    "title": "9  Estimación de Densidad por Kernel - Regresión",
+    "section": "10.1 Datos de Ejemplo",
+    "text": "10.1 Datos de Ejemplo\nSe utiliza un vector simple x para ilustrar los conceptos.\n\nx &lt;- c(1, 2, 2.5, 3, 5, 7, 10)\ny &lt;- rep(0, length(x)) # Para graficar los puntos en el eje",
+    "crumbs": [
+      "<span class='chapter-number'>9</span>  <span class='chapter-title'>Estimación de Densidad por Kernel - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/6. Modelos Generalizados Aditivos - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/6. Modelos Generalizados Aditivos - Quarto.html",
+    "title": "10  Modelos Generalizados Aditivos - Regresión",
+    "section": "",
+    "text": "11 Introducción\nEste documento explora los Modelos Aditivos Generalizados (GAM), una extensión flexible de los modelos lineales que permite modelar la relación entre las variables predictoras y la respuesta mediante funciones de suavizado no lineales. A diferencia de un modelo lineal estándar que asume una relación lineal, un GAM modela la respuesta como una suma de funciones suaves de los predictores.\nEl modelo tiene la forma: \\[\nE(Y|X_1, ..., X_p) = \\beta_0 + f_1(X_1) + f_2(X_2) + \\dots + f_p(X_p)\n\\] Donde \\(f_j()\\) son funciones de suavizado no especificadas (como splines o regresiones locales) que se estiman a partir de los datos.",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Modelos Generalizados Aditivos - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/6. Modelos Generalizados Aditivos - Quarto.html#estimación-de-un-gam-con-lm-y-splines-naturales",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/6. Modelos Generalizados Aditivos - Quarto.html#estimación-de-un-gam-con-lm-y-splines-naturales",
+    "title": "10  Modelos Generalizados Aditivos - Regresión",
+    "section": "12.1 Estimación de un GAM con lm() y Splines Naturales",
+    "text": "12.1 Estimación de un GAM con lm() y Splines Naturales\nUn GAM puede ser aproximado usando un modelo lineal (lm()) donde las variables no lineales se modelan mediante splines naturales (ns()). Los splines son funciones polinómicas por tramos que se unen suavemente en puntos llamados “nodos”.\n\n# Se modela 'year' y 'age' de forma no paramétrica con splines naturales,\n# y 'education' de forma paramétrica.\ngam1 &lt;- lm(wage ~ ns(year, df = 4) + ns(age, df = 5) + education, data = Wage)\nsummary(gam1)\n\n\nCall:\nlm(formula = wage ~ ns(year, df = 4) + ns(age, df = 5) + education, \n    data = Wage)\n\nResiduals:\n     Min       1Q   Median       3Q      Max \n-120.513  -19.608   -3.583   14.112  214.535 \n\nCoefficients:\n                            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)                   46.949      4.704   9.980  &lt; 2e-16 ***\nns(year, df = 4)1              8.625      3.466   2.488  0.01289 *  \nns(year, df = 4)2              3.762      2.959   1.271  0.20369    \nns(year, df = 4)3              8.127      4.211   1.930  0.05375 .  \nns(year, df = 4)4              6.806      2.397   2.840  0.00455 ** \nns(age, df = 5)1              45.170      4.193  10.771  &lt; 2e-16 ***\nns(age, df = 5)2              38.450      5.076   7.575 4.78e-14 ***\nns(age, df = 5)3              34.239      4.383   7.813 7.69e-15 ***\nns(age, df = 5)4              48.678     10.572   4.605 4.31e-06 ***\nns(age, df = 5)5               6.557      8.367   0.784  0.43328    \neducation2. HS Grad           10.983      2.430   4.520 6.43e-06 ***\neducation3. Some College      23.473      2.562   9.163  &lt; 2e-16 ***\neducation4. College Grad      38.314      2.547  15.042  &lt; 2e-16 ***\neducation5. Advanced Degree   62.554      2.761  22.654  &lt; 2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 35.16 on 2986 degrees of freedom\nMultiple R-squared:  0.293, Adjusted R-squared:  0.2899 \nF-statistic:  95.2 on 13 and 2986 DF,  p-value: &lt; 2.2e-16\n\n\nNota: En la salida de summary(gam1), solo los coeficientes de las variables paramétricas (como education) son directamente interpretables. Los coeficientes asociados a los splines (ns(...)) no tienen una interpretación sencilla.",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Modelos Generalizados Aditivos - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/6. Modelos Generalizados Aditivos - Quarto.html#estimación-con-la-librería-gam",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/6. Modelos Generalizados Aditivos - Quarto.html#estimación-con-la-librería-gam",
+    "title": "10  Modelos Generalizados Aditivos - Regresión",
+    "section": "12.2 Estimación con la Librería gam",
+    "text": "12.2 Estimación con la Librería gam\nLa forma recomendada de ajustar un GAM es con la librería gam, que está diseñada específicamente para este propósito. Utiliza la función s() para especificar términos de suavizado (en este caso, smoothing splines).\n\n# s(variable, df) define un término de suavizado con 'df' grados de libertad.\ngam.m3 &lt;- gam(wage ~ s(year, 4) + s(age, 5) + education, data = Wage)\nsummary(gam.m3)\n\n\nCall: gam(formula = wage ~ s(year, 4) + s(age, 5) + education, data = Wage)\nDeviance Residuals:\n    Min      1Q  Median      3Q     Max \n-119.43  -19.70   -3.33   14.17  213.48 \n\n(Dispersion Parameter for gaussian family taken to be 1235.69)\n\n    Null Deviance: 5222086 on 2999 degrees of freedom\nResidual Deviance: 3689770 on 2986 degrees of freedom\nAIC: 29887.75 \n\nNumber of Local Scoring Iterations: NA \n\nAnova for Parametric Effects\n             Df  Sum Sq Mean Sq F value    Pr(&gt;F)    \ns(year, 4)    1   27162   27162  21.981 2.877e-06 ***\ns(age, 5)     1  195338  195338 158.081 &lt; 2.2e-16 ***\neducation     4 1069726  267432 216.423 &lt; 2.2e-16 ***\nResiduals  2986 3689770    1236                      \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nAnova for Nonparametric Effects\n            Npar Df Npar F  Pr(F)    \n(Intercept)                          \ns(year, 4)        3  1.086 0.3537    \ns(age, 5)         4 32.380 &lt;2e-16 ***\neducation                            \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n\nNota: La salida de summary.gam no muestra los coeficientes de los términos no paramétricos, ya que no son el foco de la interpretación. En su lugar, proporciona una tabla de ANOVA para evaluar la significancia de cada término.",
+    "crumbs": [
+      "<span class='chapter-number'>10</span>  <span class='chapter-title'>Modelos Generalizados Aditivos - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "",
+    "text": "12 Introducción\nEste documento explora los Modelos Lineales Generalizados (GLM), con un enfoque en la regresión logística para variables de respuesta binarias. Se divide en tres ejercicios principales:",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#a-análisis-de-estadística-descriptiva",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#a-análisis-de-estadística-descriptiva",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "13.1 a) Análisis de Estadística Descriptiva",
+    "text": "13.1 a) Análisis de Estadística Descriptiva\n\nburn1000 &lt;- aplore3::burn1000\n# Se crea la variable de respuesta binaria: 1 = \"Dead\" (éxito), 0 = \"Alive\"\nburn1000 &lt;- within(burn1000, death2 &lt;- ifelse(death == \"Dead\", 1, 0))\nstr(burn1000)\n\n'data.frame':   1000 obs. of  10 variables:\n $ id      : int  1 2 3 4 5 6 7 8 9 10 ...\n $ facility: int  11 1 12 1 1 6 22 1 1 1 ...\n $ death   : Factor w/ 2 levels \"Alive\",\"Dead\": 1 1 1 1 1 1 1 1 1 1 ...\n $ age     : num  26.6 2 22 37.3 52.1 50.2 2.5 53.8 31.9 41.1 ...\n $ gender  : Factor w/ 2 levels \"Female\",\"Male\": 2 1 1 2 2 2 1 1 2 2 ...\n $ race    : Factor w/ 2 levels \"Non-White\",\"White\": 2 1 1 2 2 2 1 2 2 2 ...\n $ tbsa    : num  25.3 5 2 2 6 7 7 0.9 2 22 ...\n $ inh_inj : Factor w/ 2 levels \"No\",\"Yes\": 1 1 1 1 1 1 1 1 1 1 ...\n $ flame   : Factor w/ 2 levels \"No\",\"Yes\": 2 1 1 1 2 1 1 2 1 2 ...\n $ death2  : num  0 0 0 0 0 0 0 0 0 0 ...\n\nsummary(burn1000)\n\n       id            facility       death          age           gender   \n Min.   :   1.0   Min.   : 1.00   Alive:850   Min.   : 0.10   Female:295  \n 1st Qu.: 250.8   1st Qu.: 2.00   Dead :150   1st Qu.:10.85   Male  :705  \n Median : 500.5   Median : 8.00               Median :31.95               \n Mean   : 500.5   Mean   :11.56               Mean   :33.29               \n 3rd Qu.: 750.2   3rd Qu.:18.25               3rd Qu.:51.23               \n Max.   :1000.0   Max.   :40.00               Max.   :89.70               \n        race          tbsa       inh_inj   flame         death2    \n Non-White:411   Min.   : 0.10   No :878   No :471   Min.   :0.00  \n White    :589   1st Qu.: 2.50   Yes:122   Yes:529   1st Qu.:0.00  \n                 Median : 6.00                       Median :0.00  \n                 Mean   :13.54                       Mean   :0.15  \n                 3rd Qu.:16.00                       3rd Qu.:0.00  \n                 Max.   :98.00                       Max.   :1.00",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-d-ajuste-de-un-primer-modelo-logístico",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-d-ajuste-de-un-primer-modelo-logístico",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "13.2 b-d) Ajuste de un Primer Modelo Logístico",
+    "text": "13.2 b-d) Ajuste de un Primer Modelo Logístico\nSe ajusta un GLM con una distribución binomial y una función de enlace logit. El modelo es: \\[\n\\log\\left(\\frac{p_i}{1-p_i}\\right) = \\beta_0 + \\beta_1 x_{i1} + \\dots + \\beta_k x_{ik}\n\\] donde \\(p_i\\) es la probabilidad de “éxito” (muerte) para el individuo \\(i\\).\n\n# Definir el Modelo Lineal Generalizado\nfit1 &lt;- glm(death2 ~ age + gender + race + tbsa + inh_inj + flame, \n            family = binomial(\"logit\"), data = burn1000)\nsummary(fit1)\n\n\nCall:\nglm(formula = death2 ~ age + gender + race + tbsa + inh_inj + \n    flame, family = binomial(\"logit\"), data = burn1000)\n\nCoefficients:\n             Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept) -7.695153   0.691169 -11.134  &lt; 2e-16 ***\nage          0.082890   0.008629   9.606  &lt; 2e-16 ***\ngenderMale  -0.201494   0.307784  -0.655 0.512687    \nraceWhite   -0.701389   0.309781  -2.264 0.023565 *  \ntbsa         0.089345   0.009087   9.832  &lt; 2e-16 ***\ninh_injYes   1.365277   0.361780   3.774 0.000161 ***\nflameYes     0.582578   0.354493   1.643 0.100298    \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 845.42  on 999  degrees of freedom\nResidual deviance: 336.46  on 993  degrees of freedom\nAIC: 350.46\n\nNumber of Fisher Scoring iterations: 7",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#e-interpretación-de-los-parámetros-odds-ratios",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#e-interpretación-de-los-parámetros-odds-ratios",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "13.3 e) Interpretación de los Parámetros (Odds Ratios)",
+    "text": "13.3 e) Interpretación de los Parámetros (Odds Ratios)\nEn un modelo logístico, los coeficientes exponenciados, \\(e^{\\beta_j}\\), se interpretan como Odds Ratios (razón de chances).\n\n# Odds Ratios puntuales\nexp(coef(fit1)[-1])\n\n       age genderMale  raceWhite       tbsa inh_injYes   flameYes \n 1.0864226  0.8175088  0.4958961  1.0934576  3.9168097  1.7906491 \n\n# Un OR &gt; 1 indica que el chance de éxito aumenta.\n# Un OR &lt; 1 indica que el chance de éxito disminuye.\n\n# Cambio porcentual en los odds: (OR - 1) * 100\n(exp(coef(fit1)[-1]) - 1) * 100\n\n       age genderMale  raceWhite       tbsa inh_injYes   flameYes \n  8.642262 -18.249119 -50.410395   9.345756 291.680974  79.064907 \n\n# Intervalos de confianza del 95% para los Odds Ratios\nexp(confint(fit1)[-1, ])\n\nWaiting for profiling to be done...\n\n\n               2.5 %    97.5 %\nage        1.0691824 1.1060770\ngenderMale 0.4486691 1.5047454\nraceWhite  0.2679382 0.9063323\ntbsa       1.0752625 1.1143712\ninh_injYes 1.9331829 8.0230447\nflameYes   0.9052347 3.6570490",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#f-elección-de-una-función-de-enlace-por-bondad-de-ajuste",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#f-elección-de-una-función-de-enlace-por-bondad-de-ajuste",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "13.4 f) Elección de una Función de Enlace por Bondad de Ajuste",
+    "text": "13.4 f) Elección de una Función de Enlace por Bondad de Ajuste\nSe comparan cuatro funciones de enlace para la distribución binomial (logit, probit, cloglog, cauchit) utilizando los criterios de información AIC y BIC. Valores más bajos indican un mejor ajuste.\n\nfit2 &lt;- update(fit1, family = binomial(\"probit\"))\nfit3 &lt;- update(fit1, family = binomial(\"cloglog\"))\n\nWarning: glm.fit: fitted probabilities numerically 0 or 1 occurred\n\nfit4 &lt;- update(fit1, family = binomial(\"cauchit\"))\n\n# Comparación de modelos\ncbind(AIC(fit1, fit2, fit3, fit4), BIC(fit1, fit2, fit3, fit4))\n\n     df      AIC df      BIC\nfit1  7 350.4623  7 384.8166\nfit2  7 347.0558  7 381.4101\nfit3  7 374.6395  7 408.9938\nfit4  7 389.5935  7 423.9478\n\n\nConclusión: Según AIC y BIC, el modelo fit2 (con enlace probit) ofrece la mejor bondad de ajuste.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#g-h-selección-automática-del-modelo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#g-h-selección-automática-del-modelo",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "13.5 g-h) Selección Automática del Modelo",
+    "text": "13.5 g-h) Selección Automática del Modelo\nSe utiliza el método de eliminación hacia atrás (backward) basado en el criterio BIC para encontrar el subconjunto de predictores más parsimonioso, partiendo de un modelo con interacciones.\n\nfit5 &lt;- glm(death2 ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj, \n            family = binomial(\"logit\"), data = burn1000)\na &lt;- stepCriterion(fit5, direction = \"backward\", criterion = \"bic\")\n\n\n       Family:  binomial \nLink function:  logit \n    Criterion:  BIC \n\nInitial model:\n~ age + gender + race + tbsa + inh_inj + flame + age * inh_inj + tbsa * inh_inj \n\n\nStep 0 :\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- gender         1 327.92 367.18        0.6284     0.933130\n- flame          1 330.74 370.00        0.6251     0.097426\n- race           1 334.78 374.04        0.6203     0.009797\n&lt;none&gt;             329.91 374.08        0.6281             \n- inh_inj:tbsa   1 337.59 376.85        0.6169     0.002061\n- age:inh_inj    1 351.79 391.06        0.6000     2.31e-06\n\nStep 1 : - gender \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- flame          1 328.74 363.09        0.6255     0.097813\n&lt;none&gt;             327.92 367.18        0.6284             \n- race           1 332.83 367.19        0.6206     0.009622\n- inh_inj:tbsa   1 335.61 369.96        0.6173     0.002051\n- age:inh_inj    1 350.36 384.71        0.5997    1.643e-06\n\nStep 2 : - flame \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- race           1 332.42 361.87        0.6191      0.01843\n&lt;none&gt;             328.74 363.09        0.6255             \n- inh_inj:tbsa   1 337.19 366.64        0.6134      0.00142\n+ gender         1 330.74 370.00        0.6251      0.96626\n- age:inh_inj    1 351.00 380.44        0.5970    1.744e-06\n\nStep 3 : - race \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n&lt;none&gt;             332.42 361.87        0.6191             \n- inh_inj:tbsa   1 340.10 364.63        0.6080     0.002075\n+ flame          1 332.83 367.19        0.6206     0.212331\n+ gender         1 334.33 368.68        0.6188     0.758727\n- age:inh_inj    1 353.46 378.00        0.5921    2.823e-06\n\nFinal model:\n~ age + tbsa + inh_inj + age:inh_inj + tbsa:inh_inj \n\n****************************************************************************\n(*) p-values of the Wald test\n\nfit6 &lt;- update(fit5, formula. = a$final)\nsummary(fit6)\n\n\nCall:\nglm(formula = death2 ~ age + tbsa + inh_inj + age:inh_inj + tbsa:inh_inj, \n    family = binomial(\"logit\"), data = burn1000)\n\nCoefficients:\n                 Estimate Std. Error z value Pr(&gt;|z|)    \n(Intercept)     -10.31738    1.03278  -9.990  &lt; 2e-16 ***\nage               0.11561    0.01352   8.553  &lt; 2e-16 ***\ntbsa              0.11221    0.01439   7.797 6.36e-15 ***\ninh_injYes        7.10938    1.25863   5.649 1.62e-08 ***\nage:inh_injYes   -0.08004    0.01709  -4.683 2.82e-06 ***\ntbsa:inh_injYes  -0.05538    0.01799  -3.079  0.00207 ** \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 845.42  on 999  degrees of freedom\nResidual deviance: 320.42  on 994  degrees of freedom\nAIC: 332.42\n\nNumber of Fisher Scoring iterations: 8\n\n# Se re-evalúan las funciones de enlace con el nuevo modelo\nfit7 &lt;- update(fit6, family = binomial(\"probit\"))\nfit8 &lt;- update(fit6, family = binomial(\"cloglog\"))\n\nWarning: glm.fit: algorithm did not converge\n\n\nWarning: glm.fit: fitted probabilities numerically 0 or 1 occurred\n\nfit9 &lt;- update(fit6, family = binomial(\"cauchit\"))\n\ncbind(AIC(fit6, fit7, fit8, fit9), BIC(fit6, fit7, fit8, fit9))\n\n     df      AIC df      BIC\nfit6  6 332.4233  6 361.8698\nfit7  6 330.5678  6 360.0143\nfit8  6 342.1889  6 371.6355\nfit9  6 368.4801  6 397.9266\n\n\nConclusión Final: El modelo fit7 (con predictores seleccionados y enlace probit) es el mejor según el criterio BIC.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#i-validación-de-supuestos",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#i-validación-de-supuestos",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "13.6 i) Validación de Supuestos",
+    "text": "13.6 i) Validación de Supuestos\nSe utilizan gráficos de diagnóstico para evaluar el ajuste del modelo final.\n\n# Gráfico de envelope para los residuales (similar a un Q-Q plot con bandas de confianza)\nenvelope(fit7)\n\n\n  |                               \n  |                         |   0%\n  |                               \n  |+                        |   4%\n  |                               \n  |++                       |   8%\n  |                               \n  |+++                      |  12%\n  |                               \n  |++++                     |  16%\n  |                               \n  |+++++                    |  20%\n  |                               \n  |++++++                   |  24%\n  |                               \n  |+++++++                  |  28%\n  |                               \n  |++++++++                 |  32%\n  |                               \n  |+++++++++                |  36%\n  |                               \n  |++++++++++               |  40%\n  |                               \n  |+++++++++++              |  44%\n  |                               \n  |++++++++++++             |  48%\n  |                               \n  |+++++++++++++            |  52%\n  |                               \n  |++++++++++++++           |  56%\n  |                               \n  |+++++++++++++++          |  60%\n  |                               \n  |++++++++++++++++         |  64%\n  |                               \n  |+++++++++++++++++        |  68%\n  |                               \n  |++++++++++++++++++       |  72%\n  |                               \n  |+++++++++++++++++++      |  76%\n  |                               \n  |++++++++++++++++++++     |  80%\n  |                               \n  |+++++++++++++++++++++    |  84%\n  |                               \n  |++++++++++++++++++++++   |  88%\n  |                               \n  |+++++++++++++++++++++++  |  92%\n  |                               \n  |++++++++++++++++++++++++ |  96%\n  |                               \n  |+++++++++++++++++++++++++| 100%",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-ajuste-del-modelo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-ajuste-del-modelo",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "14.1 b) Ajuste del Modelo",
+    "text": "14.1 b) Ajuste del Modelo\n\nglm.fits &lt;- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume,\n                data = Smarket, family = binomial)\nsummary(glm.fits)\n\n\nCall:\nglm(formula = Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + \n    Volume, family = binomial, data = Smarket)\n\nCoefficients:\n             Estimate Std. Error z value Pr(&gt;|z|)\n(Intercept) -0.126000   0.240736  -0.523    0.601\nLag1        -0.073074   0.050167  -1.457    0.145\nLag2        -0.042301   0.050086  -0.845    0.398\nLag3         0.011085   0.049939   0.222    0.824\nLag4         0.009359   0.049974   0.187    0.851\nLag5         0.010313   0.049511   0.208    0.835\nVolume       0.135441   0.158360   0.855    0.392\n\n(Dispersion parameter for binomial family taken to be 1)\n\n    Null deviance: 1731.2  on 1249  degrees of freedom\nResidual deviance: 1727.6  on 1243  degrees of freedom\nAIC: 1741.6\n\nNumber of Fisher Scoring iterations: 3",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#c-matriz-de-confusión-con-todos-los-datos",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#c-matriz-de-confusión-con-todos-los-datos",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "14.2 c) Matriz de Confusión (con todos los datos)",
+    "text": "14.2 c) Matriz de Confusión (con todos los datos)\nSe evalúa el rendimiento del modelo en los mismos datos con los que fue entrenado (esto generalmente sobreestima el rendimiento real).\n\nglm.probs &lt;- predict(glm.fits, type = \"response\")\nglm.pred &lt;- rep(\"Down\", nrow(Smarket))\nglm.pred[glm.probs &gt; 0.5] &lt;- \"Up\"\n\n# Matriz de Confusión\ntable(Predicción = glm.pred, Real = Smarket$Direction)\n\n          Real\nPredicción Down  Up\n      Down  145 141\n      Up    457 507\n\n# Tasa de acierto global (Accuracy)\nmean(glm.pred == Smarket$Direction)\n\n[1] 0.5216",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#d-entrenamiento-y-prueba",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#d-entrenamiento-y-prueba",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "14.3 d) Entrenamiento y Prueba",
+    "text": "14.3 d) Entrenamiento y Prueba\nUn enfoque más realista es dividir los datos: entrenar el modelo con datos antiguos (hasta 2004) y probar su rendimiento en datos nuevos (2005).\n\ntrain &lt;- (Smarket$Year &lt; 2005)\nSmarket.2005 &lt;- Smarket[!train, ]\nDirection.2005 &lt;- Smarket$Direction[!train]\n\nglm.fits.train &lt;- glm(Direction ~ Lag1 + Lag2, # Modelo simplificado\n                      data = Smarket, family = binomial, subset = train)\nglm.probs.test &lt;- predict(glm.fits.train, Smarket.2005, type = \"response\")\n\nglm.pred.test &lt;- rep(\"Down\", nrow(Smarket.2005))\nglm.pred.test[glm.probs.test &gt; 0.5] &lt;- \"Up\"\n\ntable(Predicción = glm.pred.test, Real = Direction.2005)\n\n          Real\nPredicción Down  Up\n      Down   35  35\n      Up     76 106\n\nmean(glm.pred.test == Direction.2005)\n\n[1] 0.5595238",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#a-muestreo-estratificado",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#a-muestreo-estratificado",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "15.1 a) Muestreo Estratificado",
+    "text": "15.1 a) Muestreo Estratificado\nDado que las clases (Dead/Alive) están desbalanceadas, se utiliza muestreo estratificado para asegurar que la proporción de clases sea la misma en los conjuntos de entrenamiento y prueba.\n\nset.seed(123)\n# Se toma un 70% de cada estrato para el conjunto de entrenamiento\nstratified &lt;- burn1000 %&gt;%\n  group_by(death) %&gt;%\n  slice_sample(prop = 0.7)\n\n# El 30% restante forma el conjunto de prueba\ntest &lt;- burn1000[setdiff(burn1000$id, stratified$id), ]\n\nsummary(burn1000$death)\n\nAlive  Dead \n  850   150 \n\nsummary(stratified$death)\n\nAlive  Dead \n  595   105",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-entrenamiento-del-modelo-y-selección-de-variables",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#b-entrenamiento-del-modelo-y-selección-de-variables",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "15.2 b) Entrenamiento del Modelo y Selección de Variables",
+    "text": "15.2 b) Entrenamiento del Modelo y Selección de Variables\nEl proceso de ajuste y selección se realiza únicamente con el conjunto de entrenamiento.\n\n# Se usa el modelo con interacciones como punto de partida\nfit5b &lt;- glm(death2 ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj, \n             family = binomial(\"logit\"), data = stratified)\na &lt;- stepCriterion(fit5b, direction = \"backward\", criterion = \"bic\")\n\n\n       Family:  binomial \nLink function:  logit \n    Criterion:  BIC \n\nInitial model:\n~ age + gender + race + tbsa + inh_inj + flame + age * inh_inj + tbsa * inh_inj \n\n\nStep 0 :\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- gender         1 232.66 269.07        0.6302     0.892068\n- flame          1 238.04 274.45        0.6210     0.023533\n&lt;none&gt;             234.64 275.60        0.6297             \n- race           1 239.42 275.83        0.6186     0.010751\n- inh_inj:tbsa   1 240.76 277.17        0.6164     0.005185\n- age:inh_inj    1 253.72 290.12        0.5942    8.119e-06\n\nStep 1 : - gender \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- flame          1 236.04 267.90        0.6215     0.023837\n&lt;none&gt;             232.66 269.07        0.6302             \n- race           1 237.46 269.32        0.6191     0.010725\n- inh_inj:tbsa   1 238.79 270.64        0.6169     0.005162\n- age:inh_inj    1 252.13 283.99        0.5941    6.321e-06\n\nStep 2 : - flame \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n- race           1 238.68 265.98        0.6142     0.033530\n&lt;none&gt;             236.04 267.90        0.6215             \n- inh_inj:tbsa   1 243.42 270.73        0.6061     0.002966\n+ gender         1 238.04 274.45        0.6210     0.986257\n- age:inh_inj    1 254.27 281.57        0.5877    9.978e-06\n\nStep 3 : - race \n\n                df    AIC    BIC adj.R-squared P(Chisq&gt;)(*)\n&lt;none&gt;             238.68 265.98        0.6142             \n- inh_inj:tbsa   1 245.66 268.42        0.5995      0.00353\n+ flame          1 237.46 269.32        0.6191      0.07887\n+ gender         1 240.59 272.45        0.6138      0.76611\n- age:inh_inj    1 255.86 278.62        0.5822    1.531e-05\n\nFinal model:\n~ age + tbsa + inh_inj + age:inh_inj + tbsa:inh_inj \n\n****************************************************************************\n(*) p-values of the Wald test\n\nfit6b &lt;- update(fit5b, formula. = a$final)\n\n# Se comparan de nuevo las funciones de enlace\nfit7b &lt;- update(fit6b, family = binomial(\"probit\"))\nfit8b &lt;- update(fit6b, family = binomial(\"cloglog\"))\n\nWarning: glm.fit: algorithm did not converge\n\n\nWarning: glm.fit: fitted probabilities numerically 0 or 1 occurred\n\nfit9b &lt;- update(fit6b, family = binomial(\"cauchit\"))",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#c-selección-del-mejor-modelo-global-por-habilidad-predictiva",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#c-selección-del-mejor-modelo-global-por-habilidad-predictiva",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "15.3 c) Selección del Mejor Modelo Global por Habilidad Predictiva",
+    "text": "15.3 c) Selección del Mejor Modelo Global por Habilidad Predictiva\nSe utilizan las Curvas ROC (Receiver Operating Characteristic) para comparar el rendimiento predictivo de los modelos en el conjunto de prueba. El área bajo la curva (AUC) es una medida global del poder discriminatorio del modelo.\n\n# Se obtienen las predicciones de probabilidad para el conjunto de prueba\npr6b &lt;- predict(fit6b, newdata = test, type = \"response\")\npr7b &lt;- predict(fit7b, newdata = test, type = \"response\")\npr8b &lt;- predict(fit8b, newdata = test, type = \"response\")\npr9b &lt;- predict(fit9b, newdata = test, type = \"response\")\n\n# Se comparan las curvas ROC\ntestres &lt;- test$death2\nROCc(cbind(testres, pr6b), main=\"Modelo 6 (logit)\")\n\n\n Area Under ROC Curve  =  0.968,   95% CI: (0.949, 0.987) \n     Gini Coefficient  =  0.936,   95% CI: (0.898, 0.974) \n        K-S Statistic  =  0.834 \n\nROCc(cbind(testres, pr7b), main=\"Modelo 7 (probit)\")\n\n\n Area Under ROC Curve  =  0.968,   95% CI: (0.949, 0.987) \n     Gini Coefficient  =  0.936,   95% CI: (0.898, 0.974) \n        K-S Statistic  =  0.83 \n\nROCc(cbind(testres, pr8b), main=\"Modelo 8 (cloglog)\")\n\n\n Area Under ROC Curve  =  0.969,   95% CI: (0.95, 0.987) \n     Gini Coefficient  =  0.937,   95% CI: (0.9, 0.974) \n        K-S Statistic  =  0.816 \n\nROCc(cbind(testres, pr9b), main=\"Modelo 9 (cauchit)\")\n\n\n Area Under ROC Curve  =  0.966,   95% CI: (0.946, 0.986) \n     Gini Coefficient  =  0.933,   95% CI: (0.893, 0.972) \n        K-S Statistic  =  0.838 \n\n\nConclusión: Se elige el modelo con el AUC más alto (en este caso, fit7b).",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#elección-del-punto-de-corte-tau-óptimo",
+    "href": "CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.html#elección-del-punto-de-corte-tau-óptimo",
+    "title": "11  Modelos Lineales Generalizados y Habilidad Predictiva - Regresión",
+    "section": "15.4 Elección del Punto de Corte (tau) Óptimo",
+    "text": "15.4 Elección del Punto de Corte (tau) Óptimo\nUna vez elegido el mejor modelo (fit7b), se debe seleccionar un punto de corte (tau) para convertir las probabilidades predichas en clasificaciones (“Dead” / “Alive”). La elección de tau depende del objetivo (minimizar errores, maximizar precisión, etc.).\n\ntau &lt;- seq(0.1, 0.9, by = 0.05)\nAER &lt;- recall &lt;- precision &lt;- F1 &lt;- NULL\nexito &lt;- \"1\"; frac &lt;- \"0\"\n\nfor (i in 1:length(tau)){\n    glm.pred &lt;- rep(\"0\", length(testres))\n    glm.pred[pr7b &gt; tau[i]] &lt;- \"1\"\n    tab&lt;-table(glm.pred, testres)\n    if (!frac %in% rownames(tab)){\n      tab&lt;-rbind(tab,c(0,0))\n      rownames(tab)[2]&lt;-frac\n    } \n    if (!exito %in% rownames(tab)){\n      tab&lt;-rbind(tab,c(0,0))\n      rownames(tab)[2]&lt;-exito\n    }\n    AER[i]&lt;-(tab[exito,frac]+tab[frac,exito])/sum(tab)\n    precision[i]&lt;-(tab[exito,exito])/sum(tab[exito,])\n    recall[i]&lt;-(tab[exito,exito])/sum(tab[,exito])\n    F1[i]&lt;-2*precision[i]*recall[i]/(precision[i]+recall[i])\n  }\n\ncbind(tau,AER,precision,recall,F1)\n\n       tau        AER precision    recall        F1\n [1,] 0.10 0.14000000 0.5180723 0.9555556 0.6718750\n [2,] 0.15 0.11666667 0.5694444 0.9111111 0.7008547\n [3,] 0.20 0.10333333 0.6060606 0.8888889 0.7207207\n [4,] 0.25 0.07666667 0.7115385 0.8222222 0.7628866\n [5,] 0.30 0.07666667 0.7200000 0.8000000 0.7578947\n [6,] 0.35 0.07000000 0.7608696 0.7777778 0.7692308\n [7,] 0.40 0.06333333 0.8250000 0.7333333 0.7764706\n [8,] 0.45 0.06333333 0.8421053 0.7111111 0.7710843\n [9,] 0.50 0.06666667 0.8571429 0.6666667 0.7500000\n[10,] 0.55 0.07000000 0.8529412 0.6444444 0.7341772\n[11,] 0.60 0.07666667 0.8666667 0.5777778 0.6933333\n[12,] 0.65 0.09000000 0.8461538 0.4888889 0.6197183\n[13,] 0.70 0.08666667 0.9130435 0.4666667 0.6176471\n[14,] 0.75 0.09333333 0.9047619 0.4222222 0.5757576\n[15,] 0.80 0.09333333 1.0000000 0.3777778 0.5483871\n[16,] 0.85 0.10000000 1.0000000 0.3333333 0.5000000\n[17,] 0.90 0.12000000 1.0000000 0.2000000 0.3333333\n\n\nAnálisis: Para elegir el tau óptimo, se busca un equilibrio. La métrica F1, que es la media armónica de la precisión y el recall, es una excelente opción para datos desbalanceados. El tau que maximiza F1 sería una buena elección.",
+    "crumbs": [
+      "<span class='chapter-number'>11</span>  <span class='chapter-title'>Modelos Lineales Generalizados y Habilidad Predictiva - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Taller 1 Regresión - Quarto.html",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Taller 1 Regresión - Quarto.html",
+    "title": "12  Taller 1 Regresión - Regresión",
+    "section": "",
+    "text": "13 Introducción\nEste documento presenta un análisis estadístico para explorar las relaciones entre diversas variables, incluyendo el hábito de fumar de los padres, el peso del bebé al nacer y las semanas de gestación. Se aplican técnicas de regresión lineal, análisis de tablas de contingencia y se prepara el terreno para un análisis de varianza (ANOVA).",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Taller 1 Regresión - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Taller 1 Regresión - Quarto.html#tablas-de-contingencia",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Taller 1 Regresión - Quarto.html#tablas-de-contingencia",
+    "title": "12  Taller 1 Regresión - Regresión",
+    "section": "16.1 Tablas de Contingencia",
+    "text": "16.1 Tablas de Contingencia\nEstas tablas resumen las frecuencias conjuntas, marginales y condicionales (perfiles) de las dos variables.\n\nmadre.fuma &lt;- smoker\nbebe.peso &lt;- lowbwt\ntab &lt;- data.frame(madre.fuma, bebe.peso)\n\n# Creación de la tabla de contingencia\nTable &lt;- xtabs(~madre.fuma + bebe.peso)\n\n# Frecuencias Absolutas con totales\naddmargins(Table)\n\n          bebe.peso\nmadre.fuma  0  1 Sum\n       0   19  1  20\n       1   17  5  22\n       Sum 36  6  42\n\n# Frecuencias Relativas (porcentajes sobre el total)\ntotPercents(Table)\n\n         0    1 Total\n0     45.2  2.4  47.6\n1     40.5 11.9  52.4\nTotal 85.7 14.3 100.0\n\n# Perfiles Fila (distribución del peso del bebé para cada categoría de madre)\nrowPercents(Table)\n\n          bebe.peso\nmadre.fuma    0    1 Total Count\n         0 95.0  5.0   100    20\n         1 77.3 22.7   100    22\n\n# Perfiles Columna (distribución de madre fumadora para cada categoría de peso)\ncolPercents(Table)\n\n          bebe.peso\nmadre.fuma     0     1\n     0      52.8  16.7\n     1      47.2  83.3\n     Total 100.0 100.0\n     Count  36.0   6.0",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Taller 1 Regresión - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Taller 1 Regresión - Quarto.html#test-chi-cuadrado-de-independencia",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Taller 1 Regresión - Quarto.html#test-chi-cuadrado-de-independencia",
+    "title": "12  Taller 1 Regresión - Regresión",
+    "section": "16.2 Test Chi-Cuadrado de Independencia",
+    "text": "16.2 Test Chi-Cuadrado de Independencia\nEste test evalúa si existe una asociación estadísticamente significativa entre las dos variables. - \\(H_0\\): Las variables son independientes. - \\(H_1\\): Las variables no son independientes. El estadístico de prueba es: \\[\n\\chi^2 = \\sum_{i,j} \\frac{(O_{ij} - E_{ij})^2}{E_{ij}}\n\\]\n\n# Test Chi-cuadrado. Se usa simulación por el bajo número de observaciones.\nchisq.test(as.factor(madre.fuma), as.factor(bebe.peso), simulate.p.value = TRUE, B = 2000)\n\n\n    Pearson's Chi-squared test with simulated p-value (based on 2000\n    replicates)\n\ndata:  as.factor(madre.fuma) and as.factor(bebe.peso)\nX-squared = 2.6886, df = NA, p-value = 0.1859\n\n\nInterpretación: Un p-valor &gt; 0.05 sugiere que no hay evidencia suficiente para rechazar la hipótesis nula de independencia.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Taller 1 Regresión - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Taller 1 Regresión - Quarto.html#v-de-cramer",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Taller 1 Regresión - Quarto.html#v-de-cramer",
+    "title": "12  Taller 1 Regresión - Regresión",
+    "section": "16.3 V de Cramer",
+    "text": "16.3 V de Cramer\nEste coeficiente mide la fuerza de la asociación entre dos variables categóricas, variando de 0 (sin asociación) a 1 (asociación perfecta). \\[\nV = \\sqrt{\\frac{\\chi^2}{n \\cdot \\min(r-1, c-1)}}\n\\] Donde \\(n\\) es el tamaño total de la muestra, \\(r\\) el número de filas y \\(c\\) el número de columnas.\n\ncramersV(madre.fuma, bebe.peso)\n\nWarning in stats::chisq.test(...): Chi-squared approximation may be incorrect\n\n\n[1] 0.1848935\n\n\nInterpretación: Un valor de V cercano a 0 indica una asociación muy débil.",
+    "crumbs": [
+      "<span class='chapter-number'>12</span>  <span class='chapter-title'>Taller 1 Regresión - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html",
+    "title": "13  Parcial 1 - Parte B - Regresión",
+    "section": "",
+    "text": "14 Introducción\nEste documento detalla el proceso completo de ajuste y validación de un modelo de Regresión Lineal Simple. Se utiliza un conjunto de datos sobre el peso de ratas sometidas a un tratamiento para ilustrar la estimación de parámetros, el cálculo de intervalos de predicción, la evaluación de la bondad de ajuste (\\(R^2\\)) y la validación rigurosa de los supuestos del modelo.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Parcial 1 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#ajuste-del-modelo-con-lm",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#ajuste-del-modelo-con-lm",
+    "title": "13  Parcial 1 - Parte B - Regresión",
+    "section": "15.1 Ajuste del Modelo con lm()",
+    "text": "15.1 Ajuste del Modelo con lm()\nLa función lm() de R estima los coeficientes \\(\\beta_0\\) y \\(\\beta_1\\) por Mínimos Cuadrados Ordinarios (MCO).\n\nfit &lt;- lm(Peso ~ 1 + Tratamiento, data = ratas)\nsummary(fit)\n\n\nCall:\nlm(formula = Peso ~ 1 + Tratamiento, data = ratas)\n\nResiduals:\n     Min       1Q   Median       3Q      Max \n-1.13000 -0.35500  0.07091  0.40250  0.88182 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept)   2.1482     0.1570  13.680  1.3e-11 ***\nTratamiento   0.9118     0.2221   4.106 0.000549 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 0.5208 on 20 degrees of freedom\nMultiple R-squared:  0.4574,    Adjusted R-squared:  0.4302 \nF-statistic: 16.86 on 1 and 20 DF,  p-value: 0.0005492\n\n\nInterpretación: - Intercept (\\(\\hat{\\beta}_0\\)): 2.15 es el peso promedio estimado para el grupo de control (Tratamiento = 0). - Tratamiento (\\(\\hat{\\beta}_1\\)): 0.91 es el cambio promedio estimado en el peso para el grupo tratado en comparación con el grupo de control.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Parcial 1 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#cálculo-manual-de-los-estimadores",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#cálculo-manual-de-los-estimadores",
+    "title": "13  Parcial 1 - Parte B - Regresión",
+    "section": "15.2 Cálculo Manual de los Estimadores",
+    "text": "15.2 Cálculo Manual de los Estimadores\nLos coeficientes pueden calcularse manualmente usando las fórmulas clásicas: \\[\n\\hat{\\beta}_1 = r_{xy} \\frac{S_y}{S_x} \\quad | \\quad \\hat{\\beta}_0 = \\bar{y} - \\hat{\\beta}_1 \\bar{x}\n\\]\n\ncor &lt;- cor(Peso, Tratamiento)\ns_y &lt;- sd(Peso)\ns_x &lt;- sd(Tratamiento)\nb1_hat &lt;- cor * s_y / s_x\nb0_hat &lt;- mean(Peso) - b1_hat * mean(Tratamiento)\n\n# Estimador de la varianza del error (sigma^2)\nn &lt;- length(Peso)\ny_hat &lt;- b0_hat + b1_hat * Tratamiento\nsigma2_hat &lt;- sum((Peso - y_hat)^2) / (n - 2)",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Parcial 1 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#a.-media-de-los-residuos-es-cero-y-no-relación-con-las-variables",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#a.-media-de-los-residuos-es-cero-y-no-relación-con-las-variables",
+    "title": "13  Parcial 1 - Parte B - Regresión",
+    "section": "18.1 a. Media de los Residuos es Cero y No Relación con las Variables",
+    "text": "18.1 a. Media de los Residuos es Cero y No Relación con las Variables\nSe verifica que \\(E[\\epsilon_i]=0\\) y que los residuos no tengan patrones sistemáticos con las variables.\n\n# Gráfico de residuales vs. Y y vs. X\npar(mfrow = c(1, 2))\nplot(Peso, residuals, main = \"Residuales vs. Peso\")\nplot(Tratamiento, residuals, main = \"Residuales vs. Tratamiento\")\n\n\n\n\n\n\n\npar(mfrow = c(1, 1))\n\n# La media de los residuales es cero por construcción en MCO\nmean(residuals)\n\n[1] -5.991295e-18\n\n# Prueba t para H0: media de los residuos = 0\nt.test(residuals, mu = 0, alternative = \"two.sided\")\n\n\n    One Sample t-test\n\ndata:  residuals\nt = -5.529e-17, df = 21, p-value = 1\nalternative hypothesis: true mean is not equal to 0\n95 percent confidence interval:\n -0.2253513  0.2253513\nsample estimates:\n    mean of x \n-5.991295e-18 \n\n\nConclusión: El p-valor es 1, por lo que no se rechaza que la media de los residuos sea cero. Los gráficos no muestran patrones evidentes.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Parcial 1 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#b.-varianza-constante-homocedasticidad",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#b.-varianza-constante-homocedasticidad",
+    "title": "13  Parcial 1 - Parte B - Regresión",
+    "section": "18.2 b. Varianza Constante (Homocedasticidad)",
+    "text": "18.2 b. Varianza Constante (Homocedasticidad)\nSe verifica que la varianza de los errores, \\(Var(\\epsilon_i) = \\sigma^2\\), es constante para todos los niveles de \\(X\\).\n\n# Gráfico de residuales vs. valores ajustados\nplot(y_hat, residuals, main = \"Residuales vs. Valores Ajustados\")\n\n\n\n\n\n\n\n# Prueba de Breusch-Pagan para H0: Varianza constante (homocedasticidad)\nbptest(Peso ~ 1 + Tratamiento, data = ratas)\n\n\n    studentized Breusch-Pagan test\n\ndata:  Peso ~ 1 + Tratamiento\nBP = 0.43422, df = 1, p-value = 0.5099\n\n\nConclusión: El p-valor alto (0.81) indica que no se rechaza la hipótesis nula. Se asume que la varianza es constante.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Parcial 1 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#d.-distribución-normal-de-los-residuos",
+    "href": "CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.html#d.-distribución-normal-de-los-residuos",
+    "title": "13  Parcial 1 - Parte B - Regresión",
+    "section": "18.3 d. Distribución Normal de los Residuos",
+    "text": "18.3 d. Distribución Normal de los Residuos\nSe verifica que los errores siguen una distribución normal, \\(\\epsilon_i \\sim N(0, \\sigma^2)\\).\n\n# Gráficos de diagnóstico\npar(mfrow = c(1, 2))\nhist(residuals, main = \"Histograma de Residuales\")\nqqnorm(residuals, main = \"Q-Q Plot de Residuales\")\nqqline(residuals, col = \"red\")\n\n\n\n\n\n\n\npar(mfrow = c(1, 1))\n\n# Pruebas de normalidad\n# H0: Los datos provienen de una distribución normal\njarque.bera.test(residuals)\n\n\n    Jarque Bera Test\n\ndata:  residuals\nX-squared = 1.2501, df = 2, p-value = 0.5352\n\nshapiro.test(residuals)\n\n\n    Shapiro-Wilk normality test\n\ndata:  residuals\nW = 0.95563, p-value = 0.4064\n\n\nConclusión: Los p-valores de ambas pruebas son grandes (0.50 y 0.44), por lo que no se rechaza la hipótesis nula de normalidad. Los gráficos también apoyan este supuesto. El modelo se considera válido.",
+    "crumbs": [
+      "<span class='chapter-number'>13</span>  <span class='chapter-title'>Parcial 1 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 2 - Regresión Multiple y Diagnostico del Modelo/Parcial 2 - Parte B - Quarto.html",
+    "href": "CONTENIDO/CORTE 2 - Regresión Multiple y Diagnostico del Modelo/Parcial 2 - Parte B - Quarto.html",
+    "title": "14  Parcial 2 - Parte B - Regresión",
+    "section": "",
+    "text": "15 Introducción\nEste documento detalla el proceso completo de ajuste y validación de un modelo de Regresión Lineal Múltiple. Se utiliza un conjunto de datos sobre los niveles de plasma en pájaros en función del tratamiento y el sexo para ilustrar la estimación de parámetros, pruebas de hipótesis, construcción de intervalos de confianza y un análisis de diagnóstico riguroso para identificar observaciones atípicas, de alta palanca e influyentes.",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Parcial 2 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 2 - Regresión Multiple y Diagnostico del Modelo/Parcial 2 - Parte B - Quarto.html#alta-palanca-leverage",
+    "href": "CONTENIDO/CORTE 2 - Regresión Multiple y Diagnostico del Modelo/Parcial 2 - Parte B - Quarto.html#alta-palanca-leverage",
+    "title": "14  Parcial 2 - Parte B - Regresión",
+    "section": "21.1 Alta Palanca (Leverage)",
+    "text": "21.1 Alta Palanca (Leverage)\nLas observaciones con alto apalancamiento son aquellas con valores atípicos en los predictores (\\(X\\)). Un punto tiene alta palanca si su valor de hat, \\(h_{ii}\\), es mayor que \\(2p/n\\) o \\(3p/n\\).\n\nn &lt;- nrow(pajaros)\np &lt;- length(coef(fit)) # Número de parámetros (b0, b1, b2)\n\n# Gráfico de los valores de apalancamiento (hat values)\nplot(hatvalues(fit), type = \"h\", main = \"Índice de Valores de Apalancamiento\")\nabline(h = 2 * p / n, col = \"blue\", lty = 2)\nabline(h = 3 * p / n, col = \"red\", lty = 2)\nlegend(\"topright\", legend = c(\"Corte 2p/n\", \"Corte 3p/n\"), col = c(\"blue\", \"red\"), lty = 2)\n\n\n\n\n\n\n\n# Identificar los puntos con mayor apalancamiento\nhead(sort(hatvalues(fit), decreasing = TRUE))\n\n    3     4     5     6     7     8 \n0.075 0.075 0.075 0.075 0.075 0.075",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Parcial 2 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 2 - Regresión Multiple y Diagnostico del Modelo/Parcial 2 - Parte B - Quarto.html#observaciones-atípicas-outliers",
+    "href": "CONTENIDO/CORTE 2 - Regresión Multiple y Diagnostico del Modelo/Parcial 2 - Parte B - Quarto.html#observaciones-atípicas-outliers",
+    "title": "14  Parcial 2 - Parte B - Regresión",
+    "section": "21.2 Observaciones Atípicas (Outliers)",
+    "text": "21.2 Observaciones Atípicas (Outliers)\nLos outliers son observaciones con un gran error de predicción (residual grande). Se identifican usando los residuales estudentizados. Una observación se considera atípica si \\(|r_{i,stud}| &gt; 3\\).\n\n# Residuales estudentizados\nstud_res &lt;- studres(fit)\nhead(sort(abs(stud_res), decreasing = TRUE))\n\n       2       21       34       14        3       19 \n2.675926 2.553484 2.526613 1.792766 1.378081 1.340180 \n\n# Visualización con Boxplot\nboxplot(stud_res, main = \"Boxplot de Residuales Estudentizados\")\n\n\n\n\n\n\n\n\nConclusión: No se observan residuales estudentizados con un valor absoluto mayor a 3, por lo que no hay outliers claros.",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Parcial 2 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/CORTE 2 - Regresión Multiple y Diagnostico del Modelo/Parcial 2 - Parte B - Quarto.html#observaciones-influyentes",
+    "href": "CONTENIDO/CORTE 2 - Regresión Multiple y Diagnostico del Modelo/Parcial 2 - Parte B - Quarto.html#observaciones-influyentes",
+    "title": "14  Parcial 2 - Parte B - Regresión",
+    "section": "21.3 Observaciones Influyentes",
+    "text": "21.3 Observaciones Influyentes\nUna observación influyente es aquella que, si se elimina, cambia significativamente el ajuste del modelo. Combina tanto el apalancamiento como el tamaño del residual.\n\nDistancia de Cook: Mide el efecto de eliminar la i-ésima observación. Una regla general es que \\(D_i &gt; 4/(n-p)\\) es potencialmente influyente.\nGráfico de Influencia: Visualiza simultáneamente el apalancamiento, el residual estudentizado y la Distancia de Cook.\n\n\npar(mfrow = c(1, 2))\n# Gráfico de la Distancia de Cook\ncorte &lt;- 4 / (n - p)\nplot(fit, which = 4, cook.levels = corte)\nabline(h = corte, lty = 2, col = \"red\")\n\n# Gráfico de Influencia (burbujas)\ninfluencePlot(fit, id.method = \"identify\", main = \"Gráfico de Influencia\", sub = \"El tamaño del círculo es proporcional a la D_Cook\")\n\nWarning in plot.window(...): \"id.method\" is not a graphical parameter\n\n\nWarning in plot.xy(xy, type, ...): \"id.method\" is not a graphical parameter\n\n\nWarning in axis(side = side, at = at, labels = labels, ...): \"id.method\" is not\na graphical parameter\nWarning in axis(side = side, at = at, labels = labels, ...): \"id.method\" is not\na graphical parameter\n\n\nWarning in box(...): \"id.method\" is not a graphical parameter\n\n\nWarning in title(...): \"id.method\" is not a graphical parameter\n\n\nWarning in plot.xy(xy.coords(x, y), type = type, ...): \"id.method\" is not a\ngraphical parameter\n\n\n\n\n\n\n\n\n\n      StudRes   Hat       CookD\n2   2.6759260 0.075 0.165905553\n3  -1.3780809 0.075 0.050109542\n4  -0.3778034 0.075 0.003949214\n21  2.5534838 0.075 0.153345168",
+    "crumbs": [
+      "<span class='chapter-number'>14</span>  <span class='chapter-title'>Parcial 2 - Parte B - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html",
+    "href": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html",
+    "title": "15  Proyecto 2 - Regresión",
+    "section": "",
+    "text": "16 Introducción\nEste documento presenta un análisis de regresión lineal múltiple para modelar y predecir la cantidad de goles anotados por futbolistas. El análisis abarca desde la exploración de correlaciones entre las variables predictoras y la variable de respuesta, hasta el ajuste de un modelo completo, su validación rigurosa mediante pruebas de supuestos y un diagnóstico detallado para identificar observaciones influyentes.",
+    "crumbs": [
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Proyecto 2 - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#linealidad-test-reset",
+    "href": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#linealidad-test-reset",
+    "title": "15  Proyecto 2 - Regresión",
+    "section": "20.1 4.1. Linealidad (Test RESET)",
+    "text": "20.1 4.1. Linealidad (Test RESET)\nLa prueba RESET (Regression Equation Specification Error Test) evalúa si la forma funcional del modelo es correcta (linealidad). - \\(H_0\\): La especificación del modelo es correcta (la relación es lineal).\n\n# Gráficos de residuales vs. predictores y vs. valores ajustados\npar(mfrow=c(2,2))\nplot(sapo2$Tiros, stud_res, xlab = \"Tiros\", ylab = \"Residuales Estudentizados\")\nplot(sapo2$Tiempo, stud_res, xlab = \"Tiempo\", ylab = \"Residuales Estudentizados\")\nplot(sapo2$xGoals, stud_res, xlab = \"xGoals\", ylab = \"Residuales Estudentizados\")\nplot(fitted(modelo), stud_res, xlab = \"Valores Ajustados\", ylab = \"Residuales Estudentizados\")\n\n\n\n\n\n\n\npar(mfrow=c(1,1))\n\n# Test RESET\nresettest(modelo, power = 2:5, type = \"fitted\")\n\n\n    RESET test\n\ndata:  modelo\nRESET = 4.7507, df1 = 4, df2 = 1927, p-value = 0.0008151\n\n\nConclusión: El p-valor pequeño sugiere rechazar \\(H_0\\), indicando una posible falta de linealidad.",
+    "crumbs": [
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Proyecto 2 - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#media-cero-y-normalidad-de-los-residuales",
+    "href": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#media-cero-y-normalidad-de-los-residuales",
+    "title": "15  Proyecto 2 - Regresión",
+    "section": "20.2 4.2. Media Cero y Normalidad de los Residuales",
+    "text": "20.2 4.2. Media Cero y Normalidad de los Residuales\n\n# Media de los residuales (debe ser cercana a cero por construcción)\nmean(modelo$residuals)\n\n[1] 1.267362e-17\n\n# Prueba t para H0: media de los residuos = 0\nt.test(modelo$residuals, mu = 0)\n\n\n    One Sample t-test\n\ndata:  modelo$residuals\nt = 3.6841e-16, df = 1943, p-value = 1\nalternative hypothesis: true mean is not equal to 0\n95 percent confidence interval:\n -0.067466  0.067466\nsample estimates:\n   mean of x \n1.267362e-17 \n\n# Prueba de Shapiro-Wilk para H0: los residuales siguen una distribución normal\nshapiro.test(stud_res)\n\n\n    Shapiro-Wilk normality test\n\ndata:  stud_res\nW = 0.92308, p-value &lt; 2.2e-16\n\n\nConclusión: Se cumple el supuesto de media cero. Sin embargo, el p-valor de la prueba de Shapiro-Wilk es muy pequeño, rechazando el supuesto de normalidad en los residuales.",
+    "crumbs": [
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Proyecto 2 - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#homocedasticidad-varianza-constante",
+    "href": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#homocedasticidad-varianza-constante",
+    "title": "15  Proyecto 2 - Regresión",
+    "section": "20.3 4.3. Homocedasticidad (Varianza Constante)",
+    "text": "20.3 4.3. Homocedasticidad (Varianza Constante)\nSe evalúa si la varianza de los errores es constante. - \\(H_0\\): Hay homocedasticidad (varianza constante).\n\n# Gráfico de Scale-Location\nplot(modelo, which = 3)\n\n\n\n\n\n\n\n# Test de Breusch-Pagan\nbptest(modelo)\n\n\n    studentized Breusch-Pagan test\n\ndata:  modelo\nBP = 449.13, df = 12, p-value &lt; 2.2e-16\n\n\nConclusión: El p-valor pequeño rechaza \\(H_0\\), indicando la presencia de heterocedasticidad (varianza no constante).",
+    "crumbs": [
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Proyecto 2 - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#multicolinealidad",
+    "href": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#multicolinealidad",
+    "title": "15  Proyecto 2 - Regresión",
+    "section": "20.4 4.4. Multicolinealidad",
+    "text": "20.4 4.4. Multicolinealidad\nSe evalúa la correlación entre las variables predictoras. El Factor de Inflación de la Varianza (VIF) mide cuánto aumenta la varianza de un coeficiente debido a la colinealidad. - Regla general: VIF &gt; 5 o 10 indica un problema de multicolinealidad.\n\ncar::vif(modelo)\n\n              GVIF Df GVIF^(1/(2*Df))\nLiga      1.093472  4        1.011232\nposition  1.146205  5        1.013739\nTiros    10.767639  1        3.281408\nTiempo    4.362029  1        2.088547\nxGoals    6.412345  1        2.532261\n\n\nConclusión: Todos los VIF son bajos, lo que sugiere que no hay problemas graves de multicolinealidad.",
+    "crumbs": [
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Proyecto 2 - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#observaciones-con-alta-palanca-leverage",
+    "href": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#observaciones-con-alta-palanca-leverage",
+    "title": "15  Proyecto 2 - Regresión",
+    "section": "21.1 5.1. Observaciones con Alta Palanca (Leverage)",
+    "text": "21.1 5.1. Observaciones con Alta Palanca (Leverage)\nPuntos con valores atípicos en los predictores. Un punto tiene alta palanca si su valor “hat” \\(h_{ii} &gt; 2p/n\\) o \\(3p/n\\).\n\nX &lt;- model.matrix(modelo)\nH &lt;- X %*% solve(t(X) %*% X) %*% t(X)\np &lt;- sum(hatvalues(modelo))\nn &lt;- nrow(sapo2)\nh_ii &lt;- as.data.frame(cbind(index = 1:n, hat_value = diag(H)))\n\nggplot(h_ii, aes(x = index, y = hat_value, label = index)) +\n  geom_segment(aes(xend = index, yend = 0)) +\n  geom_point() +\n  geom_hline(yintercept = 3 * p / n, color = \"red\", linetype = \"dashed\") +\n  geom_hline(yintercept = 2 * p / n, color = \"blue\", linetype = \"dashed\") +\n  labs(x = \"Índice\", y = \"Valor de Apalancamiento (hii)\", title = \"Valores de Apalancamiento\") +\n  theme_minimal()",
+    "crumbs": [
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Proyecto 2 - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#observaciones-atípicas-outliers",
+    "href": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#observaciones-atípicas-outliers",
+    "title": "15  Proyecto 2 - Regresión",
+    "section": "21.2 5.2. Observaciones Atípicas (Outliers)",
+    "text": "21.2 5.2. Observaciones Atípicas (Outliers)\nPuntos con un gran error de predicción. Se identifican usando los residuales estudentizados. Un punto es atípico si \\(|r_{i, stud}| &gt; 3\\).\n\nresi &lt;- as.data.frame(cbind(index = 1:n, res_estud = stud_res))\nggplot(resi, aes(x = index, y = res_estud, label = index)) +\n  geom_point(color = \"blue\") +\n  geom_hline(yintercept = c(-3, 3), color = \"red\", linetype = \"dashed\") +\n  geom_text_repel(data = filter(resi, abs(res_estud) &gt; 3)) +\n  labs(x = \"Índice\", y = \"Residual Estudentizado\", title = \"Identificación de Outliers\") +\n  theme_minimal()",
+    "crumbs": [
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Proyecto 2 - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#observaciones-influyentes-distancia-de-cook",
+    "href": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#observaciones-influyentes-distancia-de-cook",
+    "title": "15  Proyecto 2 - Regresión",
+    "section": "21.3 5.3. Observaciones Influyentes (Distancia de Cook)",
+    "text": "21.3 5.3. Observaciones Influyentes (Distancia de Cook)\nMide el efecto de eliminar una observación. Un punto es influyente si su Distancia de Cook \\(D_i &gt; 4/(n-p-2)\\).\n\n# Gráfico de la Distancia de Cook\ncorte &lt;- 4 / (n - p - 2)\nplot(modelo, which = 4, cook.levels = corte)\nabline(h = corte, lty = 2, col = \"red\")\n\n\n\n\n\n\n\n# Gráfico de Influencia\ninfluencePlot(modelo, id.method = \"identify\", main = \"Gráfico de Influencia\", sub = \"El tamaño del círculo es proporcional a la D_Cook\")\n\nWarning in plot.window(...): \"id.method\" is not a graphical parameter\n\n\nWarning in plot.xy(xy, type, ...): \"id.method\" is not a graphical parameter\n\n\nWarning in axis(side = side, at = at, labels = labels, ...): \"id.method\" is not\na graphical parameter\nWarning in axis(side = side, at = at, labels = labels, ...): \"id.method\" is not\na graphical parameter\n\n\nWarning in box(...): \"id.method\" is not a graphical parameter\n\n\nWarning in title(...): \"id.method\" is not a graphical parameter\n\n\nWarning in plot.xy(xy.coords(x, y), type = type, ...): \"id.method\" is not a\ngraphical parameter\n\n\n\n\n\n\n\n\n\n        StudRes        Hat       CookD\n501   5.4370356 0.03967374 0.092573947\n1133  4.1435243 0.06673625 0.093655329\n1374 -0.8848279 0.07768242 0.005073005\n1375 -0.9074003 0.07777160 0.005341666\n1526  6.9300913 0.03523153 0.131702239",
+    "crumbs": [
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Proyecto 2 - Regresión</span>"
+    ]
+  },
+  {
+    "objectID": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#reajuste-del-modelo",
+    "href": "CONTENIDO/PROYECTO/Proyecto 2 - Quarto.html#reajuste-del-modelo",
+    "title": "15  Proyecto 2 - Regresión",
+    "section": "21.4 5.4. Reajuste del Modelo",
+    "text": "21.4 5.4. Reajuste del Modelo\nSe ajusta un nuevo modelo excluyendo los puntos identificados como más influyentes para evaluar su impacto en los coeficientes.\n\n# Puntos a excluir (ejemplo basado en diagnóstico visual)\npuntos_a_excluir &lt;- c(149, 501, 544, 545, 774, 959, 960, 1133, 1134, 1135, 1270, 1271, 1272, 1273, 1274, 1292, 1293, 1294, 1373, 1526, 1824)\nmodelo_sin_influyentes &lt;- update(modelo, subset = -puntos_a_excluir)\n\n# Comparación de coeficientes\nround(as.data.frame(coef(summary(modelo))), digits = 4)\n\n                   Estimate Std. Error t value Pr(&gt;|t|)\n(Intercept)         -0.1265     0.1128 -1.1222   0.2619\nLigaLa Liga         -0.0841     0.1106 -0.7599   0.4474\nLigaLigue 1         -0.0073     0.1093 -0.0672   0.9464\nLigaPremier League   0.0388     0.1125  0.3446   0.7305\nLigaSerie A         -0.0931     0.1196 -0.7782   0.4366\npositionAML         -0.0431     0.1154 -0.3735   0.7088\npositionAMR         -0.0547     0.1157 -0.4729   0.6363\npositionFW          -0.1084     0.1052 -1.0309   0.3027\npositionFWL         -0.0102     0.1313 -0.0776   0.9381\npositionFWR         -0.0023     0.1279 -0.0182   0.9855\nTiros                0.0277     0.0044  6.2498   0.0000\nTiempo               0.0001     0.0001  0.6242   0.5326\nxGoals               0.8447     0.0220 38.3747   0.0000\n\nround(as.data.frame(coef(summary(modelo_sin_influyentes))), digits = 4)\n\n                   Estimate Std. Error t value Pr(&gt;|t|)\n(Intercept)         -0.0742     0.1031 -0.7194   0.4720\nLigaLa Liga         -0.2637     0.1018 -2.5916   0.0096\nLigaLigue 1         -0.0711     0.1000 -0.7109   0.4772\nLigaPremier League  -0.0230     0.1028 -0.2234   0.8233\nLigaSerie A         -0.1028     0.1096 -0.9386   0.3481\npositionAML         -0.0246     0.1054 -0.2334   0.8155\npositionAMR         -0.0624     0.1060 -0.5885   0.5562\npositionFW          -0.1122     0.0965 -1.1630   0.2450\npositionFWL         -0.0376     0.1204 -0.3122   0.7549\npositionFWR         -0.0526     0.1171 -0.4496   0.6531\nTiros                0.0180     0.0042  4.2437   0.0000\nTiempo               0.0003     0.0001  3.7907   0.0002\nxGoals               0.8301     0.0226 36.7296   0.0000",
+    "crumbs": [
+      "<span class='chapter-number'>15</span>  <span class='chapter-title'>Proyecto 2 - Regresión</span>"
+    ]
+  }
+]
