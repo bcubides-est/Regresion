@@ -1,0 +1,243 @@
+---
+title: "Proyecto 2"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: false  
+---
+
+# Introducción
+
+Este documento presenta un análisis de regresión lineal múltiple para modelar y predecir la cantidad de goles anotados por futbolistas. El análisis abarca desde la exploración de correlaciones entre las variables predictoras y la variable de respuesta, hasta el ajuste de un modelo completo, su validación rigurosa mediante pruebas de supuestos y un diagnóstico detallado para identificar observaciones influyentes.
+
+### Librerías Requeridas
+
+Se cargan únicamente los paquetes necesarios para la ejecución de este análisis.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(readr)
+library(dplyr)
+library(ppcor)      # Para correlaciones parciales
+library(ggplot2)
+library(ggrepel)
+library(MASS)       # Para studres()
+library(lmtest)     # Para bptest() y resettest()
+library(car)        # Para vif() e influencePlot()
+library(RColorBrewer) # Para paletas de colores
+```
+
+### Carga y Exploración de Datos
+
+```{r}
+#| label: carga-datos
+
+sapo2 <- read.csv("DataBase_Proyecto2.csv", comment.char = "#")
+# View(sapo2)
+```
+
+# 1. Análisis de Correlación
+
+Se explora la relación lineal entre la variable de respuesta (`Goles`) y las variables predictoras. Se calculan tres tipos de correlaciones:
+
+-   **Pearson ($r$)**: Mide la relación lineal.
+-   **Kendall ($\tau$)**: Mide la asociación monotónica (basada en rangos).
+-   **Parcial**: Mide la relación entre dos variables controlando el efecto de las demás.
+
+```{r}
+#| label: analisis-correlacion
+
+# Correlaciones (incluyendo variables de equipo)
+round(cor(sapo2[, c(12, 8, 9, 10, 11)]), digits = 4)
+round(pcor(sapo2[, c(12, 8, 9, 10, 11)])$estimate, digits = 4)
+plot(sapo2[, c(12, 4, 6, 8, 9, 10, 11)])
+```
+
+# 2. Análisis Descriptivo por Grupos
+
+Se visualiza cómo varía la cantidad de goles según la liga y la posición del jugador mediante boxplots.
+
+```{r}
+#| label: descriptivo-grupos
+#| fig-width: 12
+#| fig-height: 6
+
+col <- c(RColorBrewer::brewer.pal(9, "Set1")[1:9], RColorBrewer::brewer.pal(8, "Dark2")[1:8])
+boxplot(Goles ~ Liga * position, data = sapo2,
+        xlab = "Liga - Posición", ylab = "Goles",
+        frame = FALSE, col = col[1:length(unique(sapo2$position))], las=2)
+```
+
+# 3. Modelo de Regresión Lineal Múltiple
+
+Se ajusta un modelo para predecir los goles en función de la liga, la posición, los tiros, el tiempo jugado y los goles esperados (xGoals). El modelo es de la forma:
+$$
+\text{Goles}_i = \beta_0 + \beta_1 \text{Liga}_i + \dots + \beta_k \text{xGoals}_i + \epsilon_i
+$$
+
+```{r}
+#| label: ajuste-modelo
+
+modelo <- lm(Goles ~ 1 + Liga + position + Tiros + Tiempo + xGoals, data = sapo2)
+summary(modelo)
+
+# Tabla de coeficientes
+round(as.data.frame(modelo$coefficients), digits = 7)
+```
+
+# 4. Validación de Supuestos del Modelo
+
+Se realizan pruebas formales y diagnósticos gráficos para verificar los supuestos del modelo de regresión lineal.
+
+```{r}
+#| label: validacion-setup
+
+# Se extraen los residuales estudentizados
+stud_res <- studres(modelo)
+```
+
+## 4.1. Linealidad (Test RESET)
+
+La prueba RESET (Regression Equation Specification Error Test) evalúa si la forma funcional del modelo es correcta (linealidad).
+-   **$H_0$**: La especificación del modelo es correcta (la relación es lineal).
+
+```{r}
+#| label: validacion-linealidad
+
+# Gráficos de residuales vs. predictores y vs. valores ajustados
+par(mfrow=c(2,2))
+plot(sapo2$Tiros, stud_res, xlab = "Tiros", ylab = "Residuales Estudentizados")
+plot(sapo2$Tiempo, stud_res, xlab = "Tiempo", ylab = "Residuales Estudentizados")
+plot(sapo2$xGoals, stud_res, xlab = "xGoals", ylab = "Residuales Estudentizados")
+plot(fitted(modelo), stud_res, xlab = "Valores Ajustados", ylab = "Residuales Estudentizados")
+par(mfrow=c(1,1))
+
+# Test RESET
+resettest(modelo, power = 2:5, type = "fitted")
+```
+**Conclusión**: El p-valor pequeño sugiere rechazar $H_0$, indicando una posible falta de linealidad.
+
+## 4.2. Media Cero y Normalidad de los Residuales
+
+```{r}
+#| label: validacion-normalidad
+
+# Media de los residuales (debe ser cercana a cero por construcción)
+mean(modelo$residuals)
+
+# Prueba t para H0: media de los residuos = 0
+t.test(modelo$residuals, mu = 0)
+
+# Prueba de Shapiro-Wilk para H0: los residuales siguen una distribución normal
+shapiro.test(stud_res)
+```
+**Conclusión**: Se cumple el supuesto de media cero. Sin embargo, el p-valor de la prueba de Shapiro-Wilk es muy pequeño, rechazando el supuesto de normalidad en los residuales.
+
+## 4.3. Homocedasticidad (Varianza Constante)
+
+Se evalúa si la varianza de los errores es constante.
+-   **$H_0$**: Hay homocedasticidad (varianza constante).
+
+```{r}
+#| label: validacion-homocedasticidad
+
+# Gráfico de Scale-Location
+plot(modelo, which = 3)
+
+# Test de Breusch-Pagan
+bptest(modelo)
+```
+**Conclusión**: El p-valor pequeño rechaza $H_0$, indicando la presencia de heterocedasticidad (varianza no constante).
+
+## 4.4. Multicolinealidad
+
+Se evalúa la correlación entre las variables predictoras. El Factor de Inflación de la Varianza (VIF) mide cuánto aumenta la varianza de un coeficiente debido a la colinealidad.
+-   **Regla general**: VIF > 5 o 10 indica un problema de multicolinealidad.
+
+```{r}
+#| label: validacion-multicolinealidad
+
+car::vif(modelo)
+```
+**Conclusión**: Todos los VIF son bajos, lo que sugiere que no hay problemas graves de multicolinealidad.
+
+# 5. Análisis de Diagnóstico: Puntos Influyentes
+
+Se identifican observaciones que pueden tener un efecto desproporcionado en el ajuste del modelo.
+
+## 5.1. Observaciones con Alta Palanca (Leverage)
+
+Puntos con valores atípicos en los predictores. Un punto tiene alta palanca si su valor "hat" $h_{ii} > 2p/n$ o $3p/n$.
+
+```{r}
+#| label: diagnostico-leverage
+
+X <- model.matrix(modelo)
+H <- X %*% solve(t(X) %*% X) %*% t(X)
+p <- sum(hatvalues(modelo))
+n <- nrow(sapo2)
+h_ii <- as.data.frame(cbind(index = 1:n, hat_value = diag(H)))
+
+ggplot(h_ii, aes(x = index, y = hat_value, label = index)) +
+  geom_segment(aes(xend = index, yend = 0)) +
+  geom_point() +
+  geom_hline(yintercept = 3 * p / n, color = "red", linetype = "dashed") +
+  geom_hline(yintercept = 2 * p / n, color = "blue", linetype = "dashed") +
+  labs(x = "Índice", y = "Valor de Apalancamiento (hii)", title = "Valores de Apalancamiento") +
+  theme_minimal()
+```
+
+## 5.2. Observaciones Atípicas (Outliers)
+
+Puntos con un gran error de predicción. Se identifican usando los residuales estudentizados. Un punto es atípico si $|r_{i, stud}| > 3$.
+
+```{r}
+#| label: diagnostico-outliers
+
+resi <- as.data.frame(cbind(index = 1:n, res_estud = stud_res))
+ggplot(resi, aes(x = index, y = res_estud, label = index)) +
+  geom_point(color = "blue") +
+  geom_hline(yintercept = c(-3, 3), color = "red", linetype = "dashed") +
+  geom_text_repel(data = filter(resi, abs(res_estud) > 3)) +
+  labs(x = "Índice", y = "Residual Estudentizado", title = "Identificación de Outliers") +
+  theme_minimal()
+```
+
+## 5.3. Observaciones Influyentes (Distancia de Cook)
+
+Mide el efecto de eliminar una observación. Un punto es influyente si su Distancia de Cook $D_i > 4/(n-p-2)$.
+
+```{r}
+#| label: diagnostico-influencia
+
+# Gráfico de la Distancia de Cook
+corte <- 4 / (n - p - 2)
+plot(modelo, which = 4, cook.levels = corte)
+abline(h = corte, lty = 2, col = "red")
+
+# Gráfico de Influencia
+influencePlot(modelo, id.method = "identify", main = "Gráfico de Influencia", sub = "El tamaño del círculo es proporcional a la D_Cook")
+```
+
+## 5.4. Reajuste del Modelo
+
+Se ajusta un nuevo modelo excluyendo los puntos identificados como más influyentes para evaluar su impacto en los coeficientes.
+
+```{r}
+#| label: reajuste-modelo
+
+# Puntos a excluir (ejemplo basado en diagnóstico visual)
+puntos_a_excluir <- c(149, 501, 544, 545, 774, 959, 960, 1133, 1134, 1135, 1270, 1271, 1272, 1273, 1274, 1292, 1293, 1294, 1373, 1526, 1824)
+modelo_sin_influyentes <- update(modelo, subset = -puntos_a_excluir)
+
+# Comparación de coeficientes
+round(as.data.frame(coef(summary(modelo))), digits = 4)
+round(as.data.frame(coef(summary(modelo_sin_influyentes))), digits = 4)
+```

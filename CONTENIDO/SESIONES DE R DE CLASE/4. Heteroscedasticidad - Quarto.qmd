@@ -1,0 +1,183 @@
+---
+title: "Heteroscedasticidad"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: true   
+---
+
+# Introducción
+
+Este documento presenta un análisis detallado sobre la **heteroscedasticidad**, uno de los problemas más comunes en el modelado de regresión que viola el supuesto de varianza constante de los errores. Se simulará un conjunto de datos que presenta heterocedasticidad, se mostrarán las técnicas gráficas y formales para su diagnóstico, y se explorarán cuatro soluciones principales para corregir o mitigar sus efectos: errores estándar robustos, Mínimos Cuadrados Ponderados (WLS), Mínimos Cuadrados Generalizados Factibles (FGLS) y la transformación de la variable de respuesta (Box-Cox).
+
+### Librerías Requeridas
+
+Se cargan únicamente los paquetes necesarios para la ejecución de este análisis.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(lmtest)   # Para bptest()
+library(sandwich) # Para errores estándar robustos (vcovHC)
+library(MASS)     # Para boxcox() y studres()
+```
+
+# Ejemplo con Heteroscedasticidad
+
+Se simula un conjunto de datos donde la varianza del término de error depende de una de las variables predictoras ($Var(\epsilon_i | x_{i1}) = \sigma^2 x_{i1}$), induciendo así heterocedasticidad.
+
+```{r}
+#| label: simulacion-datos
+
+num <- 1000
+set.seed(109)
+x1 <- rpois(num, 12)
+x2 <- rgamma(num, 2)
+# El término de error depende de x1, creando heterocedasticidad
+error_term <- sapply(x1, function(i) rnorm(1, 0, sqrt(i))) 
+
+# Ecuación del modelo
+y <- 2*x1 + 0.5*x2 + error_term
+
+# Se toma una muestra de los datos simulados
+dat <- cbind(y, x1, x2)
+dat <- as.data.frame(dat[sample(1:num, 500, replace = TRUE),])
+```
+
+# Estimación Ordinaria de MCO
+
+Se ajusta un modelo de regresión lineal estándar (Mínimos Cuadrados Ordinarios, MCO), ignorando inicialmente el problema de heterocedasticidad.
+
+```{r}
+#| label: modelo-mco
+
+plot(dat)
+reg <- lm(y ~ x1 + x2, data = dat)
+summary(reg)
+```
+
+# Diagnóstico de Homoscedasticidad
+
+Se realizan pruebas gráficas y formales para detectar la presencia de heterocedasticidad.
+
+-   **$H_0$**: Hay homocedasticidad (varianza de los errores constante).
+-   **$H_1$**: Hay heterocedasticidad (varianza no constante).
+
+```{r}
+#| label: diagnostico-heteroscedasticidad
+
+# Diagnósticos gráficos
+par(mfrow = c(2, 2))
+plot(reg, which = 3) # Scale-Location plot
+plot(dat$x1, reg$residuals, xlab="x1", ylab="Residuales") # Patrón de abanico
+plot(dat$x2, reg$residuals, xlab="x2", ylab="Residuales")
+plot(reg$fitted.values, reg$residuals, xlab="Valores Ajustados", ylab="Residuales")
+par(mfrow = c(1, 1))
+
+# Prueba formal: Test de Breusch-Pagan
+bptest(reg)
+```
+**Conclusión**: Los gráficos (especialmente el de residuales vs. x1) muestran un patrón de abanico, donde la dispersión de los residuales aumenta con el valor del predictor. El Test de Breusch-Pagan confirma esto con un p-valor muy pequeño, rechazando la hipótesis nula de homocedasticidad. **Se concluye que hay un problema de heteroscedasticidad.**
+
+---
+
+# Soluciones a la Heteroscedasticidad
+
+## Alternativa 1: Errores Estándar Robustos
+
+Esta solución no cambia los coeficientes estimados ($\hat{\beta}_j$), pero corrige sus errores estándar para que la inferencia (p-valores, intervalos de confianza) sea válida a pesar de la heterocedasticidad. Se utiliza la matriz de varianza-covarianza de White (HC).
+
+```{r}
+#| label: solucion-robustos
+
+# Se recalculan las pruebas de hipótesis de los coeficientes con errores robustos
+coeftest(reg, vcov. = vcovHC, type = "HC3")
+
+# Intervalos de confianza robustos
+coefci(reg, vcov. = vcovHC, type = "HC3")
+
+# Comparación con los intervalos de confianza originales (no válidos)
+confint(reg)
+
+# Comparación de modelos (equivalente a anova) con errores robustos
+reg2 <- lm(y ~ x1, data = dat)
+waldtest(reg2, reg, vcov = vcovHC)
+```
+
+## Alternativa 2: Mínimos Cuadrados Ponderados (WLS)
+
+Si se conoce la forma de la heterocedasticidad, se puede corregir el modelo ajustando por Mínimos Cuadrados Ponderados (WLS). En este caso, como $Var(\epsilon_i | x_{i1}) \propto x_{i1}$, los pesos a utilizar son $w_i = 1/x_{i1}$. WLS produce estimadores eficientes (BLUE).
+
+```{r}
+#| label: solucion-wls
+
+# Se ajusta el modelo WLS especificando los pesos
+reg_wls <- lm(y ~ x1 + x2, data = dat, weights = 1/x1)
+summary(reg_wls)
+
+# Se comprueba que los residuales ponderados ahora son homocedásticos
+plot(dat$x1, residuals(reg_wls) / sqrt(dat$x1), main = "Residuales Ponderados vs. x1")
+plot(fitted(reg_wls), residuals(reg_wls) / sqrt(dat$x1), main = "Residuales Ponderados vs. Ajustados")
+```
+
+## Alternativa 3: Mínimos Cuadrados Generalizados Factibles (FGLS)
+
+Cuando la forma de la heterocedasticidad no se conoce, se puede estimar a partir de los residuales del modelo MCO inicial.
+
+```{r}
+#| label: solucion-fgls
+
+# Modelo FGLS simple (no recomendado): usa los residuales^2 como estimación de la varianza
+fgls <- lm(y ~ x1 + x2, data = dat, weights = 1/reg$residuals^2) 
+summary(fgls)
+
+# Recomendación de Wooldridge: modelar el logaritmo de los residuales al cuadrado
+modvar <- lm(log(reg$residuals^2) ~ x1 + x2, data = dat)
+# Los pesos se obtienen como la inversa del exponencial de los valores ajustados de este modelo
+fgls2 <- lm(y ~ x1 + x2, data = dat, weights = 1/exp(modvar$fitted.values))
+summary(fgls2)
+
+# Se comprueba la homocedasticidad de los nuevos residuales ponderados
+plot(dat$x1, studres(fgls2), main="Residuales Estudentizados del Modelo FGLS (Wooldridge)")
+```
+
+## Alternativa 4: Transformar la Variable Respuesta (Box-Cox)
+
+Otra estrategia es transformar la variable $Y$ para estabilizar la varianza. El método de Box-Cox ayuda a encontrar la transformación de potencia óptima ($\lambda$).
+
+$$
+Y^{(\lambda)} = \frac{Y^\lambda - 1}{\lambda}
+$$
+
+```{r}
+#| label: solucion-boxcox
+
+# La función boxcox() busca el valor de lambda que maximiza la verosimilitud
+BC <- boxcox(reg)
+lam <- BC$x[which.max(BC$y)]
+lam
+
+# Se transforma Y y se ajusta un nuevo modelo
+yl <- (dat$y^lam - 1) / lam
+dat2 <- cbind(dat, yl)
+reg3 <- lm(yl ~ x1 + x2, data = dat2)
+summary(reg3)
+
+# Se verifica si el nuevo modelo es homocedástico
+plot(reg3, which = 3)
+bptest(reg3)
+
+# Se compara la normalidad de los residuales del modelo original y el transformado
+par(mfrow=c(1,2))
+hist(studres(reg), main="Residuales Originales")
+hist(studres(reg3), main="Residuales del Modelo Transformado")
+par(mfrow=c(1,1))
+shapiro.test(studres(reg3))
+```
+**Conclusión**: La transformación Box-Cox ha corregido exitosamente el problema de heterocedasticidad, como lo confirma el p-valor alto del test de Breusch-Pagan en el nuevo modelo.

@@ -1,0 +1,235 @@
+---
+title: "Validación del Modelo"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: true   
+---
+
+# Introducción
+
+Este documento presenta un análisis de diagnóstico completo para un modelo de regresión lineal múltiple ajustado a los datos de `Atletas`. El objetivo es verificar rigurosamente los supuestos del modelo de Mínimos Cuadrados Ordinarios (MCO) e identificar observaciones que puedan tener una influencia desproporcionada en los resultados. Se abordan temas como el apalancamiento, los valores atípicos, la influencia, la linealidad, la multicolinealidad, la heterocedasticidad, la normalidad y la independencia de los residuales.
+
+### Librerías Requeridas
+
+Se cargan únicamente los paquetes necesarios para la ejecución de este análisis.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(readxl)
+library(MASS)      # Para studres()
+library(lmtest)    # Para bptest(), dwtest(), resettest()
+library(car)       # Para vif(), influencePlot(), qqPlot()
+library(tseries)   # Para jarque.bera.test(), runs.test()
+library(glmtoolbox) # Para envelope() plot
+```
+
+### Carga de Datos y Ajuste del Modelo Inicial
+
+```{r}
+#| label: carga-datos-modelo
+
+Atletas <- read_excel("Atletas.xlsx")
+fit <- lm(lbm ~ 1 + ht + wt + rcc, data = Atletas)
+summary(fit)
+```
+
+# a-b) Alta Palanca (Leverage)
+
+El **apalancamiento (leverage)** mide qué tan atípica es una observación en términos de sus valores predictores (el espacio de las $X$). Un punto tiene alta palanca si su valor "hat", $h_{ii}$, es grande.
+-   **Regla de Decisión**: Se considera alta palanca si $h_{ii} > 2p/n$ (límite flexible) o $h_{ii} > 3p/n$ (límite estricto), donde $p$ es el número de parámetros y $n$ es el tamaño de la muestra.
+
+```{r}
+#| label: leverage-analysis
+
+n <- nrow(Atletas)
+p <- length(coef(fit)) # Número de parámetros estimados
+
+# Gráfico de los valores de apalancamiento (hat values)
+plot(hatvalues(fit), type = "h", main = "Índice de Valores de Apalancamiento")
+abline(h = 2 * p / n, col = "blue", lty = 2)
+abline(h = 3 * p / n, col = "red", lty = 2)
+legend("topright", legend = c("Corte 2p/n", "Corte 3p/n"), col = c("blue", "red"), lty = 2)
+
+# Gráfico de Residuales vs. Apalancamiento
+plot(fit, which = 5)
+
+# Identificar los puntos con mayor apalancamiento
+head(sort(hatvalues(fit), decreasing = TRUE))
+
+# La siguiente función es para uso interactivo en una sesión de R.
+# La llamada a la función se ha comentado para permitir el renderizado del documento.
+highleverage <- function(fit) {
+  p <- length(coefficients(fit))
+  n <- length(fitted(fit))
+  ratio <- p / n
+  plot(hatvalues(fit), main = 'Index Plot of Ratio')
+  abline(h = c(2, 3) * ratio, col = 'red', lty = 2)
+  identify(1:n, hatvalues(fit), names(hatvalues(fit)))
+}
+# x11() # Abre una nueva ventana gráfica
+# highleverage(fit)
+```
+
+# c) Observaciones Atípicas (Outliers)
+
+Los **outliers** son observaciones con un gran error de predicción. Se identifican usando los **residuales estudentizados**, que siguen una distribución t de Student.
+-   **Regla de Decisión**: Una observación se considera un outlier potencial si su residual estudentizado absoluto, $|r_{i, stud}|$, es mayor que 3.
+
+```{r}
+#| label: outliers-analysis
+
+# Residuales estudentizados
+stud_res <- studres(fit)
+
+# Ordenar los residuales estudentizados de mayor a menor en valor absoluto
+head(sort(abs(stud_res), decreasing = TRUE))
+
+# Boxplot para detectar valores extremos
+boxplot(stud_res, main = "Boxplot de Residuales Estudentizados")
+```
+**Conclusión**: No se observan valores que superen el umbral de 3, por lo que no hay outliers claros.
+
+# d) Observaciones Influyentes
+
+Una observación **influyente** es aquella que, si se elimina, cambia significativamente el ajuste del modelo. Combina tanto el apalancamiento como el tamaño del residual.
+
+-   **Métrica Principal**: **Distancia de Cook ($D_i$)**.
+-   **Regla de Decisión**: Un punto es potencialmente influyente si $D_i > 4/(n-p)$.
+
+```{r}
+#| label: influence-analysis
+#| fig-width: 10
+#| fig-height: 5
+
+par(mfrow=c(1,2))
+# Gráfico de la Distancia de Cook
+corte <- 4 / (n - p)
+plot(fit, which = 4, cook.levels = corte)
+abline(h = corte, lty = 2, col = "red")
+
+# Gráfico de Influencia (combina leverage, outliers y Cook's D)
+influencePlot(fit, id.method = "identify", main = "Gráfico de Influencia", sub = "El tamaño del círculo es proporcional a la D_Cook")
+```
+
+## Comparación de modelos con y sin puntos influyentes
+
+```{r}
+#| label: influence-refit
+
+# Puntos identificados como más influyentes
+puntos_influyentes <- c(8, 11, 29, 61, 88)
+
+# Modelo sin las observaciones influyentes
+fit3 <- update(fit, subset = -puntos_influyentes)
+summary(fit3)
+```
+
+# e) Patrones Inexplicados (Linealidad)
+
+Se verifica si la relación funcional entre los predictores y la respuesta es lineal.
+-   **Método**: **Test RESET** de Ramsey.
+-   **$H_0$**: La forma funcional del modelo es correcta (lineal).
+
+```{r}
+#| label: linearity-analysis
+
+# Gráficos de residuales vs. predictores y valores ajustados
+par(mfrow=c(2,2))
+plot(Atletas$ht, stud_res, xlab="Altura")
+plot(Atletas$wt, stud_res, xlab="Peso")
+plot(Atletas$rcc, stud_res, xlab="Glóbulos Rojos")
+plot(fitted(fit), stud_res, xlab="Valores Ajustados")
+par(mfrow=c(1,1))
+
+# Aplicar el test RESET
+resettest(fit, type = "regressor")
+resettest(fit, type = "fitted")
+```
+**Conclusión**: Los p-valores (0.50 y 0.52) son grandes, por lo que no se rechaza $H_0$. No hay evidencia de patrones no lineales no explicados.
+
+# f) Multicolinealidad
+
+Se evalúa la correlación entre las variables predictoras.
+-   **Métrica**: **Factor de Inflación de la Varianza (VIF)**.
+-   **Regla de Decisión**: Un VIF > 5 o 10 indica un problema potencial de multicolinealidad.
+
+```{r}
+#| label: multicollinearity-analysis
+
+vif(fit)
+```
+**Conclusión**: Todos los VIF son bajos, lo que sugiere que no hay problemas de multicolinealidad.
+
+# g) Heteroscedasticidad
+
+Se verifica si la varianza de los errores es constante (homocedasticidad).
+-   **Método**: **Test de Breusch-Pagan**.
+-   **$H_0$**: Hay homocedasticidad (varianza constante).
+
+```{r}
+#| label: heteroscedasticity-analysis
+
+# Gráficos descriptivos
+plot(fit, which = 3) # Scale-Location plot
+plot(fit$fitted.values, stud_res, main="Residuales Estudentizados vs. Ajustados")
+
+# Test de Breusch-Pagan
+bptest(fit)
+```
+**Conclusión**: El p-valor (0.24) es mayor que 0.05, por lo que no se rechaza $H_0$. No hay evidencia de heterocedasticidad.
+
+# h) Normalidad
+
+Se verifica si los errores siguen una distribución normal.
+-   **Métodos**: Gráficos (Q-Q Plot, histograma) y pruebas formales (Shapiro-Wilk, Jarque-Bera).
+-   **$H_0$**: Los residuales siguen una distribución normal.
+
+```{r}
+#| label: normality-analysis
+
+# Gráficos de diagnóstico
+par(mfrow=c(1,2))
+plot(fit, which = 2) # Q-Q Plot
+hist(stud_res, main="Histograma de Residuales Estudentizados")
+par(mfrow=c(1,1))
+
+# Pruebas de normalidad
+shapiro.test(stud_res)
+jarque.bera.test(stud_res)
+
+# Q-Q Plot con bandas de confianza simuladas (robusto ante outliers)
+envelope(fit)
+```
+**Conclusión**: Las pruebas formales no rechazan la normalidad (p-valores > 0.05), y los gráficos son consistentes con este supuesto.
+
+# i) Independencia
+
+Se verifica si los errores no están correlacionados entre sí. Es crucial si los datos tienen un orden temporal o espacial.
+-   **Métodos**: Gráfico de autocorrelación (ACF), Test de Durbin-Watson, Test de Rachas.
+-   **$H_0$ (Durbin-Watson)**: No hay autocorrelación de primer orden.
+-   **$H_0$ (Runs Test)**: La secuencia de signos de los residuales es aleatoria.
+
+```{r}
+#| label: independence-analysis
+
+# Correlación en el tiempo (si los datos están ordenados temporalmente)
+plot(stud_res, type = "l", main="Residuales en orden de observación")
+abline(h = 0, col = "red")
+acf(stud_res, main="Función de Autocorrelación")
+
+# Test de Durbin-Watson
+dwtest(fit)
+
+# Prueba de rachas para independencia
+x <- factor(sign(stud_res))
+runs.test(x)
+```
+**Conclusión**: El p-valor del test de Durbin-Watson es alto (0.19), por lo que no se rechaza la independencia de los errores.

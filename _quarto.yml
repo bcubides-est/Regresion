@@ -1,0 +1,54 @@
+project:
+  type: book
+
+book:
+  title: "REGRESIÓN"
+  author: "Brayan Cubides"
+  repo-url: "https://github.com/bcubides-est/Regresion"
+  repo-branch: main
+  favicon: logo.png
+  description: "Material del curso de Regresión"
+  url: "/Regresion/"
+  page-navigation: true        # prev/next
+  sidebar:
+    tools:
+    - icon: globe
+      href: https://bcubides-est.github.io/website/inicio.html
+      text: "Ir a mi web"
+
+    - icon: download
+      href: 'javascript:window.print()'
+      text: "Descargar (PDF)"
+    logo: logo.png
+    search: true    
+  image: logo.png
+  
+  chapters:
+    - index.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/0. TODO de Estadística Descriptiva - Clase Profe Mario - Quarto.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/1. ANOVA_oneway - Quarto.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/2. Regresion Lineal Simple - Quarto.qmd
+    - CONTENIDO/CORTE 1 - Regresión Lineal Simple/Taller 1 Regresión - Quarto.qmd
+    - CONTENIDO/CORTE 1 - Regresión Lineal Simple/Parcial 1 - Parte B - Quarto.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/3. Regresion lineal multiple - Quarto.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/4. Heteroscedasticidad - Quarto.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/4. Validación del Modelo - Quarto.qmd
+    - CONTENIDO/CORTE 2 - Regresión Multiple y Diagnostico del Modelo/Parcial 2 - Parte B - Quarto.qmd
+    - CONTENIDO/PROYECTO/Proyecto 2 - Quarto.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/5. Selección del modelo. Regre RIDGE y LASSO - Quarto.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/6. Densidad No Paramétrica - Quarto.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/6. Modelos Generalizados Aditivos - Quarto.qmd
+    - CONTENIDO/SESIONES DE R DE CLASE/7. Modelos Lineales Generalizados - Quarto.qmd
+
+format:
+  html:
+    theme:
+      light: cerulean #simplex 
+      dark: cyborg
+    css: custom.css
+    code-fold: false
+    toc-collapse: true  # Listas desplegables contraídas por defecto
+    toc-depth: 2
+    execute:
+      output-dir: _book
+    self-contained: false

@@ -1,0 +1,328 @@
+---
+title: "Regresion Lineal Simple"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: true   
+---
+
+# Introducción
+
+Este documento presenta una guía detallada para el análisis de Regresión Lineal Simple a través de dos ejercicios prácticos. Se abordan todos los pasos del modelado: estimación de parámetros, pruebas de hipótesis con sus sistemas explícitos, construcción de intervalos de confianza y predicción, y la validación rigurosa de los supuestos del modelo.
+
+## Librerías Requeridas
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(MASS)
+library(lmtest)
+library(tseries)
+library(ggplot2)
+```
+
+---
+
+# EJERCICIO 1: Relación entre Frecuencia Cardiaca y Peso
+
+Se explora la relación entre la frecuencia cardiaca en reposo (`frecuencia`) y el peso corporal (`peso`).
+
+### Carga y Exploración de Datos
+
+```{r}
+#| label: ej1-datos
+
+pacientes <- read.csv("frecuencia.csv", sep=";")
+frecuencia <- pacientes$Frecuencia
+peso <- pacientes$Peso
+pacientes <- data.frame(frecuencia, peso) 
+head(pacientes)
+plot(pacientes$peso, pacientes$frecuencia, xlab="Peso", ylab="Frecuencia", main="Diagrama de Dispersión")
+```
+
+## A) Modelo Propuesto de Regresión
+
+Se ajusta un modelo de la forma:
+$$
+\text{frecuencia}_i = \beta_0 + \beta_1 \cdot \text{peso}_i + \epsilon_i
+$$
+
+```{r}
+#| label: ej1-modelo
+
+fit <- lm(frecuencia ~ 1 + peso, data = pacientes)
+summary(fit)
+```
+**Lectura del `summary(fit)`**:
+-   `Intercept` ($\hat{\beta}_0$): `r round(coef(fit)[1], 3)` es la estimación del intercepto.
+-   `peso` ($\hat{\beta}_1$): `r round(coef(fit)[2], 3)` es la estimación de la pendiente.
+-   `Std. Error` para `peso`: Es la raíz de la varianza estimada de $\hat{\beta}_1$.
+-   `Residual standard error`: `r round(summary(fit)$sigma, 3)` es la estimación de la desviación estándar de los errores ($\hat{\sigma}$).
+-   `Adjusted R-squared`: `r round(summary(fit)$adj.r.squared, 4)` es el coeficiente de determinación ajustado.
+-   `degrees of freedom`: `r fit$df.residual` son los grados de libertad para los intervalos de confianza y pruebas de hipótesis de los coeficientes.
+
+## B) Estimación de Parámetros (Manual)
+
+Se calculan manualmente los estimadores de los coeficientes, sus varianzas y la varianza del error.
+
+$$
+\hat{\beta}_1 = r_{xy} \frac{S_y}{S_x} \quad | \quad \hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x} \quad | \quad \hat{\sigma}^2 = \frac{SCE}{n-2}
+$$
+
+```{r}
+#| label: ej1-estimacion-manual
+
+cor <- cor(pacientes$frecuencia, pacientes$peso)
+s_y <- sd(pacientes$frecuencia)
+s_x <- sd(pacientes$peso)
+n <- length(pacientes$frecuencia)
+
+b1_hat <- cor * s_y / s_x
+b0_hat <- mean(pacientes$frecuencia) - b1_hat * mean(pacientes$peso)
+y_hat <- b0_hat + b1_hat * pacientes$peso
+sigma2_hat <- sum((pacientes$frecuencia - y_hat)^2) / (n - 2)
+sigma_hat <- sqrt(sigma2_hat)
+
+var_hat_b1_hat <- sigma2_hat / ((n - 1) * var(pacientes$peso))
+var_hat_b0_hat <- sigma2_hat * sum(pacientes$peso^2) / (n * ((n - 1) * var(pacientes$peso)))
+cov_hat_b0_b1 <- -sigma2_hat * mean(pacientes$peso) / ((n - 1) * var(pacientes$peso))
+cor_hat_b0_b1 <- cov_hat_b0_b1 / sqrt(var_hat_b0_hat * var_hat_b1_hat)
+
+# La función vcov() calcula la matriz de varianzas-covarianzas de los estimadores
+vcov(fit)
+```
+
+## C) Intervalos de Confianza para los Parámetros $\beta_0$ y $\beta_1$
+
+Se construyen intervalos de confianza al 95% para los parámetros de localización del modelo. La fórmula es:
+$$
+\hat{\beta}_j \pm t_{(1-\alpha/2, n-2)} \cdot EE(\hat{\beta}_j)
+$$
+```{r}
+#| label: ej1-ic-parametros
+
+alpha <- 0.05
+Li <- coef(fit) - qt(1 - alpha/2, n - 2) * sqrt(diag(vcov(fit)))
+Ls <- coef(fit) + qt(1 - alpha/2, n - 2) * sqrt(diag(vcov(fit)))
+cbind(Li, Ls)
+
+# Usando la función directa
+confint(object = fit, level = 0.95)
+```
+
+## D) Prueba de Hipótesis: ¿Hay relación entre las variables?
+
+Se realiza una prueba de hipótesis para determinar si la pendiente $\beta_1$ es significativamente diferente de cero.
+
+**Sistema de Hipótesis:**
+$$
+H_0: \beta_1 = 0 \quad \text{vs.} \quad H_1: \beta_1 \neq 0
+$$
+
+```{r}
+#| label: ej1-ph-b1-cero
+
+sign <- 0.05
+t_c <- (as.numeric(fit$coeff - 0) / sqrt(vcov(fit)))
+valcrit <- qt(df = n - 2, 1 - sign/2)
+
+# Decisión por valor crítico
+abs(t_c) > valcrit
+# Decisión por p-valor
+pval <- 2 * (1 - pt(abs(t_c), df = n - 2))
+pval
+```
+**Conclusión**: Dado que `abs(t_c) > valcrit` es `TRUE` y el p-valor es prácticamente cero, se rechaza la hipótesis nula. Existe una relación lineal estadísticamente significativa entre el peso y la frecuencia cardiaca.
+
+## E) Prueba de Hipótesis: ¿Es la pendiente mayor que 1?
+
+**Sistema de Hipótesis:**
+$$
+H_0: \beta_1 = 1 \quad \text{vs.} \quad H_1: \beta_1 > 1
+$$
+
+```{r}
+#| label: ej1-ph-b1-uno
+
+sign <- 0.05
+t_c <- as.numeric((fit$coeff - 1) / sqrt(vcov(fit)))
+valcrit <- qt(df = n - 2, 1 - sign)
+
+# Decisión por valor crítico
+t_c > valcrit
+# Decisión por p-valor
+pval <- 1 - pt(t_c, df = n - 2)
+pval
+```
+**Conclusión**: `t_c > valcrit` es `FALSE` y el p-valor es muy alto (0.999). No se rechaza la hipótesis nula. No hay evidencia para afirmar que la pendiente sea mayor que 1.
+
+## F) Intervalo de Confianza del 90% para la Media Condicional
+
+Se estima el valor esperado de la frecuencia cardiaca para un `peso` de 70 kg.
+
+```{r}
+#| label: ej1-ic-media
+
+alpha <- 0.1
+x_new <- 70
+
+mu <- coef(fit) + coef(fit) * x_new
+var <- vcov(fit) + x_new^2 * vcov(fit) + 2 * x_new * vcov(fit)
+
+Li <- mu - qt(1 - alpha/2, n - 2) * sqrt(var)
+Ls <- mu + qt(1 - alpha/2, n - 2) * sqrt(var)
+cbind(Li, Ls)
+```
+El intervalo resultante indica, con un 90% de confianza, entre qué valores se encuentra la **frecuencia cardiaca promedio** para todas las personas que pesan 70 kg.
+
+## G) Intervalo de Predicción del 99%
+
+Un intervalo de predicción estima el rango en el que se espera que caiga una **nueva observación individual**.
+
+```{r}
+#| label: ej1-ic-prediccion
+
+alpha <- 0.01
+x_new <- 85
+
+sigma2 <- sum(fit$residuals^2) / (n - 2)
+mu_pred <- coef(fit) + coef(fit) * x_new
+var_pred <- sigma2 * (1 + 1/n + (x_new - mean(peso))^2 / ((n-1)*var(peso)))
+Li_pred <- mu_pred - qt(1 - alpha/2, n - 2) * sqrt(var_pred)
+Ls_pred <- mu_pred + qt(1 - alpha/2, n - 2) * sqrt(var_pred)
+cbind(Li_pred, Ls_pred)
+```
+
+## H) Descomposición de la Varianza (Tabla ANOVA)
+
+La variabilidad total (SCT) se descompone en la explicada por el modelo (SCM) y la no explicada (SCE).
+
+$$
+\sum(y_i - \bar{y})^2 = \sum(\hat{y}_i - \bar{y})^2 + \sum(y_i - \hat{y}_i)^2
+$$
+
+```{r}
+#| label: ej1-anova-manual
+
+SC_Tot <- sum((pacientes$frecuencia - mean(pacientes$frecuencia))^2)
+SC_residuales <- sum(fit$residuals^2)
+SC_mod <- sum((y_hat - mean(pacientes$frecuencia))^2)
+
+all.equal(SC_Tot, SC_mod + SC_residuales)
+```
+
+## I) Significancia de la Regresión y Coeficiente de Determinación
+
+Se realiza una prueba F para la significancia global del modelo.
+
+```{r}
+#| label: ej1-prueba-f
+
+CM_residuales <- SC_residuales / (n - 2)
+CM_mod <- SC_mod / 1
+F_c <- CM_mod / CM_residuales
+
+# Decisión por p-valor
+p_valor_f <- 1 - pf(F_c, df1 = 1, df2 = n - 2)
+p_valor_f
+```
+
+## J) Validación del Modelo
+
+Se verifican los supuestos del modelo sobre los residuales.
+
+```{r}
+#| label: ej1-validacion
+
+residuals <- fit$residuals
+
+# a. Media cero y no relación con variables
+par(mfrow=c(1,2))
+plot(frecuencia, residuals, main="Residuales vs. Y")
+plot(peso, residuals, main="Residuales vs. X")
+mean(residuals)
+t.test(residuals, mu = 0)
+
+# b. Varianza constante (Homocedasticidad)
+plot(y_hat, residuals, main="Residuales vs. Ajustados")
+bptest(frecuencia ~ 1 + peso, data=pacientes)
+# El p-valor es grande, así que no se rechaza que haya homocedasticidad.
+
+# d. Normalidad de los residuales
+par(mfrow=c(1,2))
+hist(residuals, main="Histograma de Residuales")
+qqnorm(residuals); qqline(residuals, col="red")
+jarque.bera.test(residuals)
+shapiro.test(residuals)
+# Los p-valores son grandes, por lo cual no se rechaza la normalidad.
+```
+**Conclusión**: Todos los supuestos del modelo parecen cumplirse satisfactoriamente.
+
+---
+
+# EJERCICIO 2: Efecto de un Tratamiento para la Hipertensión
+
+### Carga y Preparación de Datos
+
+```{r}
+#| label: ej2-datos
+
+hipertension <- read.table("hipertension.csv", header=T, sep=";")
+diferencia <- hipertension$Antes - hipertension$Despues
+tratamiento <- hipertension$Tratamiento
+hipertension <- data.frame(tratamiento, diferencia)
+head(hipertension)
+```
+
+## B) Estimación de Parámetros del Modelo
+
+El modelo es: $\text{diferencia}_i = \beta_0 + \beta_1 \cdot \text{tratamiento}_i + \epsilon_i$, donde `tratamiento` es 1 si es "2MED" y 0 si es "PLACEBO".
+
+```{r}
+#| label: ej2-modelo
+
+fit2 <- lm(diferencia ~ 1 + tratamiento, data = hipertension)
+summary(fit2)
+```
+
+## C) Intervalos de Confianza del 99% para los Parámetros
+
+```{r}
+#| label: ej2-ic-parametros
+
+alpha <- 0.01
+n2 <- nrow(hipertension)
+Li <- coef(fit2) - qt(1 - alpha/2, n2 - 2) * sqrt(diag(vcov(fit2)))
+Ls <- coef(fit2) + qt(1 - alpha/2, n2 - 2) * sqrt(diag(vcov(fit2)))
+cbind(Li, Ls)
+```
+
+## E) Prueba de Hipótesis: $H_0: \beta_1 = 0$ vs. $H_1: \beta_1 > 0$
+
+Se prueba si el medicamento tiene un efecto significativamente mayor que el placebo.
+
+```{r}
+#| label: ej2-ph-b1
+
+t_c <- (as.numeric(fit2$coeff - 0) / sqrt(vcov(fit2)))
+pval <- 1 - pt(t_c, df = n2 - 2)
+pval
+```
+
+## G) Comparación con un Modelo ANOVA
+
+Una regresión con una sola variable predictora categórica es matemáticamente equivalente a un ANOVA de una vía.
+
+```{r}
+#| label: ej2-anova
+
+fit_aov <- aov(diferencia ~ tratamiento, data = hipertension)
+summary(fit_aov)
+summary(fit2)
+```

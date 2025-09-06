@@ -1,0 +1,266 @@
+---
+title: "Regresion lineal multiple"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: true   
+---
+
+## Introducción
+
+Este documento presenta una guía detallada para el análisis de Regresión Lineal Múltiple a través de dos ejercicios prácticos. El primer ejercicio se centra en un modelo con predictores continuos, mientras que el segundo explora un modelo con predictores categóricos (ANOVA/ANCOVA). Se abordan todos los pasos del modelado: análisis descriptivo, estimación de parámetros, pruebas de hipótesis y construcción de intervalos de confianza.
+
+### Librerías Requeridas
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(readxl)
+library(ppcor)      # Para correlaciones parciales
+library(dplyr)
+library(ggplot2)
+library(fastDummies) # Para crear variables dummy
+```
+
+---
+
+# EJERCICIO 1: Masa Corporal Magra en Atletas
+
+Se busca modelar la masa corporal magra (`lbm`) en función de la altura (`ht`), el peso (`wt`) y el recuento de glóbulos rojos (`rcc`).
+
+## a) Análisis Descriptivo
+
+Se inicia con una exploración de las relaciones entre las variables mediante diagramas de dispersión y matrices de correlación.
+
+```{r}
+#| label: ej1-datos
+
+Atletas <- read_excel("Atletas.xlsx")
+# View(Atletas)
+
+# Matriz de diagramas de dispersión
+plot(Atletas)
+
+# Matriz de correlación de Pearson
+cor(Atletas)
+
+# Matriz de correlaciones parciales
+pcor(Atletas)
+```
+
+## c) Estimación de los Parámetros del Modelo
+
+Se ajusta un modelo de Regresión Lineal Múltiple de la forma:
+$$
+\text{lbm}_i = \beta_0 + \beta_1 \text{ht}_i + \beta_2 \text{wt}_i + \beta_3 \text{rcc}_i + \epsilon_i
+$$
+Los parámetros se estiman por Mínimos Cuadrados Ordinarios (MCO).
+
+```{r}
+#| label: ej1-modelo
+
+fit <- lm(lbm ~ 1 + ht + wt + rcc, data = Atletas)
+summary(fit)
+
+# Intervalos de confianza para los coeficientes
+confint(fit)
+```
+
+## d) Comprobación Matricial de los Parámetros
+
+Los estimadores MCO pueden calcularse manualmente usando la notación matricial:
+$$
+\hat{\boldsymbol{\beta}} = (X^T X)^{-1} X^T Y
+$$
+
+```{r}
+#| label: ej1-calculo-matricial
+
+n <- dim(Atletas)[1]
+Y <- as.matrix(Atletas[, 1])
+X <- as.matrix(Atletas[, 2:4])
+X <- cbind(rep(1, n), X) # Añadir columna de unos para el intercepto
+colnames(X)[1]<-"interc"
+
+betahat <- solve(t(X) %*% X) %*% t(X) %*% Y
+
+# Comprobar si los cálculos manuales y los de lm() coinciden
+all.equal(as.numeric(betahat), as.numeric(fit$coefficients))
+```
+
+## e) Matriz de Varianzas y Covarianzas Estimada
+
+La matriz de varianza-covarianza de los estimadores se calcula como:
+$$
+\text{Var}(\hat{\boldsymbol{\beta}}) = \hat{\sigma}^2 (X^T X)^{-1}
+$$
+donde $\hat{\sigma}^2 = \frac{SCE}{n-p}$ es la varianza residual estimada.
+
+```{r}
+#| label: ej1-vcov
+
+# Resultado de R
+vcov(fit)
+
+# Cálculo manual
+varhat <- (1 / (n - 4)) * sum((Y - X %*% betahat)^2)
+vcovbetahat <- varhat * solve(t(X) %*% X)
+
+# Comprobar si son iguales
+all.equal(as.numeric(vcovbetahat), as.numeric(vcov(fit)))
+```
+
+## i) Prueba de Significancia Global del Modelo
+
+Se evalúa si el modelo en su conjunto es significativo.
+-   **$H_0$**: $\beta_1 = \beta_2 = \beta_3 = 0$ (El modelo no es significativo).
+-   **$H_1$**: Al menos un $\beta_j \neq 0$.
+
+```{r}
+#| label: ej1-significancia-global
+
+# Opción 1: Usar el F-statistic de la salida de summary()
+summary(fit)
+
+# Opción 2: Comparar el modelo completo con un modelo reducido (solo intercepto) usando anova()
+fit0 <- lm(lbm ~ 1, data = Atletas)
+anova(fit0, fit, test = "F")
+```
+**Conclusión**: En ambas opciones, el p-valor es extremadamente pequeño, por lo que se rechaza $H_0$. El modelo es globalmente significativo.
+
+## m) Prueba de Significancia de un Subconjunto de Variables
+
+Se prueba si las variables `ht` y `rcc` son conjuntamente necesarias en el modelo.
+-   **$H_0$**: $\beta_{ht} = \beta_{rcc} = 0$.
+-   **$H_1$**: Al menos uno de los dos coeficientes es distinto de cero.
+
+```{r}
+#| label: ej1-significancia-subconjunto
+
+# Se compara el modelo completo con un modelo reducido que excluye ht y rcc
+fit1 <- lm(lbm ~ 1 + wt, data = Atletas)
+anova(fit1, fit, test = "F")
+```
+**Conclusión**: El p-valor pequeño indica que se rechaza $H_0$. Las variables `ht` y `rcc` son conjuntamente significativas y deben permanecer en el modelo.
+
+## n) Prueba de Hipótesis Lineal: $\beta_{ht} = \beta_{wt}$ ?
+
+Se prueba si los efectos de la altura y el peso son iguales.
+-   **$H_0$**: $\beta_{ht} - \beta_{wt} = 0$.
+-   **$H_1$**: $\beta_{ht} - \beta_{wt} \neq 0$.
+
+```{r}
+#| label: ej1-hipotesis-lineal
+
+a <- c(0, 1, -1, 0) # Vector para la combinación lineal
+t_C <- t(a)%*%as.matrix(fit$coeff)/sqrt((t(a)%*%as.matrix(vcov(fit))%*%a))
+pval_n <- 2 * (1 - pt(abs(t_C), n - 4))
+c(t_calculado = t_C, p_valor = pval_n)
+```
+**Conclusión**: Se rechaza $H_0$. Los efectos de la altura y el peso son significativamente diferentes.
+
+## o) Intervalo de Confianza del 95% para la Media
+
+Se calcula un intervalo de confianza para el valor esperado de `lbm` para un atleta con `ht=170`, `wt=70` y `rcc=4.5`.
+
+```{r}
+#| label: ej1-ic-media
+
+nuevos_datos <- data.frame(ht = 170, wt = 70, rcc = 4.5)
+predict(fit, nuevos_datos, se.fit = TRUE, interval = "confidence", level = 0.95)
+```
+
+---
+
+# EJERCICIO 2: Índice de Placa Bacteriana (IPB)
+
+Se busca modelar el IPB en función del grupo de tratamiento y el sexo del paciente, un ejemplo de modelo **ANCOVA**.
+
+## a) Estadísticas Descriptivas
+
+```{r}
+#| label: ej2-datos
+
+ipb_data <- read_excel("ipb.xlsx")
+head(ipb_data)
+
+# Resúmenes por grupo
+ipb_data %>%
+  group_by(grupo, sexo) %>%
+  summarise(
+    n = n(),
+    media_ipb = mean(ipb),
+    sd_ipb = sd(ipb)
+  )
+
+# Boxplot
+boxplot(ipb ~ grupo * sexo, data = ipb_data,
+        xlab = "Grupo y Sexo", ylab = "IPB",
+        frame = FALSE, col = c("#00AFBB", "#E7B800", "#FC4E07"))
+```
+
+## c) Estimación de Parámetros del Modelo
+
+Se ajusta un modelo con predictores categóricos. R crea automáticamente las variables *dummy*.
+$$
+\text{ipb}_i = \beta_0 + \beta_1 \text{grupo2}_i + \beta_2 \text{grupo3}_i + \beta_3 \text{sexoM}_i + \epsilon_i
+$$
+-   $\beta_0$ es la media del grupo de referencia (Grupo 1, Femenino).
+-   Los otros $\beta$ son los cambios promedio con respecto al grupo de referencia.
+
+```{r}
+#| label: ej2-modelo
+
+fit_ipb <- lm(ipb ~ 1 + grupo + sexo, data = ipb_data)
+summary(fit_ipb)
+```
+
+## d) ¿El IPB depende del Grupo?
+
+Se prueba si los coeficientes asociados a los grupos son conjuntamente cero.
+-   **$H_0$**: $\beta_{grupo2} = \beta_{grupo3} = 0$.
+
+```{r}
+#| label: ej2-efecto-grupo
+
+# Se compara el modelo completo con un modelo reducido sin la variable 'grupo'
+fit_reducido_grupo <- lm(ipb ~ 1 + sexo, data = ipb_data)
+anova(fit_reducido_grupo, fit_ipb, test = "F")
+```
+**Conclusión**: El p-valor es muy pequeño, se rechaza $H_0$. El grupo tiene un efecto significativo en el IPB.
+
+## e) ¿El IPB depende del Sexo?
+
+Se prueba si el coeficiente asociado al sexo es cero.
+-   **$H_0$**: $\beta_{sexoM} = 0$.
+
+```{r}
+#| label: ej2-efecto-sexo
+
+# Se puede juzgar directamente por el p-valor de 'sexoM' en summary(fit_ipb)
+summary(fit_ipb)
+```
+**Conclusión**: El p-valor (0.13) es mayor que 0.05. No hay evidencia de que el sexo tenga un efecto significativo en el IPB, después de controlar por el grupo.
+
+## f) ¿Hay Interacción entre Sexo y Grupo?
+
+Se prueba si el efecto del grupo sobre el IPB es el mismo para hombres y mujeres.
+-   **$H_0$**: No hay interacción.
+
+```{r}
+#| label: ej2-interaccion
+
+# Se ajusta un modelo con el término de interacción
+fit_interaccion <- lm(ipb ~ 1 + grupo + sexo + grupo:sexo, data = ipb_data)
+summary(fit_interaccion)
+
+# Se comparan los modelos con y sin interacción
+anova(fit_ipb, fit_interaccion, test = "F")
+```
+**Conclusión**: El p-valor (0.55) es grande. No hay evidencia de un efecto de interacción significativo.

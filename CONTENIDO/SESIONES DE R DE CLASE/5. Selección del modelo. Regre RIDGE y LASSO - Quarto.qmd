@@ -1,0 +1,302 @@
+---
+title: "Selección del modelo. Regre RIDGE y LASSO"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: true   
+---
+
+# Introducción
+
+Este documento explora diversas técnicas para la selección del "mejor" modelo de regresión lineal. Se abordan dos enfoques principales: 
+1.  **Criterios de Bondad de Ajuste**, que penalizan la complejidad del modelo (AIC, BIC, $R^2$ ajustado).
+2.  **Criterios de Habilidad Predictiva**, que evalúan el rendimiento del modelo en datos no vistos (validación simple y validación cruzada).
+
+Finalmente, se introducen los métodos de regularización **Ridge** y **Lasso** como alternativas para manejar la multicolinealidad y realizar selección de variables de forma automática.
+
+### Librerías Requeridas
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(ISLR2)   # Para el conjunto de datos Hitters
+library(leaps)   # Para regsubsets()
+library(glmnet)  # Para Ridge y Lasso
+```
+
+# 1. Bondad de Ajuste (Selección del Mejor Subconjunto de Variables)
+
+## a. Lectura y Limpieza de Datos
+
+Se utiliza el conjunto de datos `Hitters`, eliminando las observaciones con valores faltantes en la variable `Salary`.
+
+```{r}
+#| label: carga-datos
+
+head(Hitters)
+sum(is.na(Hitters$Salary))
+Hitters <- na.omit(Hitters)
+dim(Hitters)
+```
+
+## b. Encontrar los Mejores Modelos para cada Cantidad de Variables
+
+La función `regsubsets` encuentra el mejor subconjunto de predictores para cada tamaño de modelo (de 1 predictor, de 2 predictores, etc.), donde "mejor" se define como el que minimiza la Suma de Cuadrados Residual (SCR) o equivalentemente, maximiza el $R^2$.
+
+```{r}
+#| label: regsubsets
+
+regfit.full <- regsubsets(Salary ~ ., data = Hitters, nvmax = 19)
+reg.summary <- summary(regfit.full)
+names(reg.summary)
+```
+
+## c. Definir el Criterio de Bondad de Ajuste
+
+Se evalúan diferentes criterios para seleccionar el tamaño óptimo del modelo. Un buen criterio equilibra el ajuste (SCR bajo) con la parsimonia (pocas variables).
+
+-   **$R^2$ Ajustado**: $R^2_{adj} = 1 - \frac{SCR/(n-p)}{SCT/(n-1)}$
+-   **$C_p$ de Mallows**: $C_p = \frac{1}{n}(SCR + 2p\hat{\sigma}^2)$
+-   **BIC**: $BIC = \frac{1}{n}(SCR + \log(n)p\hat{\sigma}^2)$
+
+Se busca maximizar el $R^2$ ajustado o minimizar $C_p$ y BIC.
+
+```{r}
+#| label: criterios-ajuste
+#| fig-width: 8
+#| fig-height: 8
+
+par(mfrow = c(2, 2))
+# Suma de Cuadrados Residual (RSS)
+plot(reg.summary$rss, xlab = "Número de Variables", ylab = "SCR", type = "l")
+# R^2 Ajustado
+plot(reg.summary$adjr2, xlab = "Número de Variables", ylab = "R2 Ajustado", type = "l")
+which.max(reg.summary$adjr2)
+points(11, reg.summary$adjr2[11], col = "red", cex = 2, pch = 20)
+# Cp de Mallows
+plot(reg.summary$cp, xlab = "Número de Variables", ylab = "Cp", type = "l")
+which.min(reg.summary$cp)
+points(10, reg.summary$cp[10], col = "red", cex = 2, pch = 20)
+# BIC
+plot(reg.summary$bic, xlab = "Número de Variables", ylab = "BIC", type = "l")
+which.min(reg.summary$bic)
+points(6, reg.summary$bic[6], col = "red", cex = 2, pch = 20)
+```
+
+### Visualización de las variables para cada criterio
+
+```{r}
+#| label: visualizacion-variables
+
+# Para ver los gráficos
+plot(regfit.full, scale = "r2")
+plot(regfit.full, scale = "adjr2")
+plot(regfit.full, scale = "Cp")
+plot(regfit.full, scale = "bic")
+```
+
+Basado en el criterio BIC, el mejor modelo es el que tiene 6 variables.
+
+```{r}
+#| label: coeficientes-mejor-modelo
+
+# Coeficientes del mejor modelo con 6 variables según BIC
+coef(regfit.full, 6)
+```
+
+## d. Regresión Forward y Backward
+
+Son métodos computacionalmente más eficientes que la selección por mejor subconjunto, aunque no garantizan encontrar el mejor modelo absoluto.
+
+```{r}
+#| label: forward-backward
+
+# Forward Selection
+regfit.fwd <- regsubsets(Salary ~ ., data = Hitters, nvmax = 19, method = "forward")
+summary(regfit.fwd)
+
+# Backward Selection
+regfit.bwd <- regsubsets(Salary ~ ., data = Hitters, nvmax = 19, method = "backward")
+summary(regfit.bwd)
+
+# Comparación del mejor modelo con 7 variables
+coef(regfit.full, 7) # Mejor subset
+coef(regfit.fwd, 7)  # Forward
+coef(regfit.bwd, 7)  # Backward
+```
+
+# 2. Habilidad Predictiva (Validación Simple)
+
+Este enfoque evalúa el rendimiento del modelo en un conjunto de datos de prueba que no se utilizó para el entrenamiento. El objetivo es minimizar el Error Cuadrático Medio (ECM) de predicción.
+
+$$
+ECM = \frac{1}{n_{test}} \sum_{i \in test} (y_i - \hat{y}_i)^2
+$$
+
+## a. Dividir los datos en Entrenamiento (70%) y Prueba (30%)
+
+```{r}
+#| label: validacion-simple-split
+
+set.seed(1)
+train_indices <- sample(1:nrow(Hitters), size = 0.7 * nrow(Hitters))
+train <- rep(FALSE, nrow(Hitters))
+train[train_indices] <- TRUE
+test <- !train
+
+# Entrenar los modelos usando solo los datos de entrenamiento
+regfit.best <- regsubsets(Salary ~ ., data = Hitters[train, ], nvmax = 19)
+
+# Crear la matriz de diseño para el conjunto de prueba
+test.mat <- model.matrix(Salary ~ ., data = Hitters[test, ])
+```
+
+## b. Calcular el Error de Predicción en el Conjunto de Prueba
+
+```{r}
+#| label: validacion-simple-error
+
+val.errors <- rep(NA, 19)
+for (i in 1:19) {
+  coefi <- coef(regfit.best, id = i)
+  pred <- test.mat[, names(coefi)] %*% coefi
+  val.errors[i] <- mean((Hitters$Salary[test] - pred)^2)
+}
+
+# El modelo con 7 variables minimiza el ECM en el conjunto de prueba
+which.min(val.errors)
+coef(regfit.best, 7)
+```
+
+# 3. Validación Cruzada (k-fold Cross-Validation)
+
+La validación cruzada es un método más robusto para estimar el error de predicción, especialmente con muestras de tamaño moderado. Los datos se dividen en *k* pliegues (folds), y el modelo se entrena *k* veces, usando en cada ocasión un pliegue diferente como conjunto de prueba y el resto como entrenamiento.
+
+## Creación de los Folds (k=10)
+
+```{r}
+#| label: cv-folds
+
+k <- 10
+n <- nrow(Hitters)
+set.seed(1)
+folds <- sample(rep(1:k, length = n))
+cv.errors <- matrix(NA, k, 19, dimnames = list(NULL, paste(1:19)))
+```
+
+## Entrenar y Evaluar los Modelos en cada Fold
+
+```{r}
+#| label: cv-loop
+
+# Función predict para objetos regsubsets
+predict.regsubsets <- function(object, newdata, id, ...) {
+  form <- as.formula(object$call[[2]])
+  mat <- model.matrix(form, newdata)
+  coefi <- coef(object, id = id)
+  xvars <- names(coefi)
+  mat[, xvars] %*% coefi
+}
+
+for (j in 1:k) {
+  best.fit <- regsubsets(Salary ~ .,
+                         data = Hitters[folds != j, ],
+                         nvmax = 19)
+  for (i in 1:19) {
+    pred <- predict(best.fit, Hitters[folds == j, ], id = i)
+    cv.errors[j, i] <- mean((Hitters$Salary[folds == j] - pred)^2)
+  }
+}
+```
+
+## Resumir los Errores y Seleccionar el Mejor Modelo
+
+Se promedia el ECM a través de los *k* pliegues para cada tamaño de modelo.
+
+```{r}
+#| label: cv-results
+
+mean.cv.errors <- apply(cv.errors, 2, mean)
+plot(mean.cv.errors, type = "b")
+
+# El modelo con 10 variables minimiza el ECM promedio de validación cruzada
+which.min(mean.cv.errors)
+
+# Coeficientes del modelo final, re-entrenado con todos los datos
+reg.best.final <- regsubsets(Salary ~ ., data = Hitters, nvmax = 19)
+coef(reg.best.final, 10)
+```
+
+# 4. Regresión Ridge y Lasso
+
+Son métodos de regularización que penalizan la magnitud de los coeficientes para prevenir el sobreajuste y manejar la multicolinealidad.
+
+-   **Ridge**: Minimiza $SCR + \lambda \sum \beta_j^2$. Encoge los coeficientes pero no los hace exactamente cero.
+-   **Lasso**: Minimiza $SCR + \lambda \sum |\beta_j|$. Puede encoger coeficientes hasta hacerlos exactamente cero, realizando selección de variables.
+
+```{r}
+#| label: ridge-lasso-setup
+
+# Se preparan la matriz de predictores X y el vector de respuesta y
+x <- model.matrix(Salary ~ ., Hitters)[, -1]
+y <- Hitters$Salary
+```
+
+## Ridge Regression ($\alpha=0$)
+
+```{r}
+#| label: ridge-regression
+
+# Secuencia de búsqueda para el parámetro de penalización lambda
+grid <- 10^seq(10, -2, length = 100)
+
+# Ajuste del modelo Ridge
+ridge.mod <- glmnet(x, y, alpha = 0, lambda = grid)
+
+# Determinación del lambda óptimo por validación cruzada
+set.seed(1)
+cv.out <- cv.glmnet(x[train, ], y[train], alpha = 0)
+# plot(cv.out) # Descomentar para ver el gráfico en sesión interactiva
+bestlam_ridge <- cv.out$lambda.min
+bestlam_ridge
+
+# Evaluación del ECM en el conjunto de prueba
+ridge.pred <- predict(ridge.mod, s = bestlam_ridge, newx = x[test, ])
+mean((ridge.pred - y[test])^2)
+
+# Coeficientes finales del modelo Ridge, re-entrenado con todos los datos
+out_ridge <- glmnet(x, y, alpha = 0)
+predict(out_ridge, type = "coefficients", s = bestlam_ridge)
+```
+
+## Regresión Lasso ($\alpha=1$)
+
+```{r}
+#| label: lasso-regression
+
+# Ajuste del modelo Lasso
+lasso.mod <- glmnet(x[train, ], y[train], alpha = 1, lambda = grid)
+# plot(lasso.mod) # Gráfico de la trayectoria de los coeficientes
+
+# Determinación del lambda óptimo por validación cruzada
+set.seed(1)
+cv.out <- cv.glmnet(x[train, ], y[train], alpha = 1)
+# plot(cv.out)
+bestlam_lasso <- cv.out$lambda.min
+bestlam_lasso
+
+# Evaluación del ECM en el conjunto de prueba
+lasso.pred <- predict(lasso.mod, s = bestlam_lasso, newx = x[test, ])
+mean((lasso.pred - y[test])^2)
+
+# Coeficientes finales del modelo Lasso, re-entrenado con todos los datos
+out_lasso <- glmnet(x, y, alpha = 1, lambda = grid)
+lasso.coef <- predict(out_lasso, type = "coefficients", s = bestlam_lasso)
+lasso.coef[lasso.coef != 0] # Muestra solo las variables que no fueron eliminadas
+```

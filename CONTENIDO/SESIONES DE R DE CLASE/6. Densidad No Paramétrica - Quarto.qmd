@@ -1,0 +1,105 @@
+---
+title: "Estimación de Densidad por Kernel"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: true   
+---
+
+# Introducción a la Estimación de Densidad por Kernel
+
+La **estimación de densidad por kernel** es un método no paramétrico para estimar la función de densidad de probabilidad de una variable aleatoria. A diferencia de un histograma, que agrupa los datos en "cajas" discretas, la estimación por kernel crea una curva suave y continua.
+
+La fórmula general del estimador de densidad por kernel es:
+$$
+\hat{f}_h(x) = \frac{1}{nh} \sum_{i=1}^{n} K\left(\frac{x - x_i}{h}\right)
+$$
+Donde:
+-   $n$ es el número de puntos de datos.
+-   $h$ es el **ancho de banda** (conocido como `bw` en la función `density` de R), que controla el nivel de suavizado.
+-   $K$ es la **función kernel**, una función simétrica que integra a uno (ej. rectangular, gaussiana, Epanechnikov).
+
+En este documento, se explora el efecto de estos dos parámetros (`bw` y `kernel`) en la estimación de la densidad para un pequeño conjunto de datos.
+
+## Datos de Ejemplo
+
+Se utiliza un vector simple `x` para ilustrar los conceptos.
+
+```{r}
+#| label: setup
+
+x <- c(1, 2, 2.5, 3, 5, 7, 10)
+y <- rep(0, length(x)) # Para graficar los puntos en el eje
+```
+
+# Análisis con Kernel Rectangular
+
+El kernel rectangular es el más simple, equivalente a construir una "caja" de altura $1/(2h)$ y ancho $2h$ alrededor de cada punto de datos.
+
+### Ancho de Banda Pequeño (`bw = 0.7`)
+
+Un ancho de banda pequeño considera solo a los vecinos más cercanos de cada punto. Esto puede resultar en una estimación con **alta variabilidad** (muy "puntiaguda"), que se ajusta mucho a la muestra actual pero podría no generalizar bien.
+
+```{r}
+#| label: rectangular-pequeno
+
+hist(x, prob = TRUE)
+points(x, y, col = "red", pch = 12)
+lines(density(x, kernel = "rectangular", bw = 0.7), lwd = 2, col = "blue")
+```
+
+### Ancho de Banda Grande (`bw = 3`)
+
+Un ancho de banda grande considera a muchos datos como vecinos de cada punto. Esto produce una estimación muy suavizada, con **baja variabilidad** pero potencialmente con un **alto sesgo** (puede ocultar características importantes de la distribución).
+
+```{r}
+#| label: rectangular-grande
+
+hist(x, prob = TRUE)
+points(x, y, col = "red", pch = 12)
+lines(density(x, kernel = "rectangular", bw = 3), lwd = 2, col = "blue")
+```
+
+### Ancho de Banda Óptimo (por defecto)
+
+Si no se especifica un ancho de banda, R calcula uno que intenta equilibrar el compromiso entre sesgo y varianza.
+
+```{r}
+#| label: rectangular-optimo
+
+hist(x, prob = TRUE)
+points(x, y, col = "red", pch = 12)
+lines(density(x, kernel = "rectangular"), lwd = 2, col = "blue")
+```
+
+# Análisis con Kernel Gaussiano (por defecto en R)
+
+El kernel más utilizado es el Gaussiano, que centra una pequeña campana de Gauss en cada punto de datos, resultando en una curva más suave. Si no se especifica el kernel, R utiliza el Gaussiano por defecto.
+
+### Ancho de Banda Fijo (`bw = 1.2`)
+
+Aquí se muestra el efecto de fijar manualmente el ancho de banda con el kernel Gaussiano.
+
+```{r}
+#| label: gaussiano-fijo
+
+hist(x, prob = TRUE)
+points(x, y, col = "red", pch = 12)
+lines(density(x, bw = 1.2), lwd = 2, col = "blue")
+```
+
+### Ancho de Banda Óptimo (por defecto)
+
+Este es el resultado que R produce por defecto, utilizando un kernel Gaussiano y un ancho de banda calculado automáticamente para ser "óptimo".
+
+```{r}
+#| label: gaussiano-optimo
+
+hist(x, prob = TRUE)
+points(x, y, col = "red", pch = 12)
+lines(density(x), lwd = 2, col = "blue")
+```

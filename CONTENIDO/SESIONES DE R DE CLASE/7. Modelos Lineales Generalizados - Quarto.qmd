@@ -1,0 +1,291 @@
+---
+title: "Modelos Lineales Generalizados GAM"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: false 
+---
+
+# Introducción
+
+Este documento explora los **Modelos Lineales Generalizados (GLM)**, con un enfoque en la regresión logística para variables de respuesta binarias. Se divide en tres ejercicios principales:
+
+1.  **Ejercicio 1**: Se ajusta un modelo logístico, se interpretan sus coeficientes, se comparan diferentes funciones de enlace y se realiza una selección automática de variables.
+
+2.  **Ejercicio 2**: Se aplica la regresión logística para predecir la dirección del mercado de valores, introduciendo el concepto de dividir los datos en conjuntos de entrenamiento y prueba.
+
+3.  **Ejercicio 3**: Se profundiza en la evaluación de la **habilidad predictiva** del modelo, utilizando muestreo estratificado, curvas ROC, y la optimización de un punto de corte (`tau`) para la clasificación.
+
+### Librerías Requeridas
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(readxl)
+library(dplyr)
+library(glmtoolbox) # Para stepCriterion() y envelope()
+library(aplore3)    # Para el dataset burn1000
+library(ISLR2)      # Para el dataset Smarket
+```
+
+# EJERCICIO 1: Bondad de Ajuste en Regresión Logística
+
+Se utiliza el conjunto de datos `burn1000` para modelar la probabilidad de muerte (`death`) en función de varios factores de riesgo.
+
+## a) Análisis de Estadística Descriptiva
+
+```{r}
+#| label: ej1-datos
+
+burn1000 <- aplore3::burn1000
+# Se crea la variable de respuesta binaria: 1 = "Dead" (éxito), 0 = "Alive"
+burn1000 <- within(burn1000, death2 <- ifelse(death == "Dead", 1, 0))
+str(burn1000)
+summary(burn1000)
+```
+
+## b-d) Ajuste de un Primer Modelo Logístico
+
+Se ajusta un GLM con una distribución `binomial` y una función de enlace `logit`. El modelo es:
+$$
+\log\left(\frac{p_i}{1-p_i}\right) = \beta_0 + \beta_1 x_{i1} + \dots + \beta_k x_{ik}
+$$
+donde $p_i$ es la probabilidad de "éxito" (muerte) para el individuo $i$.
+
+```{r}
+#| label: ej1-modelo
+
+# Definir el Modelo Lineal Generalizado
+fit1 <- glm(death2 ~ age + gender + race + tbsa + inh_inj + flame, 
+            family = binomial("logit"), data = burn1000)
+summary(fit1)
+```
+
+## e) Interpretación de los Parámetros (Odds Ratios)
+
+En un modelo logístico, los coeficientes exponenciados, $e^{\beta_j}$, se interpretan como **Odds Ratios** (razón de chances).
+
+```{r}
+#| label: ej1-interpretacion
+
+# Odds Ratios puntuales
+exp(coef(fit1)[-1])
+# Un OR > 1 indica que el chance de éxito aumenta.
+# Un OR < 1 indica que el chance de éxito disminuye.
+
+# Cambio porcentual en los odds: (OR - 1) * 100
+(exp(coef(fit1)[-1]) - 1) * 100
+
+# Intervalos de confianza del 95% para los Odds Ratios
+exp(confint(fit1)[-1, ])
+```
+
+## f) Elección de una Función de Enlace por Bondad de Ajuste
+
+Se comparan cuatro funciones de enlace para la distribución binomial (`logit`, `probit`, `cloglog`, `cauchit`) utilizando los criterios de información AIC y BIC. Valores más bajos indican un mejor ajuste.
+
+```{r}
+#| label: ej1-enlace
+
+fit2 <- update(fit1, family = binomial("probit"))
+fit3 <- update(fit1, family = binomial("cloglog"))
+fit4 <- update(fit1, family = binomial("cauchit"))
+
+# Comparación de modelos
+cbind(AIC(fit1, fit2, fit3, fit4), BIC(fit1, fit2, fit3, fit4))
+```
+**Conclusión**: Según AIC y BIC, el modelo `fit2` (con enlace **probit**) ofrece la mejor bondad de ajuste.
+
+## g-h) Selección Automática del Modelo
+
+Se utiliza el método de eliminación hacia atrás (`backward`) basado en el criterio BIC para encontrar el subconjunto de predictores más parsimonioso, partiendo de un modelo con interacciones.
+
+```{r}
+#| label: ej1-seleccion-variables
+
+fit5 <- glm(death2 ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj, 
+            family = binomial("logit"), data = burn1000)
+a <- stepCriterion(fit5, direction = "backward", criterion = "bic")
+fit6 <- update(fit5, formula. = a$final)
+summary(fit6)
+
+# Se re-evalúan las funciones de enlace con el nuevo modelo
+fit7 <- update(fit6, family = binomial("probit"))
+fit8 <- update(fit6, family = binomial("cloglog"))
+fit9 <- update(fit6, family = binomial("cauchit"))
+
+cbind(AIC(fit6, fit7, fit8, fit9), BIC(fit6, fit7, fit8, fit9))
+```
+**Conclusión Final**: El modelo `fit7` (con predictores seleccionados y enlace probit) es el mejor según el criterio BIC.
+
+## i) Validación de Supuestos
+
+Se utilizan gráficos de diagnóstico para evaluar el ajuste del modelo final.
+
+```{r}
+#| label: ej1-validacion
+
+# Gráfico de envelope para los residuales (similar a un Q-Q plot con bandas de confianza)
+envelope(fit7)
+```
+
+---
+
+# EJERCICIO 2: Predicción del Mercado de Valores
+
+Se utiliza el conjunto de datos `Smarket` para predecir la dirección del mercado (`Up` o `Down`).
+
+## b) Ajuste del Modelo
+
+```{r}
+#| label: ej2-modelo
+
+glm.fits <- glm(Direction ~ Lag1 + Lag2 + Lag3 + Lag4 + Lag5 + Volume,
+                data = Smarket, family = binomial)
+summary(glm.fits)
+```
+
+## c) Matriz de Confusión (con todos los datos)
+
+Se evalúa el rendimiento del modelo en los mismos datos con los que fue entrenado (esto generalmente sobreestima el rendimiento real).
+
+```{r}
+#| label: ej2-matriz-confusion
+
+glm.probs <- predict(glm.fits, type = "response")
+glm.pred <- rep("Down", nrow(Smarket))
+glm.pred[glm.probs > 0.5] <- "Up"
+
+# Matriz de Confusión
+table(Predicción = glm.pred, Real = Smarket$Direction)
+# Tasa de acierto global (Accuracy)
+mean(glm.pred == Smarket$Direction)
+```
+
+## d) Entrenamiento y Prueba
+
+Un enfoque más realista es dividir los datos: entrenar el modelo con datos antiguos (hasta 2004) y probar su rendimiento en datos nuevos (2005).
+
+```{r}
+#| label: ej2-train-test
+
+train <- (Smarket$Year < 2005)
+Smarket.2005 <- Smarket[!train, ]
+Direction.2005 <- Smarket$Direction[!train]
+
+glm.fits.train <- glm(Direction ~ Lag1 + Lag2, # Modelo simplificado
+                      data = Smarket, family = binomial, subset = train)
+glm.probs.test <- predict(glm.fits.train, Smarket.2005, type = "response")
+
+glm.pred.test <- rep("Down", nrow(Smarket.2005))
+glm.pred.test[glm.probs.test > 0.5] <- "Up"
+
+table(Predicción = glm.pred.test, Real = Direction.2005)
+mean(glm.pred.test == Direction.2005)
+```
+
+---
+
+# EJERCICIO 3: Habilidad Predictiva
+
+Se vuelve al conjunto de datos `burn1000` para realizar una evaluación predictiva más rigurosa.
+
+## a) Muestreo Estratificado
+
+Dado que las clases (`Dead`/`Alive`) están desbalanceadas, se utiliza muestreo estratificado para asegurar que la proporción de clases sea la misma en los conjuntos de entrenamiento y prueba.
+
+```{r}
+#| label: ej3-muestreo
+
+set.seed(123)
+# Se toma un 70% de cada estrato para el conjunto de entrenamiento
+stratified <- burn1000 %>%
+  group_by(death) %>%
+  slice_sample(prop = 0.7)
+
+# El 30% restante forma el conjunto de prueba
+test <- burn1000[setdiff(burn1000$id, stratified$id), ]
+
+summary(burn1000$death)
+summary(stratified$death)
+```
+
+## b) Entrenamiento del Modelo y Selección de Variables
+
+El proceso de ajuste y selección se realiza **únicamente** con el conjunto de entrenamiento.
+
+```{r}
+#| label: ej3-entrenamiento
+
+# Se usa el modelo con interacciones como punto de partida
+fit5b <- glm(death2 ~ age + gender + race + tbsa + inh_inj + flame + age*inh_inj + tbsa*inh_inj, 
+             family = binomial("logit"), data = stratified)
+a <- stepCriterion(fit5b, direction = "backward", criterion = "bic")
+fit6b <- update(fit5b, formula. = a$final)
+
+# Se comparan de nuevo las funciones de enlace
+fit7b <- update(fit6b, family = binomial("probit"))
+fit8b <- update(fit6b, family = binomial("cloglog"))
+fit9b <- update(fit6b, family = binomial("cauchit"))
+```
+
+## c) Selección del Mejor Modelo Global por Habilidad Predictiva
+
+Se utilizan las **Curvas ROC (Receiver Operating Characteristic)** para comparar el rendimiento predictivo de los modelos en el conjunto de **prueba**. El área bajo la curva (AUC) es una medida global del poder discriminatorio del modelo.
+
+```{r}
+#| label: ej3-roc
+
+# Se obtienen las predicciones de probabilidad para el conjunto de prueba
+pr6b <- predict(fit6b, newdata = test, type = "response")
+pr7b <- predict(fit7b, newdata = test, type = "response")
+pr8b <- predict(fit8b, newdata = test, type = "response")
+pr9b <- predict(fit9b, newdata = test, type = "response")
+
+# Se comparan las curvas ROC
+testres <- test$death2
+ROCc(cbind(testres, pr6b), main="Modelo 6 (logit)")
+ROCc(cbind(testres, pr7b), main="Modelo 7 (probit)")
+ROCc(cbind(testres, pr8b), main="Modelo 8 (cloglog)")
+ROCc(cbind(testres, pr9b), main="Modelo 9 (cauchit)")
+```
+**Conclusión**: Se elige el modelo con el AUC más alto (en este caso, `fit7b`).
+
+## Elección del Punto de Corte (`tau`) Óptimo
+
+Una vez elegido el mejor modelo (`fit7b`), se debe seleccionar un punto de corte (`tau`) para convertir las probabilidades predichas en clasificaciones ("Dead" / "Alive"). La elección de `tau` depende del objetivo (minimizar errores, maximizar precisión, etc.).
+
+```{r}
+#| label: ej3-tau
+
+tau <- seq(0.1, 0.9, by = 0.05)
+AER <- recall <- precision <- F1 <- NULL
+exito <- "1"; frac <- "0"
+
+for (i in 1:length(tau)){
+    glm.pred <- rep("0", length(testres))
+    glm.pred[pr7b > tau[i]] <- "1"
+    tab<-table(glm.pred, testres)
+    if (!frac %in% rownames(tab)){
+      tab<-rbind(tab,c(0,0))
+      rownames(tab)[2]<-frac
+    } 
+    if (!exito %in% rownames(tab)){
+      tab<-rbind(tab,c(0,0))
+      rownames(tab)[2]<-exito
+    }
+    AER[i]<-(tab[exito,frac]+tab[frac,exito])/sum(tab)
+    precision[i]<-(tab[exito,exito])/sum(tab[exito,])
+    recall[i]<-(tab[exito,exito])/sum(tab[,exito])
+    F1[i]<-2*precision[i]*recall[i]/(precision[i]+recall[i])
+  }
+
+cbind(tau,AER,precision,recall,F1)
+```
+**Análisis**: Para elegir el `tau` óptimo, se busca un equilibrio. La métrica **F1**, que es la media armónica de la precisión y el recall, es una excelente opción para datos desbalanceados. El `tau` que maximiza F1 sería una buena elección.

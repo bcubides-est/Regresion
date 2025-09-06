@@ -1,0 +1,233 @@
+---
+title: "Parcial 2 - Parte B"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: false   
+---
+
+# Introducción
+
+Este documento detalla el proceso completo de ajuste y validación de un modelo de Regresión Lineal Múltiple. Se utiliza un conjunto de datos sobre los niveles de plasma en pájaros en función del tratamiento y el sexo para ilustrar la estimación de parámetros, pruebas de hipótesis, construcción de intervalos de confianza y un análisis de diagnóstico riguroso para identificar observaciones atípicas, de alta palanca e influyentes.
+
+### Librerías Requeridas
+
+Se cargan los paquetes necesarios para el análisis.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(readxl)
+library(car)    # Para diagnósticos de regresión
+library(MASS)
+```
+
+### Carga y Exploración de Datos
+
+```{r}
+#| label: carga-datos
+
+pajaros <- read_excel("pajaros.xlsx")
+# View(pajaros)
+plot(pajaros)
+```
+
+# a) Estimación de los Parámetros del Modelo
+
+Se ajusta un modelo de Regresión Lineal Múltiple de la forma:
+$$
+\text{plasma}_i = \beta_0 + \beta_1 \cdot \text{treatment}_i + \beta_2 \cdot \text{sex}_i + \epsilon_i
+$$
+Donde `treatment` y `sex` son variables binarias. Los parámetros ($\beta_0, \beta_1, \beta_2$) se estiman por Mínimos Cuadrados Ordinarios (MCO).
+
+```{r}
+#| label: estimacion-parametros
+
+fit <- lm(plasma ~ 1 + treatment + sex, data = pajaros)
+summary(fit)
+
+# Intervalos de confianza para los coeficientes
+confint(fit)
+```
+
+# b) Prueba de Significancia Global del Modelo
+
+Se evalúa si el modelo en su conjunto es significativo, es decir, si al menos uno de los predictores tiene una relación con la variable respuesta.
+
+-   **$H_0$**: $\beta_1 = \beta_2 = 0$ (El modelo no es significativo).
+-   **$H_1$**: Al menos un $\beta_j \neq 0$ (El modelo es significativo).
+
+Esto se realiza mediante una **prueba F**.
+
+```{r}
+#| label: prueba-significancia
+
+# Opción 1: Usar el F-statistic y su p-valor de la salida de summary()
+summary(fit)
+
+# Opción 2: Comparar el modelo completo con un modelo reducido (solo intercepto) usando anova()
+fit0 <- lm(plasma ~ 1, data = pajaros)
+anova(fit0, fit, test = "F")
+```
+**Conclusión**: En ambas opciones, el p-valor es extremadamente pequeño ($< 2.2e-16$), por lo que se rechaza $H_0$. El modelo es globalmente significativo.
+
+# d) Intervalo de Confianza para la Media
+
+Se calcula un intervalo de confianza del 95% para el valor esperado de `plasma` ($\mu_Y$) para un pájaro con `treatment=1` y `sex=1`.
+
+La fórmula para el intervalo de confianza del valor esperado es:
+$$
+\hat{\mu}_Y \pm t_{(1-\alpha/2, n-p)} \cdot EE(\hat{\mu}_Y)
+$$
+Donde $EE(\hat{\mu}_Y) = \sqrt{\mathbf{x_0}^T (X^T X)^{-1} \mathbf{x_0} \hat{\sigma}^2}$.
+
+```{r}
+#| label: intervalo-confianza
+
+x0_vector <- c(1, 1, 1) # Vector de condiciones: (intercepto, treatment=1, sex=1)
+
+# Opción 1: Cálculo manual
+n <- nrow(pajaros)
+p <- length(coef(fit)) # Número de parámetros
+mu_hat <- t(x0_vector) %*% as.matrix(fit$coeff)
+ee <- sqrt(t(x0_vector) %*% vcov(fit) %*% x0_vector)
+perct <- qt(0.975, df = n - p)
+LI <- mu_hat - perct * ee
+LS <- mu_hat + perct * ee
+c(LI = LI, LS = LS)
+
+# Opción 2: Usando la función predict()
+nuevos_datos <- data.frame(treatment = 1, sex = 1)
+predict(fit, nuevos_datos, interval = "confidence", level = 0.95)
+```
+
+# e) Prueba de Interacción entre `treatment` y `sex`
+
+Se evalúa si el efecto del tratamiento sobre el plasma es diferente para machos y hembras, ajustando un modelo con un término de interacción.
+
+-   **$H_0$**: No hay interacción ($\beta_{treatment:sex} = 0$).
+-   **$H_1$**: Hay interacción ($\beta_{treatment:sex} \neq 0$).
+
+```{r}
+#| label: prueba-interaccion
+
+# Se ajusta el modelo con interacción
+fit_interaccion <- lm(plasma ~ 1 + treatment + sex + treatment:sex, data = pajaros)
+summary(fit_interaccion)
+
+# Se comparan los modelos con y sin interacción usando una prueba F parcial
+anova(fit, fit_interaccion, test = "F")
+```
+**Conclusión**: El p-valor (0.898) es grande, por lo que no se rechaza $H_0$. No hay evidencia de un efecto de interacción significativo.
+
+# f) Prueba de Hipótesis Lineal: $\beta_1 + \beta_2 = 0$
+
+Se prueba si la suma de los coeficientes de `treatment` y `sex` es igual a cero.
+-   **$H_0$**: $\beta_1 + \beta_2 = 0$.
+-   **$H_1$**: $\beta_1 + \beta_2 \neq 0$.
+
+Se utiliza un estadístico t basado en la combinación lineal de los coeficientes:
+$$
+t_c = \frac{\mathbf{a}^T \hat{\boldsymbol{\beta}} - c}{\sqrt{\hat{\sigma}^2 \mathbf{a}^T (X^T X)^{-1} \mathbf{a}}}
+$$
+donde $\mathbf{a}^T = [0, 1, 1]$ y $c=0$.
+
+```{r}
+#| label: prueba-hipotesis-lineal
+
+a <- c(0, 1, 1) # Define la combinación lineal
+n <- nrow(pajaros)
+p <- length(coef(fit))
+t_C <- (t(a) %*% as.matrix(fit$coeff)) / sqrt(t(a) %*% vcov(fit) %*% a)
+
+# Cálculo del p-valor
+pval_n <- 2 * (1 - pt(abs(t_C), df = n - p))
+c(t_calculado = t_C, p_valor = pval_n)
+```
+**Conclusión**: El p-valor es muy pequeño, por lo que se rechaza $H_0$.
+
+# h) Análisis de Diagnóstico: Puntos Influyentes
+
+Se realiza un análisis de diagnóstico para identificar observaciones que puedan tener un efecto desproporcionado en el ajuste del modelo.
+
+## Alta Palanca (Leverage)
+
+Las observaciones con alto apalancamiento son aquellas con valores atípicos en los predictores ($X$). Un punto tiene alta palanca si su valor de hat, $h_{ii}$, es mayor que $2p/n$ o $3p/n$.
+
+```{r}
+#| label: diagnostico-leverage
+
+n <- nrow(pajaros)
+p <- length(coef(fit)) # Número de parámetros (b0, b1, b2)
+
+# Gráfico de los valores de apalancamiento (hat values)
+plot(hatvalues(fit), type = "h", main = "Índice de Valores de Apalancamiento")
+abline(h = 2 * p / n, col = "blue", lty = 2)
+abline(h = 3 * p / n, col = "red", lty = 2)
+legend("topright", legend = c("Corte 2p/n", "Corte 3p/n"), col = c("blue", "red"), lty = 2)
+
+# Identificar los puntos con mayor apalancamiento
+head(sort(hatvalues(fit), decreasing = TRUE))
+```
+
+## Observaciones Atípicas (Outliers)
+
+Los outliers son observaciones con un gran error de predicción (residual grande). Se identifican usando los **residuales estudentizados**. Una observación se considera atípica si $|r_{i,stud}| > 3$.
+
+```{r}
+#| label: diagnostico-outliers
+
+# Residuales estudentizados
+stud_res <- studres(fit)
+head(sort(abs(stud_res), decreasing = TRUE))
+
+# Visualización con Boxplot
+boxplot(stud_res, main = "Boxplot de Residuales Estudentizados")
+```
+**Conclusión**: No se observan residuales estudentizados con un valor absoluto mayor a 3, por lo que no hay outliers claros.
+
+## Observaciones Influyentes
+
+Una observación influyente es aquella que, si se elimina, cambia significativamente el ajuste del modelo. Combina tanto el apalancamiento como el tamaño del residual.
+
+-   **Distancia de Cook**: Mide el efecto de eliminar la i-ésima observación. Una regla general es que $D_i > 4/(n-p)$ es potencialmente influyente.
+-   **Gráfico de Influencia**: Visualiza simultáneamente el apalancamiento, el residual estudentizado y la Distancia de Cook.
+
+```{r}
+#| label: diagnostico-influencia
+#| fig-width: 10
+#| fig-height: 5
+
+par(mfrow = c(1, 2))
+# Gráfico de la Distancia de Cook
+corte <- 4 / (n - p)
+plot(fit, which = 4, cook.levels = corte)
+abline(h = corte, lty = 2, col = "red")
+
+# Gráfico de Influencia (burbujas)
+influencePlot(fit, id.method = "identify", main = "Gráfico de Influencia", sub = "El tamaño del círculo es proporcional a la D_Cook")
+```
+
+# Comparación de modelos con y sin puntos influyentes
+
+Se comparan los coeficientes del modelo original con un modelo ajustado sin las observaciones identificadas como más influyentes.
+
+```{r}
+#| label: diagnostico-comparacion
+
+# Puntos identificados como influyentes (ejemplo)
+puntos_influyentes <- c(2, 21, 34)
+
+# Modelo sin las observaciones influyentes
+fit_sin_influyentes <- update(fit, subset = -puntos_influyentes)
+
+# Comparación de resúmenes
+summary(fit)
+summary(fit_sin_influyentes)
+```

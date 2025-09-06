@@ -1,0 +1,256 @@
+---
+title: "ANOVA_oneway"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: true   
+---
+
+# Introducción
+
+Este documento presenta un análisis estadístico en dos partes. La primera parte explora la relación entre dos variables categóricas (hábito de fumar de la madre y bajo peso del bebé al nacer) utilizando tablas de contingencia y la prueba $\chi^2$ de independencia. La segunda parte introduce el Análisis de Varianza (ANOVA) de una vía para comparar las medias de una variable cuantitativa (peso de plantas) a través de diferentes grupos de tratamiento.
+
+### Librerías Requeridas
+
+Se cargan los paquetes necesarios para el análisis.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(RcmdrMisc) # Para análisis de tablas de contingencia
+library(gplots)    # Para plotmeans()
+library(ggpubr)
+library(multcomp)  # Para comparaciones múltiples
+library(car)       # Para Levene's Test
+```
+
+### Carga de Datos
+
+```{r}
+#| label: carga-datos
+
+pto9 <- read_excel("dataset_trabajo1.xlsx")
+```
+
+# Parte 1: Test Chi-Cuadrado de Independencia
+
+Se investiga si existe una relación estadísticamente significativa entre el hábito de fumar de la madre (`smoker`) y la probabilidad de que el bebé nazca con bajo peso (`lowbwt`).
+
+## Tablas de Contingencia
+
+Estas tablas resumen las frecuencias de las combinaciones de las dos variables.
+
+-   **Frecuencias Absolutas**: Conteos directos.
+-   **Perfiles Fila/Columna**: Proporciones condicionales que ayudan a visualizar la relación.
+
+```{r}
+#| label: tablas-contingencia
+
+# Frecuencias Absolutas con totales
+addmargins(table(pto9$smoker, pto9$lowbwt))
+
+# Análisis más detallado con xtabs()
+Table <- xtabs(~ pto9$smoker + pto9$lowbwt)
+addmargins(Table)      # Frecuencias Absolutas
+totPercents(Table)     # Frecuencias Relativas (porcentaje del total)
+rowPercents(Table)     # Perfiles Fila
+colPercents(Table)     # Perfiles Columna
+```
+
+## Gráfico de Frecuencias
+
+Un gráfico de barras apiladas permite visualizar las frecuencias y proporciones.
+
+```{r}
+#| label: grafico-contingencia
+#| fig-width: 10
+#| fig-height: 5
+
+par(mfrow = c(1, 2))
+# Gráfico de Frecuencias Absolutas
+ggplot(pto9, aes(x = as.factor(smoker), fill = as.factor(lowbwt))) +
+  geom_bar() +
+  labs(title = "Frecuencias Absolutas", x = "Madre Fumadora", y = "Conteo", fill = "Bajo Peso") +
+  theme_minimal()
+
+# Gráfico de Perfiles (Proporciones)
+ggplot(pto9, aes(x = as.factor(smoker), fill = as.factor(lowbwt))) +
+  geom_bar(position = "fill") +
+  labs(title = "Perfiles (Proporciones)", x = "Madre Fumadora", y = "Proporción", fill = "Bajo Peso") +
+  theme_minimal()
+```
+
+## Test Chi-Cuadrado ($\chi^2$) de Independencia
+
+Este test evalúa formalmente la hipótesis de independencia entre las dos variables.
+
+-   **$H_0$**: Las variables son independientes.
+-   **$H_1$**: Las variables no son independientes (están asociadas).
+-   **Estadístico**: $\chi^2 = \sum \frac{(O_{ij} - E_{ij})^2}{E_{ij}}$
+
+```{r}
+#| label: test-chi-cuadrado
+
+# Test estándar
+chi <- chisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt))
+chi
+
+# Test con simulación de Monte Carlo (recomendado cuando hay frecuencias esperadas bajas)
+chisq.test(as.factor(pto9$smoker), as.factor(pto9$lowbwt), simulate.p.value = TRUE, B = 2000)
+```
+**Conclusión**: Un p-valor > 0.05 sugiere que no hay evidencia suficiente para rechazar la hipótesis nula de independencia.
+
+## V de Cramer
+
+Mide la fuerza de la asociación (0 = sin asociación, 1 = asociación perfecta).
+
+```{r}
+#| label: v-cramer
+
+V <- sqrt(chi$statistic / (length(pto9$smoker) * min(2 - 1, 2 - 1)))
+V
+```
+
+---
+
+# Parte 2: ANOVA de una Vía
+
+Se utiliza el Análisis de Varianza (ANOVA) para comparar las medias de una variable cuantitativa (`weight`) entre tres o más grupos definidos por una variable categórica (`group`).
+
+-   **$H_0$**: Las medias de todos los grupos son iguales ($\mu_{ctrl} = \mu_{trt1} = \mu_{trt2}$).
+-   **$H_1$**: Al menos una de las medias es diferente.
+
+## 1. Lectura de Datos y Exploración
+
+Se utiliza el conjunto de datos `PlantGrowth`.
+
+```{r}
+#| label: anova-datos
+
+data <- PlantGrowth
+data$group <- factor(data$group, levels = c("ctrl", "trt1", "trt2"))
+head(data)
+```
+
+## 2. Resúmenes Estadísticos por Grupo
+
+```{r}
+#| label: anova-resumen
+
+group_by(data, group) %>%
+  summarise(
+    count = n(),
+    mean = mean(weight, na.rm = TRUE),
+    sd = sd(weight, na.rm = TRUE)
+  )
+```
+
+## 3. Diagnóstico Gráfico
+
+Se visualizan los datos para evaluar si los supuestos del ANOVA (normalidad, homocedasticidad) parecen razonables.
+
+```{r}
+#| label: anova-graficos
+
+# Boxplots
+ggboxplot(data, x = "group", y = "weight", 
+          color = "group", palette = c("#00AFBB", "#E7B800", "#FC4E07"),
+          order = c("ctrl", "trt1", "trt2"),
+          ylab = "Peso", xlab = "Tratamiento")
+
+# Gráfico de Medias con Intervalos de Confianza
+ggline(data, x = "group", y = "weight", 
+       add = c("mean_se", "jitter"), 
+       order = c("ctrl", "trt1", "trt2"),
+       ylab = "Peso", xlab = "Tratamiento")
+```
+
+## 4. Aplicación del Modelo ANOVA
+
+Se ajusta el modelo ANOVA para obtener la tabla de análisis de varianza y la prueba F.
+
+```{r}
+#| label: anova-modelo
+
+# Estimación de los efectos (tau)
+hat_mu <- mean(data$weight)
+tau_ctrl <- mean(data$weight[data$group == "ctrl"]) - hat_mu
+tau_tr1 <- mean(data$weight[data$group == "trt1"]) - hat_mu
+tau_tr2 <- mean(data$weight[data$group == "trt2"]) - hat_mu
+c(tau_ctrl, tau_tr1, tau_tr2)
+
+# Ajuste del modelo ANOVA
+res.aov <- aov(weight ~ group, data = data)
+summary(res.aov)
+```
+**Conclusión**: El p-valor (0.0159) es menor que 0.05, por lo que se rechaza la hipótesis nula. Se concluye que existe una diferencia estadísticamente significativa en el peso promedio entre al menos dos de los grupos de tratamiento.
+
+## 5. Comparaciones por Pares (Post-Hoc)
+
+Una vez que se rechaza la $H_0$ global, se realizan pruebas post-hoc para identificar qué pares de grupos son significativamente diferentes.
+
+```{r}
+#| label: anova-posthoc
+
+# Método de Tukey HSD (Honest Significant Difference)
+TukeyHSD(res.aov)
+
+# Pruebas t por pares con corrección de Bonferroni
+pairwise.t.test(data$weight, data$group, p.adjust.method = "bonferroni")
+```
+
+## 6. Validación de Supuestos del Modelo ANOVA
+
+Se verifican los supuestos del modelo sobre los residuales.
+
+### a. Homocedasticidad (Igualdad de Varianzas)
+
+-   **$H_0$**: Las varianzas de los grupos son iguales.
+
+```{r}
+#| label: anova-supuestos-homocedasticidad
+
+# Gráfico de diagnóstico
+plot(res.aov, 1)
+
+# Test de Levene (más robusto)
+leveneTest(weight ~ group, data = data)
+
+# Test de Bartlett (sensible a la no normalidad)
+bartlett.test(weight ~ group, data = data)
+```
+**Conclusión**: Los p-valores de ambos tests son grandes, por lo que no se rechaza la hipótesis de homocedasticidad.
+
+### b. Normalidad de los Residuales
+
+-   **$H_0$**: Los residuales siguen una distribución normal.
+
+```{r}
+#| label: anova-supuestos-normalidad
+
+# Gráfico Q-Q Plot
+plot(res.aov, 2)
+
+# Test de Shapiro-Wilk
+shapiro.test(res.aov$residuals)
+```
+**Conclusión**: El p-valor es grande, por lo que no se rechaza el supuesto de normalidad.
+
+## 7. Alternativa No Paramétrica: Test de Kruskal-Wallis
+
+Si los supuestos del ANOVA no se cumplen (especialmente normalidad y homocedasticidad), se puede utilizar la prueba de Kruskal-Wallis, que es su análoga no paramétrica y trabaja con los rangos de los datos.
+
+```{r}
+#| label: anova-no-parametrico
+
+kruskal.test(weight ~ group, data = data)
+```

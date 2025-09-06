@@ -1,0 +1,164 @@
+---
+title: "Modelos Generalizados Aditivos"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: false   
+---
+
+# Introducción
+
+Este documento explora los **Modelos Aditivos Generalizados (GAM)**, una extensión flexible de los modelos lineales que permite modelar la relación entre las variables predictoras y la respuesta mediante funciones de suavizado no lineales. A diferencia de un modelo lineal estándar que asume una relación lineal, un GAM modela la respuesta como una suma de funciones suaves de los predictores.
+
+El modelo tiene la forma:
+$$
+E(Y|X_1, ..., X_p) = \beta_0 + f_1(X_1) + f_2(X_2) + \dots + f_p(X_p)
+$$
+Donde $f_j()$ son funciones de suavizado no especificadas (como splines o regresiones locales) que se estiman a partir de los datos.
+
+### Librerías Requeridas
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+if (!require("interp")) {install.packages("interp")}
+library(ISLR2) # Para el conjunto de datos Wage
+library(splines) # Para splines naturales (ns)
+library(gam)     # Para la función gam()
+```
+
+### Carga de Datos
+
+Se utiliza el conjunto de datos `Wage` de la librería `ISLR2`.
+
+```{r}
+#| label: carga-datos
+
+data(Wage)
+attach(Wage) # Permite llamar a las columnas por su nombre directamente
+# View(Wage)
+```
+
+# a) Modelos Aditivos Generalizados (GAM)
+
+## Estimación de un GAM con `lm()` y Splines Naturales
+
+Un GAM puede ser aproximado usando un modelo lineal (`lm()`) donde las variables no lineales se modelan mediante **splines naturales** (`ns()`). Los splines son funciones polinómicas por tramos que se unen suavemente en puntos llamados "nodos".
+
+```{r}
+#| label: gam-con-lm
+
+# Se modela 'year' y 'age' de forma no paramétrica con splines naturales,
+# y 'education' de forma paramétrica.
+gam1 <- lm(wage ~ ns(year, df = 4) + ns(age, df = 5) + education, data = Wage)
+summary(gam1)
+```
+**Nota**: En la salida de `summary(gam1)`, solo los coeficientes de las variables paramétricas (como `education`) son directamente interpretables. Los coeficientes asociados a los splines (`ns(...)`) no tienen una interpretación sencilla.
+
+## Estimación con la Librería `gam`
+
+La forma recomendada de ajustar un GAM es con la librería `gam`, que está diseñada específicamente para este propósito. Utiliza la función `s()` para especificar términos de suavizado (en este caso, *smoothing splines*).
+
+```{r}
+#| label: gam-con-gam
+
+# s(variable, df) define un término de suavizado con 'df' grados de libertad.
+gam.m3 <- gam(wage ~ s(year, 4) + s(age, 5) + education, data = Wage)
+summary(gam.m3)
+```
+**Nota**: La salida de `summary.gam` no muestra los coeficientes de los términos no paramétricos, ya que no son el foco de la interpretación. En su lugar, proporciona una tabla de ANOVA para evaluar la significancia de cada término.
+
+# b) Interpretación Gráfica del GAM
+
+La principal herramienta para interpretar un GAM es la visualización de las funciones de suavizado estimadas para cada predictor. Los gráficos muestran la forma de la relación entre cada predictor y la respuesta, manteniendo constantes las demás variables.
+
+```{r}
+#| label: interpretacion-grafica
+#| fig-width: 10
+#| fig-height: 4
+
+par(mfrow = c(1, 3))
+# Gráfico de los efectos parciales del modelo ajustado con gam()
+plot(gam.m3, se = TRUE, col = "blue")
+```
+
+# c) Comparación de Modelos con `anova()`
+
+Se utiliza la prueba F para comparar formalmente la bondad de ajuste de modelos anidados con diferentes especificaciones para la variable `year`.
+
+1.  **Modelo 1**: Sin `year`.
+2.  **Modelo 2**: Con `year` como término lineal (paramétrico).
+3.  **Modelo 3**: Con `year` como término de suavizado (no paramétrico).
+
+```{r}
+#| label: comparacion-modelos
+
+gam.m1 <- gam(wage ~ s(age, 5) + education, data = Wage)
+gam.m2 <- gam(wage ~ year + s(age, 5) + education, data = Wage)
+
+# Prueba F para comparar los tres modelos anidados
+anova(gam.m1, gam.m2, gam.m3, test = "F")
+```
+**Interpretación del `anova()`**:
+-   La primera fila (p-valor < 0.001) compara el Modelo 1 con el Modelo 2. Se rechaza $H_0$, lo que significa que incluir `year` de forma lineal mejora significativamente el modelo.
+-   La segunda fila (p-valor = 0.348) compara el Modelo 2 con el Modelo 3. No se rechaza $H_0$, lo que sugiere que modelar `year` con una función de suavizado no lineal no ofrece una mejora significativa sobre el simple término lineal. Por lo tanto, el **Modelo 2 es el preferido** por ser más parsimonioso.
+
+# d) Análisis de la Salida del Modelo `gam`
+
+La salida de `summary.gam` proporciona dos tablas de ANOVA: una para los términos paramétricos y otra para los no paramétricos.
+
+```{r}
+#| label: analisis-summary
+
+summary(gam.m3)
+```
+**Interpretación del `summary.gam(gam.m3)`**:
+-   **Anova for Parametric Effects**: Muestra la significancia de los términos lineales (`education`). El p-valor pequeño indica que `education` es un predictor significativo.
+-   **Anova for Nonparametric Effects**:
+    -   La columna `p-value(Linear)` prueba la hipótesis $H_0$: "La relación es lineal". Para `s(year, 4)`, el p-valor (0.348) es grande, sugiriendo que un efecto lineal es suficiente.
+    -   La columna `p-value(Nonlinear)` prueba la hipótesis $H_0$: "La relación es nula". Para `s(age, 5)`, el p-valor (< 0.001) es pequeño, indicando que `age` tiene un efecto no lineal significativo.
+
+# e) Predicción con el Modelo GAM
+
+Una vez seleccionado el mejor modelo (en este caso, `gam.m2`), se puede utilizar para realizar predicciones.
+
+```{r}
+#| label: prediccion
+
+preds <- predict(gam.m2, newdata = Wage)
+plot(preds, Wage$wage, xlab = "Valores Predichos", ylab = "Valores Observados", main="Predicciones vs. Observaciones")
+abline(0, 1, col = "red", lwd = 2) # Línea de identidad (ajuste perfecto)
+```
+
+# f) Uso de Regresión Local (LOESS) en GAM
+
+En lugar de splines, se puede usar regresión local (`lo()`) como función de suavizado. El parámetro `span` controla el ancho de banda (el porcentaje de datos vecinos utilizados en cada ajuste local).
+
+```{r}
+#| label: gam-con-loess
+
+gam.lo <- gam(wage ~ s(year, df = 4) + lo(age, span = 0.7) + education, data = Wage)
+# x11() # Descomentar para ver en una ventana separada
+plot.Gam(gam.lo, se = TRUE, col = "green")
+```
+
+# g) Introducción de un Término de Interacción No Paramétrico
+
+Los GAM también pueden modelar interacciones entre predictores de forma no paramétrica, utilizando funciones de suavizado bivariadas (ej. `lo(year, age)`).
+
+```{r}
+#| label: gam-con-interaccion
+
+gam.lo.i <- gam(wage ~ s(year, df = 4) + lo(age, span = 0.7) + lo(year, age, span = 0.5) + education, data = Wage)
+summary(gam.lo.i)
+
+# La visualización de interacciones bivariadas produce un gráfico de contorno o perspectiva.
+plot.Gam(gam.lo.i, se = TRUE, col = "orange")
+```
+**Interpretación**: La salida de `summary` y la prueba de ANOVA para los efectos no paramétricos indican que el término de interacción `lo(year, age)` es altamente significativo y no lineal, sugiriendo que la relación entre la edad y el salario cambia a lo largo de los años.

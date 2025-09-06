@@ -1,0 +1,170 @@
+---
+title: "Taller 1"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: false
+---
+
+# Introducción
+
+Este documento presenta un análisis estadístico para explorar las relaciones entre diversas variables, incluyendo el hábito de fumar de los padres, el peso del bebé al nacer y las semanas de gestación. Se aplican técnicas de regresión lineal, análisis de tablas de contingencia y se prepara el terreno para un análisis de varianza (ANOVA).
+
+### Librerías Requeridas
+
+Se cargan únicamente los paquetes necesarios para la ejecución de este análisis.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(readxl)
+library(boot)      # Para bootstrapping
+library(RcmdrMisc) # Para análisis de tablas de contingencia
+library(ggplot2)
+library(lsr)       # Para el coeficiente V-Cramer
+```
+
+### Carga de Datos
+
+Se leen los datos desde un archivo Excel. Para que este código funcione, el archivo `dataset_trabajo1.xlsx` debe encontrarse en el mismo directorio que este documento Quarto.
+
+```{r}
+#| label: carga-datos
+
+dataset <- read_excel("dataset_trabajo1.xlsx")
+attach(dataset) # Permite llamar a las columnas por su nombre directamente
+
+# Preparación del data frame para el Ejercicio 1
+cig.dad <- dataset$fnocig 
+cig.mom <- dataset$mnocig 
+padres.cig <- data.frame(cig.mom, cig.dad)
+head(padres.cig)
+```
+
+# EJERCICIO 1
+
+# A. Correlación entre el Fumar de los Padres (con Remuestreo)
+
+Se evalúa la correlación lineal entre el número de cigarrillos fumados por la madre y el padre. El coeficiente de correlación de Pearson, $r$, se define como:
+$$
+r_{xy} = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n}(x_i - \bar{x})^2 \sum_{i=1}^{n}(y_i - \bar{y})^2}}
+$$
+Se utiliza **bootstrapping** (remuestreo) para evaluar la significancia de esta correlación de manera no paramétrica. La idea es generar múltiples muestras con reemplazo de los datos originales y calcular la correlación para cada una, creando una distribución empírica del estadístico.
+
+```{r}
+#| label: punto-a
+
+# Ajuste del modelo de regresión lineal (para referencia)
+fit <- lm(cig.dad ~ 1 + cig.mom, data = padres.cig)
+summary(fit)
+
+# Correlación observada
+correlation <- cor(cig.mom, cig.dad)
+
+# Función para calcular la correlación en muestras bootstrap
+boot_corr <- function(data, indices) {
+  d <- data[indices, ]
+  return(cor(d$cig.mom, d$cig.dad))
+}
+
+# Ejecución del bootstrapping con 1000 replicaciones
+set.seed(123) # Para reproducibilidad
+boot_result <- boot(padres.cig, boot_corr, R = 1000)
+
+# Cálculo de un estadístico Z simple y su p-valor
+statistic <- (correlation - mean(boot_result$t)) / sd(boot_result$t)
+p_value <- pnorm(statistic, lower.tail = FALSE)
+
+# Decisión basada en el p-valor
+if (p_value < 0.05) {
+  print("Se rechaza la hipótesis nula de no correlación.")
+} else {
+  print("No se rechaza la hipótesis nula de no correlación.")
+}
+```
+
+# B. Tablas de Contingencia, Test Chi-Cuadrado y V de Cramer
+
+Se analiza la relación entre dos variables categóricas: si la madre fuma (`smoker`) y si el bebé nace con bajo peso (`lowbwt`).
+
+## Tablas de Contingencia
+
+Estas tablas resumen las frecuencias conjuntas, marginales y condicionales (perfiles) de las dos variables.
+
+```{r}
+#| label: punto-b-tablas
+
+madre.fuma <- smoker
+bebe.peso <- lowbwt
+tab <- data.frame(madre.fuma, bebe.peso)
+
+# Creación de la tabla de contingencia
+Table <- xtabs(~madre.fuma + bebe.peso)
+
+# Frecuencias Absolutas con totales
+addmargins(Table)
+# Frecuencias Relativas (porcentajes sobre el total)
+totPercents(Table)
+# Perfiles Fila (distribución del peso del bebé para cada categoría de madre)
+rowPercents(Table)
+# Perfiles Columna (distribución de madre fumadora para cada categoría de peso)
+colPercents(Table)
+```
+
+## Test Chi-Cuadrado de Independencia
+
+Este test evalúa si existe una asociación estadísticamente significativa entre las dos variables.
+-   **$H_0$**: Las variables son independientes.
+-   **$H_1$**: Las variables no son independientes.
+El estadístico de prueba es:
+$$
+\chi^2 = \sum_{i,j} \frac{(O_{ij} - E_{ij})^2}{E_{ij}}
+$$
+
+```{r}
+#| label: punto-b-test
+
+# Test Chi-cuadrado. Se usa simulación por el bajo número de observaciones.
+chisq.test(as.factor(madre.fuma), as.factor(bebe.peso), simulate.p.value = TRUE, B = 2000)
+```
+**Interpretación**: Un p-valor > 0.05 sugiere que no hay evidencia suficiente para rechazar la hipótesis nula de independencia.
+
+## V de Cramer
+
+Este coeficiente mide la fuerza de la asociación entre dos variables categóricas, variando de 0 (sin asociación) a 1 (asociación perfecta).
+$$
+V = \sqrt{\frac{\chi^2}{n \cdot \min(r-1, c-1)}}
+$$
+Donde $n$ es el tamaño total de la muestra, $r$ el número de filas y $c$ el número de columnas.
+
+```{r}
+#| label: punto-b-cramer
+
+cramersV(madre.fuma, bebe.peso)
+```
+**Interpretación**: Un valor de V cercano a 0 indica una asociación muy débil.
+
+# C. Preparación para ANOVA
+
+Se prepara el `data.frame` para realizar un Análisis de Varianza (ANOVA), que se utilizaría para comparar la media de una variable cuantitativa (`gestacion`) a través de los grupos definidos por una variable categórica (`raza`).
+
+-   **$H_0$**: Las medias de las semanas de gestación son iguales en todos los grupos raciales ($\mu_1 = \mu_2 = ... = \mu_k$).
+-   **$H_1$**: Al menos una de las medias es diferente.
+
+```{r}
+#| label: punto-c-anova
+
+raza <- race
+gestacion <- Gestation
+raza.gestion <- data.frame(raza, gestacion)
+
+# El siguiente paso sería ajustar y analizar el modelo ANOVA, por ejemplo:
+# anova_model <- aov(gestacion ~ as.factor(raza), data = raza.gestion)
+# summary(anova_model)
+```

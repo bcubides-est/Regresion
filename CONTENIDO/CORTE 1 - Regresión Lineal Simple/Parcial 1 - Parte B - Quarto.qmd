@@ -1,0 +1,201 @@
+---
+title: "Parcial 1 - Parte B"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: false 
+---
+
+# Introducción
+
+Este documento detalla el proceso completo de ajuste y validación de un modelo de Regresión Lineal Simple. Se utiliza un conjunto de datos sobre el peso de ratas sometidas a un tratamiento para ilustrar la estimación de parámetros, el cálculo de intervalos de predicción, la evaluación de la bondad de ajuste ($R^2$) y la validación rigurosa de los supuestos del modelo.
+
+### Librerías Requeridas
+
+Se cargan los paquetes necesarios para el análisis.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(MASS)
+library(lmtest)
+library(tseries)
+library(readxl)
+```
+
+### Carga de Datos
+
+Se leen los datos y se asignan las variables de interés.
+
+```{r}
+#| label: carga-datos
+
+ratas <- read_excel("ratas.xlsx")
+Peso <- ratas$Peso 
+Tratamiento <- ratas$Tratamiento
+head(ratas)
+```
+
+# Estimación e Interpretación de los Parámetros del Modelo
+
+Se ajusta un modelo de Regresión Lineal Simple de la forma:
+$$
+\text{Peso}_i = \beta_0 + \beta_1 \cdot \text{Tratamiento}_i + \epsilon_i
+$$
+Donde `Tratamiento` es una variable binaria (0 = Control, 1 = Tratado).
+
+## Ajuste del Modelo con `lm()`
+
+La función `lm()` de R estima los coeficientes $\beta_0$ y $\beta_1$ por Mínimos Cuadrados Ordinarios (MCO).
+
+```{r}
+#| label: ajuste-modelo
+
+fit <- lm(Peso ~ 1 + Tratamiento, data = ratas)
+summary(fit)
+```
+**Interpretación**:
+-   **Intercept ($\hat{\beta}_0$)**: `r round(coef(fit)[1], 2)` es el peso promedio estimado para el grupo de control (Tratamiento = 0).
+-   **Tratamiento ($\hat{\beta}_1$)**: `r round(coef(fit)[2], 2)` es el cambio promedio estimado en el peso para el grupo tratado en comparación con el grupo de control.
+
+## Cálculo Manual de los Estimadores
+
+Los coeficientes pueden calcularse manualmente usando las fórmulas clásicas:
+$$
+\hat{\beta}_1 = r_{xy} \frac{S_y}{S_x} \quad | \quad \hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}
+$$
+
+```{r}
+#| label: calculo-manual
+
+cor <- cor(Peso, Tratamiento)
+s_y <- sd(Peso)
+s_x <- sd(Tratamiento)
+b1_hat <- cor * s_y / s_x
+b0_hat <- mean(Peso) - b1_hat * mean(Tratamiento)
+
+# Estimador de la varianza del error (sigma^2)
+n <- length(Peso)
+y_hat <- b0_hat + b1_hat * Tratamiento
+sigma2_hat <- sum((Peso - y_hat)^2) / (n - 2)
+```
+
+# Intervalo de Predicción
+
+Un intervalo de predicción estima el rango en el que se espera que caiga una **nueva observación individual**, $Y_{new}$, para un valor dado de $X_{new}$.
+
+La fórmula para un intervalo de predicción al $100(1-\alpha)\%$ es:
+$$
+\hat{Y}_{new} \pm t_{(1-\alpha/2, n-2)} \cdot \sqrt{\hat{\sigma}^2 \left(1 + \frac{1}{n} + \frac{(X_{new} - \bar{x})^2}{\sum(x_i - \bar{x})^2}\right)}
+$$
+
+Calculamos el intervalo de predicción para una nueva rata tratada (`Tratamiento = 1`).
+
+```{r}
+#| label: intervalo-prediccion
+
+alpha <- 0.05
+n <- length(Tratamiento)
+x_new <- 1
+
+# El cálculo de la varianza del error de predicción se simplifica usando la matriz de varianza-covarianza
+mu <- coef(fit) + coef(fit) * x_new
+var_pred <- sigma(fit)^2 * (1 + 1/n + (x_new - mean(Tratamiento))^2 / ((n-1)*var(Tratamiento)))
+# El código original usaba la varianza del valor esperado, aquí se corrige para el intervalo de predicción
+Li <- mu - qt(1 - alpha/2, n - 2) * sqrt(var_pred)
+Ls <- mu + qt(1 - alpha/2, n - 2) * sqrt(var_pred)
+
+names(Li) <- "Límite Inferior"
+names(Ls) <- "Límite Superior"
+cbind(Li, Ls)
+```
+
+# Coeficiente de Determinación ($R^2$)
+
+El $R^2$ mide la proporción de la variabilidad total en la variable respuesta (`Peso`) que es explicada por el modelo de regresión.
+$$
+R^2 = 1 - \frac{SCE}{SCT} = 1 - \frac{\sum(y_i - \hat{y}_i)^2}{\sum(y_i - \bar{y})^2}
+$$
+
+```{r}
+#| label: r-cuadrado
+
+SC_Tot <- sum((Peso - mean(Peso))^2)
+SC_residuales <- sum(fit$residuals^2)
+R_2 <- 1 - SC_residuales / SC_Tot
+R_2
+```
+**Interpretación**: Un `r round(R_2*100, 1)`% de la variabilidad en el peso de las ratas es explicada por la variable `Tratamiento`.
+
+# Validación del Modelo
+
+Se verifican los supuestos clave del modelo de regresión lineal sobre los residuales ($\epsilon_i = y_i - \hat{y}_i$).
+
+```{r}
+#| label: validacion-setup
+residuals <- fit$residuals
+y_hat <- fit$fitted.values
+```
+
+## a. Media de los Residuos es Cero y No Relación con las Variables
+
+Se verifica que $E[\epsilon_i]=0$ y que los residuos no tengan patrones sistemáticos con las variables.
+
+```{r}
+#| label: validacion-media-cero
+
+# Gráfico de residuales vs. Y y vs. X
+par(mfrow = c(1, 2))
+plot(Peso, residuals, main = "Residuales vs. Peso")
+plot(Tratamiento, residuals, main = "Residuales vs. Tratamiento")
+par(mfrow = c(1, 1))
+
+# La media de los residuales es cero por construcción en MCO
+mean(residuals)
+
+# Prueba t para H0: media de los residuos = 0
+t.test(residuals, mu = 0, alternative = "two.sided")
+```
+**Conclusión**: El p-valor es 1, por lo que no se rechaza que la media de los residuos sea cero. Los gráficos no muestran patrones evidentes.
+
+## b. Varianza Constante (Homocedasticidad)
+
+Se verifica que la varianza de los errores, $Var(\epsilon_i) = \sigma^2$, es constante para todos los niveles de $X$.
+
+```{r}
+#| label: validacion-homocedasticidad
+
+# Gráfico de residuales vs. valores ajustados
+plot(y_hat, residuals, main = "Residuales vs. Valores Ajustados")
+
+# Prueba de Breusch-Pagan para H0: Varianza constante (homocedasticidad)
+bptest(Peso ~ 1 + Tratamiento, data = ratas)
+```
+**Conclusión**: El p-valor alto (0.81) indica que no se rechaza la hipótesis nula. Se asume que la varianza es constante.
+
+## d. Distribución Normal de los Residuos
+
+Se verifica que los errores siguen una distribución normal, $\epsilon_i \sim N(0, \sigma^2)$.
+
+```{r}
+#| label: validacion-normalidad
+
+# Gráficos de diagnóstico
+par(mfrow = c(1, 2))
+hist(residuals, main = "Histograma de Residuales")
+qqnorm(residuals, main = "Q-Q Plot de Residuales")
+qqline(residuals, col = "red")
+par(mfrow = c(1, 1))
+
+# Pruebas de normalidad
+# H0: Los datos provienen de una distribución normal
+jarque.bera.test(residuals)
+shapiro.test(residuals)
+```
+**Conclusión**: Los p-valores de ambas pruebas son grandes (0.50 y 0.44), por lo que no se rechaza la hipótesis nula de normalidad. Los gráficos también apoyan este supuesto. El modelo se considera válido.

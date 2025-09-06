@@ -1,0 +1,306 @@
+---
+title: "Intro a analizar Base de Datos, y gráficos"
+author: "Brayan Cubides"
+toc: true
+toc-location: right
+toc-depth: 2
+#number-sections: true
+code-tools: true
+lightbox: true
+self-contained: true   
+---
+
+## Cargando los Paquetes
+
+Se inicia el análisis instalando (si es necesario) y cargando todas las librerías que se utilizarán a lo largo del documento.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(readxl) 
+library(psych) 
+library(tidyverse)
+library(epiDisplay)
+library(ggplot2)
+library(ggrepel)
+library(qcc)
+library(fBasics)
+library(RcmdrMisc)
+library(aplpack)
+```
+
+## Lectura de Base de Datos
+
+Se establece el directorio de trabajo y se leen los datos desde un archivo de Excel.
+**Nota**: Para una mejor portabilidad del código, se recomienda el uso de **Proyectos de RStudio**, que establecen el directorio de trabajo automáticamente en la carpeta del proyecto.
+
+```{r}
+#| label: lectura-datos
+
+Escuelas <- read_excel("Datos_informe.xlsx")
+```
+
+## Exploración del Set de Datos
+
+Se realiza una revisión inicial del conjunto de datos para entender su estructura, dimensiones y el tipo de cada variable.
+
+```{r}
+#| label: exploracion-inicial
+
+# View(Escuelas) # Para ver la base de datos, no ejecutar si es muy grande
+head(Escuelas, 10) # Muestra las primeras 10 filas
+tail(Escuelas, 10) # Muestra las ultimas 10 filas
+
+# Usando el pipe (%>%) para encadenar operaciones
+Escuelas %>% head(10)
+Escuelas %>% tail(5) %>% summary()
+```
+
+### Tipos de variables y conversión
+
+Se verifica la estructura y se convierten las columnas al tipo de dato apropiado (en este caso, a `factor` para las variables categóricas).
+
+```{r}
+#| label: conversion-variables
+
+Escuelas %>% str() # Da el resumen de la tabla
+Escuelas %>% dim() # Dimensión de la tabla
+Escuelas %>% colnames() # Muestra el Nombre de las columnas
+
+# Conversión de columnas a tipo factor
+Escuelas[,c(1,2,3,10,11,12)] <- lapply(Escuelas[,c(1,2,3,10,11,12)], as.factor)
+
+# Se recodifican los niveles de la variable 'Experiencia'
+levels(Escuelas$Experiencia) <- c("No","Si")
+
+# Se consultan las categorías únicas de la variable 'Pais'
+Escuelas %>% distinct(Pais)
+```
+
+## 1. Análisis de Variables Cualitativas
+
+### 1.1 Tablas de Frecuencia
+
+Se generan tablas para resumir las frecuencias absolutas y relativas de las variables categóricas.
+
+```{r}
+#| label: tablas-frec-cualitativas
+
+Escuelas %>% count(Pais) # Muestra las frecuencias absolutas
+table(Escuelas$Pais) # Da la tabla de frecuencias sencilla
+
+# Tabla de frecuencias completa con porcentajes y acumulados
+tab1(Escuelas$Pais, graph=FALSE)
+```
+
+### 1.2 Gráficos
+
+Se utilizan diferentes tipos de gráficos para visualizar la distribución de las variables cualitativas.
+
+#### Diagrama de barras a color
+```{r}
+#| label: grafico-barras
+
+Escuelas %>% ggplot(aes(Pais)) +
+  geom_bar(color="black", fill=rainbow(length(levels(Escuelas$Pais)))) +
+  ggtitle("Diagrama de barras de país") +
+  labs(x="país", y="Frec. Absoluta") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 30, size = 8))
+```
+
+#### Diagrama de torta más elaborado
+```{r}
+#| label: grafico-torta
+
+Escuelas2 <- Escuelas %>% count(Pais) # Cuenta las frecuencias de país
+Escuelas2$n <- Escuelas2$n * 100 / sum(Escuelas2$n) # Saca el porcentaje de cada parte
+
+Escuelas3 <- Escuelas2 %>% 
+  mutate(csum = rev(cumsum(rev(n))), 
+         pos = n/2 + lead(csum, 1),
+         pos = if_else(is.na(pos), n/2, pos))
+
+ggplot(Escuelas2, aes(x = "" , y = n, fill = fct_inorder(Pais))) +
+  geom_col(width = 1, color = 1) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Pastel1") +
+  geom_label_repel(data = Escuelas3,
+                   aes(y = pos, label = paste0(round(n, 1), "%")),
+                   size = 4.5, nudge_x = 1, show.legend = FALSE) +
+  guides(fill = guide_legend(title = "País")) +
+  theme_void()
+```
+
+#### Diagrama de Pareto
+```{r}
+#| label: grafico-pareto
+
+pareto.chart(table(Escuelas$Pais), main="Diagrama de Pareto de País")
+```
+
+## 2. Análisis de Variables Cuantitativas
+
+### 2.1 Tablas de Frecuencia
+
+Para variables continuas, es necesario agrupar los datos en intervalos para crear tablas de frecuencia.
+
+```{r}
+#| label: tablas-frec-cuantitativas
+
+library(fdth)
+# Si toma muchos valores, es mejor hacer una tabla de datos agrupados
+# Se utiliza la regla de Sturges para definir los intervalos.
+Tabla_frec <- fdt(Escuelas$Costo_local, breaks = "Sturges")
+Tabla_frec
+```
+
+### 2.2 Gráficos
+
+#### Histogramas
+El histograma es la herramienta gráfica principal para visualizar la distribución de una variable cuantitativa.
+
+```{r}
+#| label: grafico-histograma
+
+Escuelas %>% ggplot(aes(x = Costo_local)) +
+  geom_histogram(fill = "gray", color = "black", bins = 1 + floor(log2(length(Escuelas$Costo_local)))) + # Regla de Sturges
+  ggtitle("Histograma de costo local") +
+  labs(x = "Costo (US$)", y = "Frecuencia") +
+  theme_minimal()
+```
+
+#### Boxplot
+El diagrama de caja o boxplot resume la distribución a través de sus cuartiles e identifica valores atípicos.
+
+```{r}
+#| label: grafico-boxplot
+
+boxplot(Escuelas$Insc_t_completo, horizontal = TRUE, main = "Diagrama de caja de los alumnos por profesor", xlab = "Alumnos/profesor")
+```
+
+### 2.3 Estadísticas de los datos
+
+Se calculan diversas medidas de resumen para describir las variables cuantitativas.
+
+```{r}
+#| label: medidas-resumen
+
+# Medidas de tendencia central y dispersión
+mean(Escuelas$Insc_t_completo) 
+median(Escuelas$Insc_t_completo)
+sd(Escuelas$Insc_t_completo)
+max(Escuelas$Insc_t_completo)
+min(Escuelas$Insc_t_completo)
+
+# Medidas de posición (Cuantiles)
+# Cuartiles
+quantile(x = Escuelas$Insc_t_completo, probs = seq(0, 1, by = 1/4))
+# Deciles
+quantile(Escuelas$Insc_t_completo, probs = seq(0, 1, 1/10))
+# Percentiles
+quantile(Escuelas$Insc_t_completo, probs = 0.95)
+
+# Resumen estadístico completo
+summary(Escuelas)
+basicStats(Escuelas$Insc_t_completo)
+```
+
+## 3. Análisis de Pares de Variables
+
+### 3.1 Dos Variables Cualitativas
+
+#### Tablas de Contingencia
+Se utilizan para explorar la relación entre dos variables categóricas, mostrando frecuencias conjuntas y perfiles.
+
+```{r}
+#| label: bivariado-cualitativo
+
+Table <- xtabs(~Ex_Ingles + GMAT, data = Escuelas)
+addmargins(Table) #Frec. Absolutas
+# totPercents(Table) #Frec. Relativas
+rowPercents(Table) #Perfiles fila
+colPercents(Table) #Perfiles columna
+
+# Gráfico de barras apiladas para perfiles
+ggplot(Escuelas, aes(x = Pais, fill = GMAT)) +
+  geom_bar(position = "fill") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 30, size = 8))
+```
+
+### 3.2 Una Cualitativa y otra Cuantitativa
+
+#### Boxplots por categorías
+Permiten comparar la distribución de una variable cuantitativa a través de las categorías de una variable cualitativa.
+
+```{r}
+#| label: bivariado-cuali-cuanti-boxplot
+
+Escuelas %>% ggplot(aes(x = Pais, y = Costo_local)) +
+  geom_boxplot() +
+  ggtitle("Boxplot de costo local segmentado por país") +
+  labs(x = "país", y = "Costo local") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 30, size = 8))
+```
+
+#### Histogramas por categorías
+Permiten visualizar la forma de la distribución de la variable cuantitativa para cada categoría.
+```{r}
+#| label: bivariado-cuali-cuanti-hist
+
+Escuelas %>% ggplot(aes(x = Costo_extranjero)) +
+  geom_histogram(fill = "gray", color = "black", bins = 4) +
+  ggtitle("Histograma de costo extranjero") +
+  labs(x = "Costo US$", y = "Frecuencia") +
+  facet_wrap(~Experiencia) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+### 3.3 Dos variables cuantitativas
+
+#### Coeficiente de correlación
+Mide la fuerza y dirección de la relación lineal entre dos variables cuantitativas.
+```{r}
+#| label: bivariado-cuantitativo-cor
+
+cor(Escuelas$Costo_local, Escuelas$Costo_extranjero)
+```
+
+#### Diagrama de dispersión
+Visualiza la relación entre dos variables cuantitativas. Se pueden añadir otras variables a través del color o el tamaño.
+```{r}
+#| label: bivariado-cuantitativo-scatter
+
+ggplot(Escuelas, aes(x = Costo_local, y = Costo_extranjero, col = GMAT, size = Alumnos_facultad)) +
+  geom_point() +
+  labs(title = "Relación costo local vs extranjero", x = "Costo local", y = "Costo extranjero") + theme_gray()
+```
+
+## 4. Opcional: Gráficos Multivariados
+
+### Diagrama de estrellas o de radar
+Visualiza múltiples variables cuantitativas para cada observación.
+
+```{r}
+#| label: opcional-estrellas
+
+subset <- as.data.frame(cbind(Escuelas$Insc_t_completo, Escuelas$Edad, Escuelas$Costo_local, Escuelas$Alumnos_facultad))
+colnames(subset) <- c("Insc", "Edad", "cost_l", "al_pr")
+rownames(subset) <- as.factor(Escuelas$Cod)
+
+stars(subset[1:10, ], key.loc = c(10, 5), draw.segments = TRUE)
+```
+
+### Caras de Chernoff
+Mapea variables multivariadas a características de un rostro humano.
+```{r}
+#| label: opcional-chernoff
+
+a <- faces(subset[1:10, ], face.type = 1)
+plot.faces(a)
+```
